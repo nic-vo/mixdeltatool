@@ -1,12 +1,20 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth';
+
 import { authOptions } from '@lib/auth/options';
 import { routeKeyRetriever } from '@lib/auth/accessKey';
 
-import type {
-	SpotifyUserPlaylistsResponse,
-	MySpotifyPlaylistResponse
-} from '@lib/types/spotify';
+import { SPOT_PLAYLIST_ITER_INT } from '@consts/spotify';
+
+import {
+	MySpotifyAPIRouteResponse,
+	MySpotifyPlaylistObject,
+	SpotifyPlaylistObject,
+	SpotifyUserPlaylistsResponse
+} from '@components/spotify/types';
+
+
+
 
 // The assumption for this route is that every sign-on refreshes access token
 // Session never updates, and only exists until access token expiry
@@ -33,22 +41,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 			'https://api.spotify.com/v1/me/playlists',
 			{
 				headers: headers
-			})
+			});
 		if (rawSpotify.ok === false) {
 			const jsoned = await rawSpotify.json();
 			console.log(jsoned)
 			throw new Error;
 		}
-		const jsoned = await rawSpotify.json();
-		const items: SpotifyUserPlaylistsResponse[] = jsoned.items;
-		const returnItems = items.map(item => {
-			const { id, images, name, owner, tracks, href } = item;
-			const returner: MySpotifyPlaylistResponse = {
-				id, image: images[0], name, owner, tracks, href
-			};
-			console.log(returner);
-			return returner;
-		});
+		const jsoned = await rawSpotify.json() as SpotifyUserPlaylistsResponse;
+		const { next, total } = jsoned;
+		const items: SpotifyPlaylistObject[] = jsoned.items;
+		const returnItems: MySpotifyAPIRouteResponse = {
+			next, total,
+			playlists: items.map(item => {
+				const { id, images, name, owner, tracks } = item;
+				const returner: MySpotifyPlaylistObject = {
+					id, image: images[0], name, owner, tracks
+				};
+				return returner;
+			})
+		};
 		return res.status(200).json(returnItems);
 	} catch {
 		return res.status(501).json({ error: 'There was a spotify error' })
