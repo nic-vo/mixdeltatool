@@ -26,7 +26,7 @@ function PlaylistProvider(props: { children: React.ReactNode }) {
 	const getUserPlaylistsHandler = async () => {
 		setLoading(true);
 		try {
-			const raw = await fetch('/api/spotify/getPlaylists');
+			const raw = await fetch('/api/spotify/getUserPlaylists');
 			if (raw.ok === false) {
 				const jsoned = await raw.json();
 				throw jsoned.error;
