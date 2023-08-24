@@ -1,34 +1,15 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# SuperUser Actions
 
-## Getting Started
+Welcome! For now this is a Spotify-only tool and it'll probably remain that way for a while.
 
-First, run the development server:
+This will essentially be a glorified playlist cleanup / diffing / combining tool.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+## Changelog (the commit history sucks because this started out as an experiment)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 0.2.0
+  - Begin to reduce the amount of data returned to user from Spotify API through the handler
+  - Begin to compartmentalize state related to playlists
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+### 0.1.0
+  - Initial commit
+  - Next-auth + small modifications to the signIn flow to allow for API interaction
