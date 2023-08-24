@@ -14,8 +14,8 @@ export default function SpotifyDialogue(props: { user: User }) {
 	const { name, email, image } = props.user;
 	const { error,
 		loading,
-		getPlaylistsHandler,
-		playlists } = useContext(PlaylistContext);
+		getUserPlaylistsHandler,
+		userPlaylists } = useContext(PlaylistContext);
 
 	return (
 		<>
@@ -23,13 +23,13 @@ export default function SpotifyDialogue(props: { user: User }) {
 			{image !== null && <img src={image} alt='' />}
 			<button onClick={() => signOut()}>Sign out</button>
 			<button
-				onClick={getPlaylistsHandler}
+				onClick={getUserPlaylistsHandler}
 				disabled={loading}>Get Playlists</button>
 			{error && <p>{error}</p>}
-			{playlists !== null &&
-				playlists !== undefined && (
+			{userPlaylists !== null &&
+				userPlaylists !== undefined && (
 					<ul>
-						{playlists.map((playlist) => {
+						{userPlaylists.map((playlist) => {
 							return (
 								<li key={playlist.id}>
 									{playlist.image !== undefined
