@@ -1,8 +1,7 @@
 import type { User } from 'next-auth';
 import { signIn, signOut } from 'next-auth/react';
-import usePlaylists from '../hooks/playlists';
-
-import type { MySpotifyPlaylistResponse } from '@lib/types/spotify';
+import { PlaylistContext } from './playlistProvider';
+import { useContext } from 'react';
 
 export default function SpotifyDialogue(props: { user: User }) {
 	if (!props.user) return (
@@ -13,7 +12,10 @@ export default function SpotifyDialogue(props: { user: User }) {
 	);
 
 	const { name, email, image } = props.user;
-	const { error, loading, getPlaylistsHandler, playlists } = usePlaylists();
+	const { error,
+		loading,
+		getPlaylistsHandler,
+		playlists } = useContext(PlaylistContext);
 
 	return (
 		<>
@@ -24,21 +26,22 @@ export default function SpotifyDialogue(props: { user: User }) {
 				onClick={getPlaylistsHandler}
 				disabled={loading}>Get Playlists</button>
 			{error && <p>{error}</p>}
-			{playlists !== null && (
-				<ul>
-					{playlists.map((playlist) => {
-						return (
-							<li key={playlist.id}>
-								{playlist.image !== undefined
-									&& playlist.image.url !== undefined
-									&& <img src={playlist.image.url} alt='' />}
-								<p>{playlist.name}</p>
-								<p>{playlist.owner.display_name}</p>
-							</li>
-						)
-					})}
-				</ul>
-			)}
+			{playlists !== null &&
+				playlists !== undefined && (
+					<ul>
+						{playlists.map((playlist) => {
+							return (
+								<li key={playlist.id}>
+									{playlist.image !== undefined
+										&& playlist.image.url !== undefined
+										&& <img src={playlist.image.url} alt='' />}
+									<p>{playlist.name}</p>
+									<p>{playlist.owner.display_name}</p>
+								</li>
+							)
+						})}
+					</ul>
+				)}
 		</>
 	);
 };

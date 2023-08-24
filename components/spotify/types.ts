@@ -1,8 +1,14 @@
-import type { DefaultUser } from 'next-auth'
-import type { AdapterAccount } from 'next-auth/adapters'
-import type { SpotifyProfile } from 'next-auth/providers/spotify'
-
 export interface SpotifyUserPlaylistsResponse {
+	href: string,
+	limit: number
+	offset: number,
+	previous: null | string,
+	next: null | string,
+	total: number
+	items: SpotifyPlaylistObject[]
+}
+
+export interface SpotifyPlaylistObject {
 	collaborative: boolean,
 	description: string | null,
 	external_urls: string[],
@@ -13,10 +19,7 @@ export interface SpotifyUserPlaylistsResponse {
 	owner: SpotifyUser,
 	public: boolean,
 	snapshot_id: string,
-	tracks: {
-		href: string,
-		total: number
-	},
+	tracks: { href: string, total: number },
 	type: string,
 	uri: string
 }
@@ -37,14 +40,12 @@ export interface SpotifyUser {
 	display_name: string | null
 }
 
-export interface MySpotifyPlaylistResponse {
-	id: string,
-	image: SpotifyImageObject,
-	name: string,
-	owner: SpotifyUser,
-	tracks: {
-		href: string,
-		total: number
-	},
-	href: string
+export interface MySpotifyPlaylistObject extends
+	Pick<SpotifyPlaylistObject, 'id' | 'name' | 'owner' | 'tracks'> {
+	image: SpotifyImageObject
+}
+
+export interface MySpotifyAPIRouteResponse extends
+	Pick<SpotifyUserPlaylistsResponse, 'next' | 'total'> {
+	playlists: MySpotifyPlaylistObject[]
 }
