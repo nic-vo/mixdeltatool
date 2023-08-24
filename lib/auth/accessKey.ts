@@ -1,7 +1,7 @@
 import mongoosePromise, { Account } from '@lib/database/mongoose';
 import type { Account as AccountType } from 'next-auth';
 
-const signInUpdater = async (account: AccountType) => {
+export const signInUpdater = async (account: AccountType) => {
 	// Update existing access_key
 	// This should only run if app has existing provider account
 	try {
@@ -25,7 +25,7 @@ const signInUpdater = async (account: AccountType) => {
 	return null;
 };
 
-const routeKeyRetriever = async (id: string) => {
+export const routeKeyRetriever = async (id: string) => {
 	// This function assumes that my signin callback works
 	// And that on every signin,
 	// next-auth refreshes the user access token in the Account collection
@@ -34,7 +34,9 @@ const routeKeyRetriever = async (id: string) => {
 		await mongoosePromise();
 		const query = await Account.findOne({
 			userId: id
-		}).select('access_token')
+		}).where('provider')
+			.equals('spotify')
+			.select('access_token')
 			.exec();
 		if (query !== null) token = query.access_token;
 	} catch {
@@ -44,9 +46,25 @@ const routeKeyRetriever = async (id: string) => {
 		throw 'Network error'
 	};
 	return token;
-}
+};
 
-export {
-	signInUpdater,
-	routeKeyRetriever
+export const enforceSignInExpiry = async (id: string) => {
+	// This is intended to keep session expiry
+	// The same as the OAuth provider's access key expiry
+	// Search user by database id,
+	let time = null;
+	try {
+		await mongoosePromise();
+		const query = await Account.findOne({
+			userId: id
+		}).where('provider')
+			.equals('spotify')
+			.select('expires_at')
+			.exec();
+		if (query === null || query.expires_at === undefined) throw 'No linked account';
+		time = query.expires_at;
+	} catch (e) {
+		return null;
+	};
+	return time;
 };

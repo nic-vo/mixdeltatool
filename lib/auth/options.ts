@@ -3,7 +3,7 @@ import type { NextAuthOptions } from 'next-auth';
 import SpotifyProvider from 'next-auth/providers/spotify';
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter';
 import clientPromise from '@lib/database/client';
-import { signInUpdater } from './accessKey';
+import { enforceSignInExpiry, signInUpdater } from './accessKey';
 
 const SPOTIFY_SCOPES = [
 	'user-read-email',
@@ -30,7 +30,7 @@ export const authOptions: NextAuthOptions = {
 	],
 	session: {
 		strategy: 'database',
-		maxAge: 60 * 50
+		maxAge: 60 * 15
 	},
 	adapter: MongoDBAdapter(clientPromise, {
 		databaseName: process.env.MONGODB_DB_NAME
@@ -47,6 +47,21 @@ export const authOptions: NextAuthOptions = {
 		},
 		async session({ session, user }) {
 			session.user = { ...user };
+			// The following is an attempt to keep session
+			// At the same expiry as OAuth provider access key expiry
+			// But I think the session update, specifically cookie manipulation,
+			// Doesn't take into account changes to session token 'expires' here
+
+			// try {
+			// 	const expiry = await enforceSignInExpiry(user.id);
+			// 	if (expiry !== null) {
+			// 		const dater = new Date();
+			// 		dater.setMilliseconds(expiry)
+			// 		session.expires = dater.toISOString();
+			// 	}
+			// } catch {
+
+			// }
 			return session;
 		}
 	},
