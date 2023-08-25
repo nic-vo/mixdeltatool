@@ -3,7 +3,7 @@ import type { NextAuthOptions } from 'next-auth';
 import SpotifyProvider from 'next-auth/providers/spotify';
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter';
 import clientPromise from '@lib/database/client';
-import { enforceSignInExpiry, signInUpdater } from './accessKey';
+import { signInUpdater } from './accessKey';
 
 const SPOTIFY_SCOPES = [
 	'user-read-email',

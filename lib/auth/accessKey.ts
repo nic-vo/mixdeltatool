@@ -50,24 +50,3 @@ export const routeKeyRetriever = async (id: string) => {
 	};
 	return token;
 };
-
-export const enforceSignInExpiry = async (id: string) => {
-	// This is intended to keep session expiry
-	// The same as the OAuth provider's access key expiry
-	// Search user by database id,
-	let time = null;
-	try {
-		await mongoosePromise();
-		const query = await Account.findOne({
-			userId: id
-		}).where('provider')
-			.equals('spotify')
-			.select('expires_at')
-			.exec();
-		if (query === null || query.expires_at === undefined) throw 'No linked account';
-		time = query.expires_at;
-	} catch (e) {
-		return null;
-	};
-	return time;
-};
