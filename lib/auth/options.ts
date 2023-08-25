@@ -30,7 +30,7 @@ export const authOptions: NextAuthOptions = {
 	],
 	session: {
 		strategy: 'database',
-		maxAge: 60 * 15
+		maxAge: 60 * 30
 	},
 	adapter: MongoDBAdapter(clientPromise, {
 		databaseName: process.env.MONGODB_DB_NAME

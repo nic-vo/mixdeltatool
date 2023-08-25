@@ -36,9 +36,12 @@ export const routeKeyRetriever = async (id: string) => {
 			userId: id
 		}).where('provider')
 			.equals('spotify')
-			.select('access_token')
+			.select(['access_token', 'expires_at'])
 			.exec();
-		if (query !== null) token = query.access_token;
+		if (query !== null) token = {
+			access_token: query.access_token,
+			expires_at: query.expires_at
+		};
 	} catch {
 		// The only errors should be at network level hopefully;
 		// Assumes Account model is correct
