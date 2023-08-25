@@ -1,7 +1,10 @@
 import type { User } from 'next-auth';
 import { signIn, signOut } from 'next-auth/react';
-import { PlaylistContext } from './playlistProvider';
+import { PlaylistContext } from '../playlistProvider';
 import { useContext } from 'react';
+import { myContext } from '../types';
+
+import styles from './dialogue.module.scss';
 
 export default function SpotifyDialogue(props: { user: User }) {
 	if (!props.user) return (
@@ -15,7 +18,7 @@ export default function SpotifyDialogue(props: { user: User }) {
 	const { error,
 		loading,
 		getUserPlaylistsHandler,
-		userPlaylists } = useContext(PlaylistContext);
+		userPlaylists } = useContext<myContext>(PlaylistContext);
 
 	return (
 		<>
