@@ -5,5 +5,6 @@ export interface myContext {
 	customPlaylists: MySpotifyPlaylistObject[] | null,
 	loading: boolean,
 	error: string | null,
+	nextPage: number | null,
 	getUserPlaylistsHandler: () => Promise<null>
 };
