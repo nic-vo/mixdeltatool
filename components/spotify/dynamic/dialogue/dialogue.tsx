@@ -18,7 +18,8 @@ export default function SpotifyDialogue(props: { user: User }) {
 	const { error,
 		loading,
 		getUserPlaylistsHandler,
-		userPlaylists } = useContext<myContext>(PlaylistContext);
+		userPlaylists,
+		nextPage } = useContext<myContext>(PlaylistContext);
 
 	return (
 		<>
@@ -27,7 +28,9 @@ export default function SpotifyDialogue(props: { user: User }) {
 			<button onClick={() => signOut()}>Sign out</button>
 			<button
 				onClick={getUserPlaylistsHandler}
-				disabled={loading}>Get Playlists</button>
+				disabled={loading || nextPage === null}>
+				Get Playlists</button>
+			<p>Next page {nextPage !== null ? nextPage : 'end'}</p>
 			{error && <p>{error}</p>}
 			{userPlaylists !== null &&
 				userPlaylists !== undefined && (
