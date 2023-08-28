@@ -4,6 +4,7 @@ import SpotifyProvider from 'next-auth/providers/spotify';
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter';
 import clientPromise from '@lib/database/client';
 import { signInUpdater } from './accessKey';
+import { SPOT_LOGIN_WINDOW } from '@consts/spotify';
 
 const SPOTIFY_SCOPES = [
 	'user-read-email',
@@ -30,7 +31,7 @@ export const authOptions: NextAuthOptions = {
 	],
 	session: {
 		strategy: 'database',
-		maxAge: 60 * 30
+		maxAge: SPOT_LOGIN_WINDOW
 	},
 	adapter: MongoDBAdapter(clientPromise, {
 		databaseName: process.env.MONGODB_DB_NAME

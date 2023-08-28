@@ -4,7 +4,11 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@lib/auth/options';
 import { routeKeyRetriever } from '@lib/auth/accessKey';
 
-import { SPOT_PLAYLIST_ITER_INT, SPOT_PLAYLIST_PAGE_LIMIT } from '@consts/spotify';
+import {
+	SPOT_LOGIN_WINDOW,
+	SPOT_PLAYLIST_ITER_INT,
+	SPOT_PLAYLIST_PAGE_LIMIT
+} from '@consts/spotify';
 
 import {
 	MySpotifyAPIRouteResponse,
@@ -51,12 +55,13 @@ export default async function handler(
 		} catch {
 			throw { status: 502, error: 'Network error' };
 		};
-		// No token means that user account somehow unlinked => client-side redirect
+		// No token means that user account somehow unlinked => client redirect
 		if (token === null) throw { status: 401, error: 'Unauthorized' };
 
 		// Check if session is being accessed when access token might not be live
 		const { expires_at, access_token } = token;
-		if (expires_at === undefined || Date.now() - expires_at < 1800)
+		if (expires_at === undefined
+			|| Date.now() - expires_at < 3600 - SPOT_LOGIN_WINDOW)
 			throw { status: 401, error: 'Unauthorized' };
 
 		// Hit spotify API with retrieved access token
