@@ -29,8 +29,7 @@ export default async function handler(
 		if (req.method !== 'GET')
 			throw { status: 405, error: 'GET only' };
 		// Validate query parameters
-		if (Object.keys(req.query).length !== 1
-			|| Object.keys(req.query).includes('page') === false)
+		if (Object.keys(req.query).length !== 1 || 'page' in req.query === false)
 			throw { status: 400, error: 'Bad request' };
 		// Should only request page, which should be 0 <= page <= 19
 		const page = parseInt(req.query.page, 10);
@@ -77,9 +76,16 @@ export default async function handler(
 			if (rawSpotify.ok === false) {
 				// This is if somehow after all this, Spotify detects something wrong
 				const jsoned = await rawSpotify.json();
-				console.log('\n***SPOTIFY ERROR***\n');
-				console.error(jsoned.error);
-				throw '';
+				switch (rawSpotify.status) {
+					case 401:
+						throw { status: 401, error: 'Unauthorized' };
+					case 403:
+						throw { status: 401, error: 'Unauthorized' };
+					case 429:
+						throw { status: 429, error: 'Try again in a few minutes' };
+					default:
+						throw { status: 500, error: 'Spotify error' };
+				};
 			};
 			//
 			const jsoned = await rawSpotify.json() as SpotUserPlaylistsResponse;
@@ -95,15 +101,12 @@ export default async function handler(
 				})
 			};
 			return res.status(200).json(returnItems);
-		} catch (e) {
+
+		} catch (e: any) {
 			console.error(e);
-			throw { status: 502, error: 'Spotify error' };
+			throw { status: e.status || 500, error: e.error || 'Spotify error' };
 		};
 	} catch (e: any) {
-		if (e.status && e.error) {
-			return res.status(e.status).json({ error: e.error });
-		} else {
-			return res.status(500).json({ error: 'Unknown error' })
-		}
+		return res.status(e.status || 500).json({ error: e.error || 'Unknown error' });
 	};
 };
