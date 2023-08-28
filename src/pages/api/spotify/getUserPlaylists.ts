@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth';
 
 import { authOptions } from '@lib/auth/options';
@@ -11,21 +11,18 @@ import {
 } from '@consts/spotify';
 
 import {
-	MySpotifyAPIRouteResponse,
-	MySpotifyPlaylistObject,
-	SpotifyPlaylistObject,
-	SpotifyUserPlaylistsResponse
+	MyUserAPIRouteResponse,
+	MyPlaylistObject,
+	SpotPlaylistObject,
+	SpotUserPlaylistsResponse,
+	getUserPlaylistsApiRequest
 } from '@components/spotify/types';
-
-interface getPlayListsApiRequest extends Omit<NextApiRequest, 'query'> {
-	query: { page: string }
-};
 
 // The assumption for this route is that every sign-on refreshes access token
 // Session never updates, and only exists until access token expiry
 
 export default async function handler(
-	req: getPlayListsApiRequest, res: NextApiResponse
+	req: getUserPlaylistsApiRequest, res: NextApiResponse
 ) {
 	try {
 		// Validate req method
@@ -85,16 +82,16 @@ export default async function handler(
 				throw '';
 			};
 			//
-			const jsoned = await rawSpotify.json() as SpotifyUserPlaylistsResponse;
+			const jsoned = await rawSpotify.json() as SpotUserPlaylistsResponse;
 			const { next, total } = jsoned;
-			const items = jsoned.items as SpotifyPlaylistObject[];
-			const returnItems: MySpotifyAPIRouteResponse = {
+			const items = jsoned.items as SpotPlaylistObject[];
+			const returnItems: MyUserAPIRouteResponse = {
 				next, total,
 				playlists: items.map(item => {
 					const { id, images, name, owner, tracks } = item;
 					return {
 						id, image: images[0], name, owner, tracks
-					} as MySpotifyPlaylistObject;
+					} as MyPlaylistObject;
 				})
 			};
 			return res.status(200).json(returnItems);
