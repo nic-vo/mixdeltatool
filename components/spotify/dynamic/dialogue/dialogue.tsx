@@ -29,7 +29,7 @@ export default function SpotifyDialogue(props: { user: User }) {
 			<button
 				onClick={getUserPlaylistsHandler}
 				disabled={loading || nextPage === null}>
-				Get Playlists</button>
+				Get your playlists</button>
 			<p>Next page {nextPage !== null ? nextPage : 'end'}</p>
 			{error && <p>{error}</p>}
 			{userPlaylists !== null &&
@@ -42,6 +42,7 @@ export default function SpotifyDialogue(props: { user: User }) {
 										&& playlist.image.url !== undefined
 										&& <img src={playlist.image.url} alt='' />}
 									<p>{playlist.name}</p>
+									<p>{playlist.id}</p>
 									<p>{playlist.owner.display_name}</p>
 								</li>
 							)
