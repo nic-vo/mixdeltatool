@@ -1,22 +1,28 @@
-export interface SpotifyUserPlaylistsResponse {
+import { NextApiRequest } from 'next';
+
+export interface SpotPlaylistsResponse {
 	href: string,
 	limit: number
 	offset: number,
 	previous: null | string,
 	next: null | string,
 	total: number
-	items: SpotifyPlaylistObject[]
 }
 
-export interface SpotifyPlaylistObject {
+export interface SpotUserPlaylistsResponse
+	extends SpotPlaylistsResponse {
+	items: SpotPlaylistObject[]
+}
+
+export interface SpotPlaylistObject {
 	collaborative: boolean,
 	description: string | null,
 	external_urls: string[],
 	href: string,
 	id: string,
-	images: SpotifyImageObject[]
+	images: SpotImageObject[]
 	name: string,
-	owner: SpotifyUser,
+	owner: SpotUser,
 	public: boolean,
 	snapshot_id: string,
 	tracks: { href: string, total: number },
@@ -24,13 +30,13 @@ export interface SpotifyPlaylistObject {
 	uri: string
 }
 
-export interface SpotifyImageObject {
+export interface SpotImageObject {
 	url: string,
 	height: number,
 	width: number
 }
 
-export interface SpotifyUser {
+export interface SpotUser {
 	external_urls: string[],
 	followers: { href: null, total: number },
 	href: string,
@@ -40,12 +46,22 @@ export interface SpotifyUser {
 	display_name: string | null
 }
 
-export interface MySpotifyPlaylistObject extends
-	Pick<SpotifyPlaylistObject, 'id' | 'name' | 'owner' | 'tracks'> {
-	image: SpotifyImageObject
+export interface MyPlaylistObject extends
+	Pick<SpotPlaylistObject, 'id' | 'name' | 'owner' | 'tracks'> {
+	image: SpotImageObject
 }
 
-export interface MySpotifyAPIRouteResponse extends
-	Pick<SpotifyUserPlaylistsResponse, 'next' | 'total'> {
-	playlists: MySpotifyPlaylistObject[]
+export interface MyUserAPIRouteResponse extends
+	Pick<SpotUserPlaylistsResponse, 'next' | 'total'> {
+	playlists: MyPlaylistObject[]
+}
+
+export interface getUserPlaylistsApiRequest
+	extends Omit<NextApiRequest, 'query'> {
+	query: { page: string }
+}
+
+export interface getSpecificPlaylistApiRequest
+	extends Omit<NextApiRequest, 'query'> {
+	query: { playlist: string }
 }

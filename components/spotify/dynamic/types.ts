@@ -1,8 +1,8 @@
-import { MySpotifyPlaylistObject } from '@components/spotify/types'
+import { MyPlaylistObject } from '@components/spotify/types'
 
 export interface myContext {
-	userPlaylists: MySpotifyPlaylistObject[] | null,
-	customPlaylists: MySpotifyPlaylistObject[] | null,
+	userPlaylists: MyPlaylistObject[] | null,
+	customPlaylists: MyPlaylistObject[] | null,
 	loading: boolean,
 	error: string | null,
 	nextPage: number | null,

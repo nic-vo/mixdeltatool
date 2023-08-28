@@ -1,4 +1,4 @@
-import { MySpotifyAPIRouteResponse, MySpotifyPlaylistObject } from '@components/spotify/types';
+import { MyUserAPIRouteResponse, MyPlaylistObject } from '@components/spotify/types';
 import { createContext, useState, useEffect } from 'react';
 import { myContext } from './types';
 import { signIn } from 'next-auth/react';
@@ -13,7 +13,7 @@ const contextInit = {
 	getUserPlaylistsHandler: async () => null
 };
 
-type ProviderState = MySpotifyPlaylistObject[] | null;
+type ProviderState = MyPlaylistObject[] | null;
 
 const PlaylistContext = createContext<myContext>(contextInit);
 
@@ -38,7 +38,7 @@ function PlaylistProvider(props: { children: React.ReactNode }) {
 				const jsoned = await raw.json();
 				throw jsoned.error;
 			};
-			const jsoned = await raw.json() as MySpotifyAPIRouteResponse;
+			const jsoned = await raw.json() as MyUserAPIRouteResponse;
 			if (userPlaylists !== null) {
 				const currentMap = new Map();
 				const newMap = new Map();
