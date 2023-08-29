@@ -1,4 +1,4 @@
-import { NextApiRequest } from 'next';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 export interface SpotPlaylistsResponse {
 	href: string,
@@ -17,7 +17,6 @@ export interface SpotUserPlaylistsResponse
 export interface SpotPlaylistObject {
 	collaborative: boolean,
 	description: string | null,
-	external_urls: string[],
 	href: string,
 	id: string,
 	images: SpotImageObject[]
@@ -26,7 +25,7 @@ export interface SpotPlaylistObject {
 	public: boolean,
 	snapshot_id: string,
 	tracks: { href: string, total: number },
-	type: string,
+	type: 'playlist',
 	uri: string
 }
 
@@ -37,8 +36,6 @@ export interface SpotImageObject {
 }
 
 export interface SpotUser {
-	external_urls: string[],
-	followers: { href: null, total: number },
 	href: string,
 	id: string,
 	type: string,
@@ -47,7 +44,7 @@ export interface SpotUser {
 }
 
 export interface MyPlaylistObject extends
-	Pick<SpotPlaylistObject, 'id' | 'name' | 'owner' | 'tracks'> {
+	Pick<SpotPlaylistObject, 'id' | 'name' | 'owner'> {
 	image: SpotImageObject
 }
 
@@ -63,5 +60,5 @@ export interface getUserPlaylistsApiRequest
 
 export interface getSpecificPlaylistApiRequest
 	extends Omit<NextApiRequest, 'query'> {
-	query: { playlist: string }
+	query: { id: string, type: 'album' | 'playlist' }
 }
