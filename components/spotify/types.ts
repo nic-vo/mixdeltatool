@@ -29,6 +29,30 @@ export interface SpotPlaylistObject {
 	uri: string
 }
 
+export interface SpotAlbumObject {
+	album_type: 'album' | 'single' | 'compilation',
+	artists: SpotArtistObject[],
+	total_tracks: number,
+	available_markets: string[],
+	external_urls: { spotify: string },
+	href: string,
+	images: SpotImageObject[],
+	id: string,
+	name: string,
+	release_date: string,
+	release_date_precision: 'year' | 'month' | 'day',
+	type: 'album',
+	uri: string,
+	tracks: {
+		href: string
+	}
+}
+
+export interface SpotArtistObject
+	extends Omit<SpotUser, 'display_name'> {
+	name: string,
+}
+
 export interface SpotImageObject {
 	url: string,
 	height: number,
