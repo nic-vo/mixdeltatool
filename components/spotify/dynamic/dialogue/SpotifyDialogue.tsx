@@ -1,5 +1,3 @@
-import type { User } from 'next-auth';
-import { signIn, signOut } from 'next-auth/react';
 import { PlaylistContext } from '../playlistProvider';
 import { useContext, useRef } from 'react';
 
@@ -7,10 +5,8 @@ import styles from './dialogue.module.scss';
 
 const formDataFieldName = 'href';
 
-export default function SpotifyDialogue(props: { user: User }) {
+export default function SpotifyDialogue() {
 	const fieldRef = useRef<HTMLInputElement | null>(null);
-
-	const { name, email, image } = props.user;
 	const { userError,
 		userLoading,
 		getUserPlaylistsHandler,
@@ -37,18 +33,8 @@ export default function SpotifyDialogue(props: { user: User }) {
 		return null;
 	}
 
-	if (!props.user) return (
-		<>
-			<h1>Oops, looks like you're not logged in somehow.</h1>
-			<button onClick={() => signIn()}>Sign in here</button>
-		</>
-	);
-
 	return (
 		<>
-			<h1>Hello there {email?.split('@')[0] || name}!</h1>
-			{image !== null && <img src={image} alt='' />}
-			<button onClick={() => signOut()}>Sign out</button>
 			<section>
 				<h2>Your playlists</h2>
 				<section>
