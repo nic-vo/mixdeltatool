@@ -8,6 +8,7 @@ import { SPOT_LOGIN_WINDOW } from '@consts/spotify';
 
 import {
 	MyPlaylistObject,
+	SpotAlbumObject,
 	SpotPlaylistObject,
 	getSpecificPlaylistApiRequest
 } from '@components/spotify/types';
@@ -24,11 +25,13 @@ export default async function handler(
 		if (req.method !== 'GET')
 			throw { status: 405, error: 'GET only' };
 		// Validate query parameters
-		if (Object.keys(req.query).length !== 1
-			|| 'playlist' in req.query === false)
+		if (Object.keys(req.query).length !== 2
+			|| 'id' in req.query === false
+			|| 'type' in req.query === false)
 			throw { status: 400, error: 'Bad request' };
 		// Spotify playlist id *SHOULD* be 22 chars, alphanumeric
-		if (/^[A-Za-z0-9]{22}$/.test(req.query.playlist) === false)
+		if (/^[A-Za-z0-9]{22}$/.test(req.query.id) === false
+			|| (req.query.type !== 'album' && req.query.type !== 'playlist'))
 			throw { status: 422, error: 'Bad request' };
 
 		// Check next-auth session
@@ -60,12 +63,11 @@ export default async function handler(
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${access_token}`);
 			const rawSpotify = await fetch(
-				`https://api.spotify.com/v1/playlists/${req.query.playlist}`, {
+				`https://api.spotify.com/v1/${req.query.type}s/${req.query.id}`, {
 				headers: headers
 			});
 			if (rawSpotify.ok === false) {
 				// This is if somehow after all this, Spotify detects something wrong
-				const jsoned = await rawSpotify.json();
 				switch (rawSpotify.status) {
 					case 401:
 						throw { status: 401, error: 'Unauthorized' };
@@ -78,15 +80,36 @@ export default async function handler(
 				};
 			};
 			// There's a chance a user submits a non-playlist
-			const jsoned = await rawSpotify.json() as SpotPlaylistObject;
-			if (jsoned.type !== 'playlist')
-				throw { status: 422, error: "This isn't a playlist." };
-
-			const { images, id, name, owner, tracks } = jsoned;
-			const returnItem: MyPlaylistObject = {
-				image: images[0], id, name, owner, tracks
-			};
-			return res.status(200).json(returnItem);
+			const jsoned = await rawSpotify.json();
+			switch (jsoned.type) {
+				case 'playlist':
+					const rp = jsoned as SpotPlaylistObject;
+					const returnrp: MyPlaylistObject = {
+						image: rp.images[0],
+						id: rp.id,
+						name: rp.name,
+						owner: rp.owner
+					};
+					return res.status(200).json(returnrp);
+				case 'album':
+					const ra = jsoned as SpotAlbumObject;
+					const returnra: MyPlaylistObject = {
+						image: ra.images[0],
+						id: ra.id,
+						name: ra.name,
+						owner: {
+							display_name: ra.artists.map((artist) => artist.name).join(', '),
+							href: ra.artists[0].href,
+							id: ra.artists[0].id,
+							uri: ra.artists[0].uri,
+							type: 'artist'
+						}
+					};
+					return res.status(200).json(returnra);
+					break;
+				default:
+					throw { status: 422, error: "This isn't a playlist or an album." };
+			}
 
 		} catch (e: any) {
 			console.error(e);
