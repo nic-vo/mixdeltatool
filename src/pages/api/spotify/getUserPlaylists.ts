@@ -75,7 +75,6 @@ export default async function handler(
 			});
 			if (rawSpotify.ok === false) {
 				// This is if somehow after all this, Spotify detects something wrong
-				const jsoned = await rawSpotify.json();
 				switch (rawSpotify.status) {
 					case 401:
 						throw { status: 401, error: 'Unauthorized' };
