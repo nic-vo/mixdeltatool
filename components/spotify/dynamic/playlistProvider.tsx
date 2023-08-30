@@ -36,47 +36,53 @@ function PlaylistProvider(props: { children: React.ReactNode }) {
 	const [specificError, setSpecificError] = useState<string | null>(null);
 
 	const getUserPlaylistsHandler = async () => {
-		// If either 50th userCurrentPage of results or no next, cancel
-		if (userCurrentPage === null
-			|| userLoading === true) return null;
-		// Start load
+		if (userLoading === true) return null;
 		setUserLoading(true);
 		setUserError(null);
 
 		try {
+			// If either 50th userCurrentPage of results or no next, cancel
+			if (userCurrentPage === null) throw 'No more';
 			const raw = await fetch(`/api/spotify/getUserPlaylists?page=${userCurrentPage}`);
-			if (raw.status === 401) signIn();
+			if (raw.status === 401) {
+				signIn();
+				throw 'Unauthorized';
+			};
 			if (raw.ok === false) {
 				const jsoned = await raw.json();
-				throw jsoned.userError;
+				// TODO: define a standard error interface (?)
+				throw jsoned.error;
 			};
 			const jsoned = await raw.json() as MyUserAPIRouteResponse;
 			if (userPlaylists === null) {
 				setUserPlaylists(jsoned.playlists);
 			} else {
+				// Only add non-duplicate playlists
 				const currentMap = new Map();
 				const newMap = new Map();
+				// Put current playlists in map
 				for (const playlist of userPlaylists)
 					currentMap.set(playlist.id, playlist);
-
+				// Put new playlists in their own map
 				for (const playlist of jsoned.playlists)
 					if (newMap.has(playlist.id) === false)
 						newMap.set(playlist.id, playlist);
-
+				// Compare the maps
 				for (const key of newMap.keys())
 					if (currentMap.has(key) === false)
 						currentMap.set(key, newMap.get(key));
-
+				// Set new playlist state from the ones that pass
 				setUserPlaylists(Array.from(currentMap.values()));
 			};
+			// Disable fetching if no more pages
 			if (jsoned.next === null) setUserCurrentPage(null);
 			else setUserCurrentPage(prev => prev! + 1);
-			setUserLoading(false);
 		} catch (e: any) {
 			if (typeof (e) === 'string') setUserError(e);
 			else setUserError('Unknown userError');
-			setUserLoading(false);
 		};
+
+		setUserLoading(false);
 		return null;
 	};
 
