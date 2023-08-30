@@ -127,10 +127,17 @@ function PlaylistProvider(props: { children: React.ReactNode }) {
 		}) => {
 		if (specificLoading === true) return null;
 		setSpecificLoading(true);
-		const { id, type } = params;
+		setSpecificError(null);
 		try {
+			const { id, type } = params;
+			if (type !== 'album' && id !== 'playlist') {
+				throw 'There is an error with this album / playlist link.'
+			};
 			const raw = await fetch(`/api/spotify/getSpecificPlaylist?id=${id}&type=${type}`)
-			if (raw.status === 401) signIn();
+			if (raw.status === 401) {
+				signIn();
+				throw 'Unauthorized';
+			};
 			if (raw.ok === false) {
 				const jsoned = await raw.json();
 				throw jsoned.error;
@@ -139,19 +146,21 @@ function PlaylistProvider(props: { children: React.ReactNode }) {
 			if (specificPlaylists === null) {
 				setSpecificPlaylists([jsoned]);
 			} else {
+				// Check to see if existing playlists contain new one
 				const currentMap = new Map();
+				// Put current playlists into map
 				for (const playlist of specificPlaylists)
 					currentMap.set(playlist.id, playlist);
+				// Check if map has new playlist's id
 				if (currentMap.has(jsoned.id) === true) throw 'You have this playlist';
 				else currentMap.set(jsoned.id, jsoned);
 				setSpecificPlaylists(Array.from(currentMap.values()));
 			};
-			setSpecificLoading(false);
 		} catch (e: any) {
 			if (typeof (e) === 'string') setSpecificError(e);
 			else setSpecificError('Unknown specificError');
-			setSpecificLoading(false);
 		};
+		setSpecificLoading(false);
 		return null;
 	};
 
