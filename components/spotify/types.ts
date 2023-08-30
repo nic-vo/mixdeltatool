@@ -1,51 +1,40 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiRequest } from 'next';
 
-export interface SpotPlaylistsResponse {
-	href: string,
-	limit: number
-	offset: number,
-	previous: null | string,
-	next: null | string,
-	total: number
+interface BasicSpotObj {
+	id: string,
+	type: string,
+	uri: string,
+	href: string
 }
 
-export interface SpotUserPlaylistsResponse
-	extends SpotPlaylistsResponse {
-	items: SpotPlaylistObject[]
-}
-
-export interface SpotPlaylistObject {
+export interface SpotPlaylistObject extends BasicSpotObj {
 	collaborative: boolean,
 	description: string | null,
-	href: string,
-	id: string,
 	images: SpotImageObject[]
 	name: string,
 	owner: SpotUser,
 	public: boolean,
 	snapshot_id: string,
-	tracks: { href: string, total: number },
-	type: 'playlist',
-	uri: string
+	tracks: { href: string, total: number }
 }
 
-export interface SpotAlbumObject {
+export interface SpotAlbumObject extends BasicSpotObj {
 	album_type: 'album' | 'single' | 'compilation',
 	artists: SpotArtistObject[],
 	total_tracks: number,
 	available_markets: string[],
 	external_urls: { spotify: string },
-	href: string,
 	images: SpotImageObject[],
-	id: string,
 	name: string,
 	release_date: string,
 	release_date_precision: 'year' | 'month' | 'day',
-	type: 'album',
-	uri: string,
 	tracks: {
 		href: string
 	}
+}
+
+export interface SpotUser extends BasicSpotObj {
+	display_name: string | null
 }
 
 export interface SpotArtistObject
@@ -59,21 +48,24 @@ export interface SpotImageObject {
 	width: number
 }
 
-export interface SpotUser {
+export interface SpotPlaylistsResponse {
 	href: string,
-	id: string,
-	type: string,
-	uri: string,
-	display_name: string | null
+	next: null | string
+}
+
+export interface SpotUserPlaylistsResponse
+	extends SpotPlaylistsResponse {
+	items: SpotPlaylistObject[]
 }
 
 export interface MyPlaylistObject extends
 	Pick<SpotPlaylistObject, 'id' | 'name' | 'owner'> {
-	image: SpotImageObject
+	image: SpotImageObject,
+	tracks: number
 }
 
 export interface MyUserAPIRouteResponse extends
-	Pick<SpotUserPlaylistsResponse, 'next' | 'total'> {
+	Pick<SpotUserPlaylistsResponse, 'next'> {
 	playlists: MyPlaylistObject[]
 }
 
