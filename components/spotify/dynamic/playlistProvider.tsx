@@ -1,5 +1,5 @@
 import { MyUserAPIRouteResponse, MyPlaylistObject } from '@components/spotify/types';
-import { createContext, useState, useEffect, forwardRef } from 'react';
+import { createContext, useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 import { LOCAL_CUSTOM_LISTS, LOCAL_END, LOCAL_EXPIRES, LOCAL_USER_LISTS } from '@consts/spotify';
 
@@ -16,7 +16,8 @@ const contextInit = {
 	clearUserPlaylistsHandler: () => null,
 	getUserPlaylistsHandler: async () => null,
 	getSpecificPlaylistHandler: async () => null,
-	clearSpecificPlaylistsHandler: () => null
+	clearSpecificPlaylistsHandler: () => null,
+	updateUserPlaylistsHandler: () => null
 };
 
 const PlaylistContext = createContext<PlaylistSignature>(contextInit);

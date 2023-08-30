@@ -11,7 +11,8 @@ export interface PlaylistSignature {
 	clearUserPlaylistsHandler: () => null,
 	getUserPlaylistsHandler: () => Promise<null>,
 	getSpecificPlaylistHandler: (params: { id: string , type: string }) => Promise<null>,
-	clearSpecificPlaylistsHandler: () => null
+	clearSpecificPlaylistsHandler: () => null,
+	updateUserPlaylistsHandler: () => null
 };
 
 export type ProviderState = MyPlaylistObject[] | null;
