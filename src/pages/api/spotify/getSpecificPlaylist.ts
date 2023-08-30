@@ -88,7 +88,8 @@ export default async function handler(
 						image: rp.images[0],
 						id: rp.id,
 						name: rp.name,
-						owner: rp.owner
+						owner: rp.owner,
+						tracks: rp.tracks.total
 					};
 					return res.status(200).json(returnrp);
 				case 'album':
@@ -102,8 +103,9 @@ export default async function handler(
 							href: ra.artists[0].href,
 							id: ra.artists[0].id,
 							uri: ra.artists[0].uri,
-							type: 'artist'
-						}
+							type: 'artist',
+						},
+						tracks: ra.total_tracks
 					};
 					return res.status(200).json(returnra);
 					break;

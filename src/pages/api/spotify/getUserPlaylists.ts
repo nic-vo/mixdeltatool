@@ -88,14 +88,14 @@ export default async function handler(
 			};
 			//
 			const jsoned = await rawSpotify.json() as SpotUserPlaylistsResponse;
-			const { next, total } = jsoned;
+			const { next } = jsoned;
 			const items = jsoned.items as SpotPlaylistObject[];
 			const returnItems: MyUserAPIRouteResponse = {
-				next, total,
+				next,
 				playlists: items.map(item => {
 					const { id, images, name, owner, tracks } = item;
 					return {
-						id, image: images[0], name, owner, tracks
+						id, image: images[0], name, owner, tracks: tracks.total
 					} as MyPlaylistObject;
 				})
 			};
