@@ -164,6 +164,7 @@ function PlaylistProvider(props: { children: React.ReactNode }) {
 		return null;
 	};
 
+	const updateUserPlaylistsHandler = () => null;
 	return (
 		<PlaylistContext.Provider value={{
 			userPlaylists,
