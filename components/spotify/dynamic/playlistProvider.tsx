@@ -25,12 +25,14 @@ const PlaylistContext = createContext<PlaylistSignature>(contextInit);
 function PlaylistProvider(props: { children: React.ReactNode }) {
 	// This will only ever be added to
 	const [userPlaylists, setUserPlaylists] = useState<ProviderState>(null);
-	// This can be modified to remove unwanted playlists
-	const [specificPlaylists, setSpecificPlaylists] = useState<ProviderState>(null);
+	// Controls pagination, must be validated on back-end
 	const [userCurrentPage, setUserCurrentPage] = useState<number | null>(0);
+	// TODO: This can be modified to remove unwanted playlists
+	const [specificPlaylists, setSpecificPlaylists] = useState<ProviderState>(null);
+	// Statuses
 	const [userLoading, setUserLoading] = useState<boolean>(false);
-	const [specificLoading, setSpecificLoading] = useState<boolean>(false);
 	const [userError, setUserError] = useState<string | null>(null);
+	const [specificLoading, setSpecificLoading] = useState<boolean>(false);
 	const [specificError, setSpecificError] = useState<string | null>(null);
 
 	const getUserPlaylistsHandler = async () => {
@@ -40,6 +42,7 @@ function PlaylistProvider(props: { children: React.ReactNode }) {
 		// Start load
 		setUserLoading(true);
 		setUserError(null);
+
 		try {
 			const raw = await fetch(`/api/spotify/getUserPlaylists?page=${userCurrentPage}`);
 			if (raw.status === 401) signIn();
@@ -112,10 +115,10 @@ function PlaylistProvider(props: { children: React.ReactNode }) {
 	};
 
 	// For use with input element
-	const getSpecificPlaylistHandler = async (params: {
-		type: string, id: string
-	}
-	) => {
+	const getSpecificPlaylistHandler = async (
+		params: {
+			type: string, id: string
+		}) => {
 		if (specificLoading === true) return null;
 		setSpecificLoading(true);
 		const { id, type } = params;
@@ -149,16 +152,17 @@ function PlaylistProvider(props: { children: React.ReactNode }) {
 	return (
 		<PlaylistContext.Provider value={{
 			userPlaylists,
-			specificPlaylists,
-			userLoading,
-			specificLoading,
+			userCurrentPage,
 			getUserPlaylistsHandler,
-			clearUserPlaylistsHandler,
-			getSpecificPlaylistHandler,
-			clearSpecificPlaylistsHandler,
+			updateUserPlaylistsHandler,
+			userLoading,
 			userError,
+			specificPlaylists,
+			getSpecificPlaylistHandler,
+			specificLoading,
 			specificError,
-			userCurrentPage
+			clearUserPlaylistsHandler,
+			clearSpecificPlaylistsHandler,
 		}}>
 			{props.children}
 		</PlaylistContext.Provider>
@@ -168,4 +172,4 @@ function PlaylistProvider(props: { children: React.ReactNode }) {
 export {
 	PlaylistContext,
 	PlaylistProvider
-}
+};
