@@ -6,8 +6,8 @@ export default function Spotify() {
 	return (
 		<AuthProvider>
 			<PlaylistProvider>
-				{<SpotifyEntry />}
+				<SpotifyEntry />
 			</PlaylistProvider>
 		</AuthProvider>
-	)
-}
+	);
+};
