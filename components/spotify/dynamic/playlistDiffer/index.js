@@ -1,9 +1,3 @@
-import dynamic from 'next/dynamic';
-
-const PlaylistDiffer = dynamic(() => import('./PlaylistDiffer'),
-	{
-		loading: () => { return (<h1>Loading differ...</h1>) },
-		ssr: false
-	});
+import PlaylistDiffer from './PlaylistDiffer';
 
 export default PlaylistDiffer;
