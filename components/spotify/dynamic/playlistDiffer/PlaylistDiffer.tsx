@@ -1,14 +1,10 @@
-import { PlaylistContext } from '../playlistProvider';
-import { useContext, useState } from 'react';
+import DifferForm from "./differForm/DifferForm";
+import PlaylistOptions from "./playlistOptions/PlaylistOptions";
 
-const formDataFieldName = 'href';
-
-export function PlaylistDiffer() {
-	const { userPlaylists, specificPlaylists, } = useContext(PlaylistContext);
-
+export default function PlaylistDiffer() {
 	return (
-		<>
-
-		</>
+		<DifferForm>
+			<PlaylistOptions />
+		</DifferForm>
 	);
 }
