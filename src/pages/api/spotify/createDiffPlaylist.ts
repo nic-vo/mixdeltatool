@@ -14,11 +14,11 @@ export default async function handler(req: createDiffPlaylistApiRequest, res: Ne
 		// Validate query parameters
 		if (Object.keys(req.query).length !== 2
 			|| 'target' in req.query === false
-			|| 'discrim' in req.query === false)
+			|| 'differ' in req.query === false)
 			throw { status: 400, error: 'Bad request' };
 		// Spotify playlist id *SHOULD* be 22 chars, alphanumeric
 		if (/^[A-Za-z0-9]{22}$/.test(req.query.target) === false
-			|| /^[A-Za-z0-9]{22}$/.test(req.query.discrim) === false)
+			|| /^[A-Za-z0-9]{22}$/.test(req.query.differ) === false)
 			throw { status: 422, error: 'Bad request' };
 
 		// Check next-auth session

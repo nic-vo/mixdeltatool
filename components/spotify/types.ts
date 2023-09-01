@@ -81,7 +81,7 @@ export interface getSpecificPlaylistApiRequest
 
 export interface createDiffPlaylistApiRequest
 	extends Omit<NextApiRequest, 'query'> {
-	query: { target: string, discrim: string }
+	query: { target: string, differ: string }
 }
 
 export interface UserPlaylistContextSignature {
