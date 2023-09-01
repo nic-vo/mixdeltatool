@@ -1,6 +1,6 @@
 import { useContext, useMemo } from 'react';
-import { UserPlaylistContext } from '../../UserPlaylistProvider';
-import { SpecificPlaylistContext } from '../../SpecificPlaylistProvider';
+import { UserPlaylistContext } from '../../contexts/UserPlaylistProvider';
+import { SpecificPlaylistContext } from '../../contexts/SpecificPlaylistProvider';
 
 export default function PlaylistOptions() {
 	const { userPlaylists } = useContext(UserPlaylistContext);

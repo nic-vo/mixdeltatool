@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { UserPlaylistContext } from '../../UserPlaylistProvider';
+import { UserPlaylistContext } from '../../contexts/UserPlaylistProvider';
 
 export default function UserAdder() {
 

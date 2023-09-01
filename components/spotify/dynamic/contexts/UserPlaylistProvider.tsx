@@ -2,7 +2,7 @@ import { MyUserAPIRouteResponse } from '@components/spotify/types';
 import { createContext, useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 
-import type { UserPlaylistContextSignature, ProviderState } from '../types';
+import type { UserPlaylistContextSignature, ProviderState } from '../../types';
 
 const contextInit = {
 	userPlaylists: null,

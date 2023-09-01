@@ -1,5 +1,5 @@
 import { useContext, useRef, useState } from 'react';
-import { SpecificPlaylistContext } from '../../SpecificPlaylistProvider';
+import { SpecificPlaylistContext } from '../../contexts/SpecificPlaylistProvider';
 
 /*
 

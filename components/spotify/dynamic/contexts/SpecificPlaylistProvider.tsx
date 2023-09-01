@@ -1,8 +1,8 @@
-import { MyPlaylistObject } from '../types';
+import { MyPlaylistObject } from '../../types';
 import { createContext, useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 
-import type { SpecificPlaylistContextSignature, ProviderState } from '../types';
+import type { SpecificPlaylistContextSignature, ProviderState } from '../../types';
 
 const contextInit = {
 	specificPlaylists: null,

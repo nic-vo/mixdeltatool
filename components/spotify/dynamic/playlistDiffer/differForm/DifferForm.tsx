@@ -1,6 +1,6 @@
 import PlaylistSingle from './PlaylistSingle/PlaylistSingle';
-import { UserPlaylistContext } from '../../UserPlaylistProvider';
-import { SpecificPlaylistContext } from '../../SpecificPlaylistProvider';
+import { UserPlaylistContext } from '../../contexts/UserPlaylistProvider';
+import { SpecificPlaylistContext } from '../../contexts/SpecificPlaylistProvider';
 import {
 	useState,
 	useContext,
