@@ -1,38 +1,66 @@
-import { useContext } from 'react';
-import { PlaylistContext } from '../../playlistProvider';
+import { useContext, memo, useMemo } from 'react';
+import { UserPlaylistContext } from '../../UserPlaylistProvider';
+import { SpecificPlaylistContext } from '../../SpecificPlaylistProvider';
 
 import styles from './PlaylistDisplay.module.scss';
 
-const PlaylistDisplay = (props: { user: boolean }) => {
+export default function PlaylistDisplay(props: { user: boolean }) {
 	const { user } = props;
-	console.log(`Rendering user: ${props.user}`);
-	let data;
-	if (props.user === true) {
-		data = useContext(PlaylistContext).userPlaylists;
+	const { userPlaylists } = useContext(UserPlaylistContext);
+	const { specificPlaylists } = useContext(SpecificPlaylistContext);
+	let memoized;
+	if (user === true) {
+		memoized = useMemo(() => {
+			console.log(`***${user ? 'USER' : 'SPECIFIC'} DISPLAY RENDER***`)
+			return (
+				<section>
+					<h2>{user ? 'Your' : 'Specific'} Playlists</h2>
+					{userPlaylists !== null &&
+						userPlaylists !== undefined &&
+						<ul>
+							{userPlaylists.map((playlist) => {
+								return (
+									<li key={playlist.id}>
+										<p>{playlist.name}</p>
+										<p>{playlist.owner.display_name}</p>
+										<p>Tracks: {playlist.tracks}</p>
+										{playlist.image !== null &&
+											playlist.image !== undefined &&
+											<img src={playlist.image.url} alt='' />}
+									</li>
+								);
+							})}
+						</ul>
+					}
+				</section>
+			)
+		}, [userPlaylists]);
 	} else {
-		data = useContext(PlaylistContext).specificPlaylists;
+		memoized = useMemo(() => {
+			console.log(`***${user ? 'USER' : 'SPECIFIC'} LIST RENDER***`)
+			return (
+				<section>
+					<h2>{user ? 'Your' : 'Specific'} Playlists</h2>
+					{specificPlaylists !== null &&
+						specificPlaylists !== undefined &&
+						<ul>
+							{specificPlaylists.map((playlist) => {
+								return (
+									<li key={playlist.id}>
+										<p>{playlist.name}</p>
+										<p>{playlist.owner.display_name}</p>
+										<p>Tracks: {playlist.tracks}</p>
+										{playlist.image !== null &&
+											playlist.image !== undefined &&
+											<img src={playlist.image.url} alt='' />}
+									</li>
+								);
+							})}
+						</ul>
+					}
+				</section>
+			)
+		}, [specificPlaylists]);
 	};
-	return (
-		<section>
-			<h2>{user ? 'Your' : 'Specific'} Playlists</h2>
-			{data !== null &&
-				data !== undefined &&
-				<ul>
-					{data.map((playlist) => {
-						return (
-							<li key={playlist.id}>
-								<p>{playlist.name}</p>
-								<p>{playlist.owner.display_name}</p>
-								<p>Tracks: {playlist.tracks}</p>
-								{playlist.image !== null &&
-									playlist.image !== undefined &&
-									<img src={playlist.image.url} alt='' />}
-							</li>
-						);
-					})}
-				</ul>
-			}
-		</section>
-	);
+	return memoized;
 };
-export default PlaylistDisplay;
