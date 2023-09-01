@@ -108,7 +108,6 @@ export default async function handler(
 						tracks: ra.total_tracks
 					};
 					return res.status(200).json(returnra);
-					break;
 				default:
 					throw { status: 422, error: "This isn't a playlist or an album." };
 			}
