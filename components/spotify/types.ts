@@ -78,3 +78,28 @@ export interface getSpecificPlaylistApiRequest
 	extends Omit<NextApiRequest, 'query'> {
 	query: { id: string, type: 'album' | 'playlist' }
 }
+
+export interface createDiffPlaylistApiRequest
+	extends Omit<NextApiRequest, 'query'> {
+	query: { target: string, discrim: string }
+}
+
+export interface UserPlaylistContextSignature {
+	userPlaylists: MyPlaylistObject[] | null,
+	userCurrentPage: number | null,
+	userError: string | null,
+	userLoading: boolean,
+	clearUserPlaylistsHandler: () => null,
+	getUserPlaylistsHandler: () => Promise<null>,
+	updateUserPlaylistsHandler: () => null
+};
+
+export interface SpecificPlaylistContextSignature {
+	specificPlaylists: MyPlaylistObject[] | null,
+	specificError: string | null,
+	specificLoading: boolean,
+	getSpecificPlaylistHandler: (params: { id: string, type: string }) => Promise<null>,
+	clearSpecificPlaylistsHandler: () => null,
+}
+
+export type ProviderState = MyPlaylistObject[] | null;
