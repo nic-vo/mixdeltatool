@@ -2,7 +2,7 @@ import { MyPlaylistObject } from '../../types';
 import { createContext, useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 
-import type { SpecificPlaylistContextSignature, ProviderState } from '../../types';
+import type { SpecificContextSignature, ProviderState } from '../../types';
 
 const contextInit = {
 	specificPlaylists: null,
@@ -12,17 +12,17 @@ const contextInit = {
 	clearSpecificPlaylistsHandler: () => null,
 };
 
-const SpecificPlaylistContext = createContext<SpecificPlaylistContextSignature>(contextInit);
+const SpecificPlaylistContext = createContext<SpecificContextSignature>(contextInit);
 
 function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 	// TODO: This can be modified to remove unwanted playlists
-	const [specificPlaylists, setSpecificPlaylists] = useState<ProviderState>(null);
+	const [playlists, setPlaylists] = useState<ProviderState>(null);
 	// Statuses
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
 
 	// useEffect(() => {
-	// 	if (process.env.NEXT_PUBLIC_STORAGE_SALT === undefined) return () => { };
+	// 	if (process.env.NEXT_PUBLIC_STORAGE_SALT === undefined) return () => {};
 	// 	const localExpires = localStorage.getItem(LOCAL_EXPIRES);
 	// 	if (localExpires === null || parseInt(localExpires) < Date.now()) {
 	// 		localStorage.setItem(LOCAL_EXPIRES, Date.now().toString());
@@ -40,7 +40,7 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 	// }, []);
 
 	const clearSpecificPlaylistsHandler = () => {
-		setSpecificPlaylists(null);
+		setPlaylists(null);
 		setError(null);
 		return null;
 	};
@@ -66,25 +66,24 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 			};
 			if (raw.ok === false) {
 				const jsoned = await raw.json();
-				throw jsoned.error;
+				throw jsoned.error as string;
 			};
 			const jsoned = await raw.json() as MyPlaylistObject;
-			if (specificPlaylists === null) {
-				setSpecificPlaylists([jsoned]);
+			if (playlists === null) {
+				setPlaylists([jsoned]);
 			} else {
 				// Check to see if existing playlists contain new one
 				const currentMap = new Map();
 				// Put current playlists into map
-				for (const playlist of specificPlaylists)
+				for (const playlist of playlists)
 					currentMap.set(playlist.id, playlist);
 				// Check if map has new playlist's id
 				if (currentMap.has(jsoned.id) === true) throw 'You have this playlist';
 				else currentMap.set(jsoned.id, jsoned);
-				setSpecificPlaylists(Array.from(currentMap.values()));
+				setPlaylists(Array.from(currentMap.values()));
 			};
 		} catch (e: any) {
-			if (typeof (e) === 'string') setError(e);
-			else setError('Unknown error');
+			setError((typeof (e.error) === 'string' && e.error) || 'Unknown error');
 		};
 		setLoading(false);
 		return null;
@@ -93,7 +92,7 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 	return (
 		<SpecificPlaylistContext.Provider value={
 			{
-				specificPlaylists,
+				specificPlaylists: playlists,
 				specificLoading: loading,
 				specificError: error,
 				getSpecificPlaylistHandler,

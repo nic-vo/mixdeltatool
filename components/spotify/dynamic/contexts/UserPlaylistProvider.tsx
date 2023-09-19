@@ -2,7 +2,11 @@ import { MyUserAPIRouteResponse } from '@components/spotify/types';
 import { createContext, useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 
-import type { UserPlaylistContextSignature, ProviderState } from '../../types';
+import type {
+	UserContextSignature,
+	ProviderState,
+	MyPlaylistObject
+} from '../../types';
 
 const contextInit = {
 	userPlaylists: null,
@@ -14,13 +18,13 @@ const contextInit = {
 	updateUserPlaylistsHandler: () => null
 };
 
-const UserPlaylistContext = createContext<UserPlaylistContextSignature>(contextInit);
+const UserPlaylistContext = createContext<UserContextSignature>(contextInit);
 
 function UserPlaylistProvider(props: { children: React.ReactNode }) {
 	// This will only ever be added to
-	const [userPlaylists, setUserPlaylists] = useState<ProviderState>(null);
+	const [playlists, setPlaylists] = useState<ProviderState>(null);
 	// Controls pagination, must be validated on back-end
-	const [userCurrentPage, setUserCurrentPage] = useState<number | null>(0);
+	const [page, setPage] = useState<number | null>(0);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
 
@@ -29,9 +33,9 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 		console.log('get user playlists clicked')
 		setLoading(true);
 		try {
-			// If either 50th userCurrentPage of results or no next, cancel
-			if (userCurrentPage === null) throw 'No more';
-			const raw = await fetch(`/api/spotify/getUserPlaylists?page=${userCurrentPage}`);
+			// If either 50th page of results or no next, cancel
+			if (page === null) throw 'No more';
+			const raw = await fetch(`/api/spotify/getUserPlaylists?page=${page}`);
 			if (raw.status === 401) {
 				signIn();
 				throw 'Unauthorized';
@@ -39,17 +43,17 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 			if (raw.ok === false) {
 				const jsoned = await raw.json();
 				// TODO: define a standard error interface (?)
-				throw jsoned.error;
+				throw jsoned.error as string;
 			};
 			const jsoned = await raw.json() as MyUserAPIRouteResponse;
-			if (userPlaylists === null) {
-				setUserPlaylists(jsoned.playlists);
+			if (playlists === null) {
+				setPlaylists(jsoned.playlists);
 			} else {
 				// Only add non-duplicate playlists
 				const currentMap = new Map();
 				const newMap = new Map();
 				// Put current playlists in map
-				for (const playlist of userPlaylists)
+				for (const playlist of playlists)
 					currentMap.set(playlist.id, playlist);
 				// Put new playlists in their own map
 				for (const playlist of jsoned.playlists)
@@ -60,14 +64,13 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 					if (currentMap.has(key) === false)
 						currentMap.set(key, newMap.get(key));
 				// Set new playlist state from the ones that pass
-				setUserPlaylists(Array.from(currentMap.values()));
+				setPlaylists(Array.from(currentMap.values()));
 			};
 			// Disable fetching if no more pages
-			if (jsoned.next === null) setUserCurrentPage(null);
-			else setUserCurrentPage(prev => prev! + 1);
+			if (jsoned.next === null) setPage(null);
+			else setPage(prev => prev! + 1);
 		} catch (e: any) {
-			if (typeof (e) === 'string') setError(e);
-			else setError('Unknown error');
+			setError((typeof (e.error) === 'string' && e.error) || 'Unknown error');
 		};
 		setLoading(false);
 		return null;
@@ -85,7 +88,7 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 	// 		return () => { }
 	// 	}
 	// 	const localEnd = localStorage.getItem(LOCAL_END)
-	// 	if (localEnd !== null) setUserCurrentPage(null);
+	// 	if (localEnd !== null) setPage(null);
 	// 	const localUserLists = localStorage.getItem(LOCAL_USER_LISTS)
 	// 	if (localUserLists !== null) {
 	// 		const loadedUserPlaylists = JSON.parse
@@ -94,19 +97,24 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 
 	const clearUserPlaylistsHandler = () => {
 		console.log('clear user playlists clicked')
-		setUserPlaylists(null);
+		setPlaylists(null);
 		setError(null);
-		setUserCurrentPage(0);
+		setPage(0);
 		return null;
 	};
 
-	const updateUserPlaylistsHandler = () => null;
+	const updateUserPlaylistsHandler = (playlist: MyPlaylistObject) => {
+		const set = new Set(playlists);
+		set.add(playlist)
+		setPlaylists(Array.from(set));
+		return null;
+	};
 
 	return (
 		<UserPlaylistContext.Provider value={
 			{
-				userPlaylists,
-				userCurrentPage,
+				userPlaylists: playlists,
+				userCurrentPage: page,
 				userLoading: loading,
 				userError: error,
 				getUserPlaylistsHandler,
