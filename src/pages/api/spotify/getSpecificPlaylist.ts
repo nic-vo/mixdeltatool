@@ -94,7 +94,8 @@ export default async function handler(
 						id: rp.id,
 						name: rp.name,
 						owner: rp.owner,
-						tracks: rp.tracks.total
+						tracks: rp.tracks.total,
+						type: rp.type
 					};
 					return res.status(200).json(returnrp);
 				case 'album':
@@ -107,10 +108,10 @@ export default async function handler(
 							display_name: ra.artists.map((artist) => artist.name).join(', '),
 							href: ra.artists[0].href,
 							id: ra.artists[0].id,
-							uri: ra.artists[0].uri,
-							type: 'artist',
+							uri: ra.artists[0].uri
 						},
-						tracks: ra.total_tracks
+						tracks: ra.total_tracks,
+						type: ra.type
 					};
 					return res.status(200).json(returnra);
 				default:
