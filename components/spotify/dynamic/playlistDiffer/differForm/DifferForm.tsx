@@ -8,12 +8,31 @@ import {
 	useEffect,
 	useMemo
 } from 'react';
+import { signIn } from 'next-auth/react';
+import { MyPlaylistObject } from '@components/spotify/types';
+import { differTypesAndStrings } from '@consts/spotify';
+
+const radioArr = Object.keys(differTypesAndStrings);
+
+type typeState = 'adu' | 'odu' | 'otu' | 'bu' | 'stu';
 
 export default function DifferForm(props: { children: React.ReactNode }) {
 	const [target, setTarget] = useState<string | ''>('');
 	const [differ, setDiffer] = useState<string | ''>('');
-	const { userPlaylists } = useContext(UserPlaylistContext);
-	const { specificPlaylists } = useContext(SpecificPlaylistContext);
+	const [type, setType] = useState<typeState>('adu');
+	const [loading, setLoading] = useState<boolean>(false);
+	const [error, setError] = useState<string | null>(null);
+	const [success, setSuccess] = useState<true | null>(null);
+
+	const {
+		userPlaylists,
+		userLoading,
+		updateUserPlaylistsHandler
+	} = useContext(UserPlaylistContext);
+	const {
+		specificPlaylists,
+		specificLoading
+	} = useContext(SpecificPlaylistContext);
 
 	const userMap = useMemo(() => {
 		if (userPlaylists === null) return null;
@@ -50,8 +69,44 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 		return null;
 	};
 
-	const formSubmitHandler = async (e: React.SyntheticEvent) => {
+	const radioHandler = (e: ChangeEvent<HTMLInputElement>) => {
+		const newval = e.target.value as typeState;
+		setType(newval);
+		return null;
+	};
+
+	const formSubmitHandler = async (e: React.FormEvent) => {
 		e.preventDefault();
+		if (userLoading === true
+			|| specificLoading === true
+			|| target === ''
+			|| differ === ''
+			|| radioArr.includes(type) === false) return null;
+		setLoading(true);
+		try {
+			const raw = await fetch('/api/spotify/createDiffPlaylist', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					target,
+					differ,
+					type
+				})
+			});
+			if (raw.status === 401) signIn();
+			if (raw.ok === false) {
+				const jsoned = await raw.json();
+				throw jsoned.error as string;
+			};
+			const jsoned = await raw.json() as MyPlaylistObject;
+			updateUserPlaylistsHandler(jsoned);
+			setSuccess(true);
+		} catch (e: any) {
+			setError((typeof (e.error) === 'string' && e.error) || 'Unknown error');
+		};
+		setLoading(false);
 		return null;
 	};
 
@@ -85,10 +140,34 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 						{props.children}
 					</select>
 				</label>
-				<button type='submit'>Change it!</button>
+				<fieldset style={{ display: 'flex', flexDirection: 'column' }}>
+					<legend>What do you want to do to the target?</legend>
+					{
+						Object.entries(differTypesAndStrings).map((pair) => {
+							return (
+								<label htmlFor={pair[0]} key={pair[0]}>
+									<input
+										type='radio'
+										name='actionType'
+										id={pair[0]}
+										value={pair[0]}
+										defaultChecked={pair[0] === 'adu'}
+										onChange={radioHandler} />
+									{pair[1]}
+								</label>
+							)
+						})
+					}
+				</fieldset>
+				<button
+					disabled={userLoading || specificLoading}
+					type='submit'>Change it!</button>
 			</form>
 			<section>
 				<h3>Output</h3>
+				<p>
+					{type !== null && differTypesAndStrings[type]}
+				</p>
 				{
 					/*
 						Really jank conditional rendering
@@ -126,6 +205,6 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 					)
 				}
 			</section>
-		</section>
+		</section >
 	);
-}
+};
