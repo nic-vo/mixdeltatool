@@ -80,15 +80,29 @@ export interface getUserPlaylistsApiRequest
 
 export interface getSpecificPlaylistApiRequest
 	extends Omit<NextApiRequest, 'query'> {
-	query: { id: string, type: 'album' | 'playlist' }
+	query: {
+		id: string,
+		type: 'album' | 'playlist'
+	}
 }
 
-export interface createDiffPlaylistApiRequest
-	extends Omit<NextApiRequest, 'query'> {
-	query: { target: string, differ: string }
+export interface createDiffPlaylistApiRequest extends NextApiRequest {
+	body: {
+		target: { id: string, type: 'album' | 'playlist' },
+		differ: { id: string, type: 'album' | 'playlist' },
+		type: 'adu' | 'odu' | 'otu' | 'bu' | 'stu'
+	}
 }
 
-export interface UserPlaylistContextSignature {
+/*
+	'adu' === 'add differ's uniques' / 'keep the target but add everything unique from the differ'
+	'odu' === 'only differ's uniques' / 'delete everything except what's unique to the differ'
+	'otu' === 'only target's uniques' / 'delete everything except what's unique to the target'
+	'bu' === 'both uniques' / 'delete all similarities but keep all differences'
+	'stu' === 'keep only similarities'
+*/
+
+export interface UserContextSignature {
 	userPlaylists: MyPlaylistObject[] | null,
 	userCurrentPage: number | null,
 	userError: string | null,
@@ -107,3 +121,20 @@ export interface SpecificPlaylistContextSignature {
 }
 
 export type ProviderState = MyPlaylistObject[] | null;
+
+export interface SpotTracksResponse extends BasicSpotApiResponse {
+	next: string,
+	total: number,
+	items: SpotTrackObject[]
+}
+
+export interface differInternalPlaylistPromise {
+	partial: boolean,
+	total: number,
+	items: string[]
+}
+
+export interface differInternalAddPromise {
+	partial: boolean,
+	total: number
+}
