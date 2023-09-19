@@ -109,14 +109,16 @@ export interface UserContextSignature {
 	userLoading: boolean,
 	clearUserPlaylistsHandler: () => null,
 	getUserPlaylistsHandler: () => Promise<null>,
-	updateUserPlaylistsHandler: () => null
+	updateUserPlaylistsHandler: (playlist: MyPlaylistObject) => null
 };
 
-export interface SpecificPlaylistContextSignature {
+export interface SpecificContextSignature {
 	specificPlaylists: MyPlaylistObject[] | null,
 	specificError: string | null,
 	specificLoading: boolean,
-	getSpecificPlaylistHandler: (params: { id: string, type: string }) => Promise<null>,
+	getSpecificPlaylistHandler: (params:
+		{ id: string, type: string }
+	) => Promise<null>,
 	clearSpecificPlaylistsHandler: () => null,
 }
 
