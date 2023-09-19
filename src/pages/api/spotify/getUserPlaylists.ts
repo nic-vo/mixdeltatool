@@ -1,13 +1,12 @@
-import { NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth';
-
 import { authOptions } from '@lib/auth/options';
-import { routeKeyRetriever } from '@lib/auth/accessKey';
+import { routeKeyRetriever } from '@lib/auth/accessKey'
+import { pageQueryParser } from '@lib/spotify/validators';
 
 import {
 	SPOT_LOGIN_WINDOW,
 	SPOT_PLAYLIST_ITER_INT,
-	SPOT_PLAYLIST_PAGE_LIMIT
+	SPOT_URL_BASE
 } from '@consts/spotify';
 
 import {
@@ -17,6 +16,7 @@ import {
 	SpotUserPlaylistsResponse,
 	getUserPlaylistsApiRequest
 } from '@components/spotify/types';
+import { NextApiResponse } from 'next';
 
 // The assumption for this route is that every sign-on refreshes access token
 // Session never updates, and only exists until access token expiry
@@ -24,17 +24,24 @@ import {
 export default async function handler(
 	req: getUserPlaylistsApiRequest, res: NextApiResponse
 ) {
+	let returnItems: undefined | MyUserAPIRouteResponse;
+	const globalTimeout = setTimeout(() => {
+		if (returnItems !== undefined)
+			return res.status(200).json(returnItems)
+		return res.status(504).json({ error: 'Server timeout' })
+	}, 9000);
+
 	try {
 		// Validate req method
 		if (req.method !== 'GET')
 			throw { status: 405, error: 'GET only' };
 		// Validate query parameters
-		if (Object.keys(req.query).length !== 1 || 'page' in req.query === false)
-			throw { status: 400, error: 'Bad request' };
-		// Should only request page, which should be 0 <= page <= 19
-		const page = parseInt(req.query.page, 10);
-		if (isNaN(page) === true || page < 0 || page > SPOT_PLAYLIST_PAGE_LIMIT)
-			throw { status: 422, error: 'Bad request' };
+		let page;
+		try {
+			page = pageQueryParser.parse(req.query).page;
+		} catch {
+			throw { status: 400, error: 'Bad request' }
+		};
 
 		// Check next-auth session
 		const session = await getServerSession(req, res, authOptions);
@@ -70,7 +77,7 @@ export default async function handler(
 			});
 			headers.append('Authorization', `Bearer ${access_token}`);
 			const rawSpotify = await fetch(
-				`https://api.spotify.com/v1/me/playlists?${params.toString()}`, {
+				`${SPOT_URL_BASE}me/playlists?${params.toString()}`, {
 				headers: headers
 			});
 			if (rawSpotify.ok === false) {
@@ -86,19 +93,17 @@ export default async function handler(
 						throw { status: 500, error: 'Spotify error' };
 				};
 			};
-			//
 			const jsoned = await rawSpotify.json() as SpotUserPlaylistsResponse;
-			const { next } = jsoned;
 			const items = jsoned.items as SpotPlaylistObject[];
-			const returnItems: MyUserAPIRouteResponse = {
-				next,
+			returnItems = {
+				next: jsoned.next ? 1 : null,
 				playlists: items.map(item => {
-					const { id, images, name, owner, tracks } = item;
+					const { id, images, name, owner, tracks, type } = item;
 					return {
-						id, image: images[0], name, owner, tracks: tracks.total
+						id, image: images[0], name, owner, tracks: tracks.total, type
 					} as MyPlaylistObject;
 				})
-			};
+			} as MyUserAPIRouteResponse;
 			return res.status(200).json(returnItems);
 
 		} catch (e: any) {
