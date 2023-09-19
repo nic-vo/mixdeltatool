@@ -2,7 +2,6 @@ import { NextApiRequest } from 'next';
 
 interface BasicSpotObj {
 	id: string,
-	type: string,
 	uri: string,
 	href: string
 }
@@ -15,7 +14,8 @@ export interface SpotPlaylistObject extends BasicSpotObj {
 	owner: SpotUser,
 	public: boolean,
 	snapshot_id: string,
-	tracks: { href: string, total: number }
+	tracks: { href: string, total: number },
+	type: 'playlist'
 }
 
 export interface SpotAlbumObject extends BasicSpotObj {
@@ -30,8 +30,11 @@ export interface SpotAlbumObject extends BasicSpotObj {
 	release_date_precision: 'year' | 'month' | 'day',
 	tracks: {
 		href: string
-	}
+	},
+	type: 'album'
 }
+
+export interface SpotTrackObject extends BasicSpotObj { }
 
 export interface SpotUser extends BasicSpotObj {
 	display_name: string | null
@@ -48,24 +51,25 @@ export interface SpotImageObject {
 	width: number
 }
 
-export interface SpotPlaylistsResponse {
+export interface BasicSpotApiResponse {
 	href: string,
-	next: null | string
+	next: string | null
 }
 
 export interface SpotUserPlaylistsResponse
-	extends SpotPlaylistsResponse {
+	extends BasicSpotApiResponse {
 	items: SpotPlaylistObject[]
 }
 
-export interface MyPlaylistObject extends
-	Pick<SpotPlaylistObject, 'id' | 'name' | 'owner'> {
+export interface MyPlaylistObject
+	extends Pick<SpotPlaylistObject, 'id' | 'name' | 'owner'> {
 	image: SpotImageObject,
-	tracks: number
+	tracks: number,
+	type: 'album' | 'playlist'
 }
 
-export interface MyUserAPIRouteResponse extends
-	Pick<SpotUserPlaylistsResponse, 'next'> {
+export interface MyUserAPIRouteResponse {
+	next: number | null,
 	playlists: MyPlaylistObject[]
 }
 
