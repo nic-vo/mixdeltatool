@@ -4,7 +4,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@lib/auth/options';
 import { routeKeyRetriever } from '@lib/auth/accessKey';
 
-import { SPOT_LOGIN_WINDOW } from '@consts/spotify';
+import { SPOT_LOGIN_WINDOW, SPOT_URL_BASE } from '@consts/spotify';
 
 import {
 	MyPlaylistObject,
@@ -12,6 +12,9 @@ import {
 	SpotPlaylistObject,
 	getSpecificPlaylistApiRequest
 } from '@components/spotify/types';
+import { playlistIdTypeParser } from '@lib/spotify/validators';
+
+import { ZodError } from 'zod/lib';
 
 
 // The assumption for this route is that every sign-on refreshes access token
@@ -25,14 +28,16 @@ export default async function handler(
 		if (req.method !== 'GET')
 			throw { status: 405, error: 'GET only' };
 		// Validate query parameters
-		if (Object.keys(req.query).length !== 2
-			|| 'id' in req.query === false
-			|| 'type' in req.query === false)
-			throw { status: 400, error: 'Bad request' };
-		// Spotify playlist id *SHOULD* be 22 chars, alphanumeric
-		if (/^[A-Za-z0-9]{22}$/.test(req.query.id) === false
-			|| (req.query.type !== 'album' && req.query.type !== 'playlist'))
-			throw { status: 422, error: 'Bad request' };
+		try {
+			playlistIdTypeParser.parse(req.query);
+		} catch (e: any) {
+			const error = e as ZodError;
+			const map = new Map();
+			for (const issue of error.issues) map.set(issue.code, issue);
+			if (map.has('unrecognized_keys') === true)
+				throw { status: 400, error: 'Bad request' };
+			else throw { status: 422, error: 'Bad request' };
+		};
 
 		// Check next-auth session
 		const session = await getServerSession(req, res, authOptions);
@@ -63,7 +68,7 @@ export default async function handler(
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${access_token}`);
 			const rawSpotify = await fetch(
-				`https://api.spotify.com/v1/${req.query.type}s/${req.query.id}`, {
+				`${SPOT_URL_BASE}${req.query.type}s/${req.query.id}`, {
 				headers: headers
 			});
 			if (rawSpotify.ok === false) {
