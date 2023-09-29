@@ -104,9 +104,13 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 	};
 
 	const updateUserPlaylistsHandler = (playlist: MyPlaylistObject) => {
-		const set = new Set(playlists);
-		set.add(playlist)
-		setPlaylists(Array.from(set));
+		const set = new Set();
+		if (playlists !== null) {
+			for (const playlist of playlists) set.add(playlist.id);
+			if (set.has(playlist.id) === false) {
+				setPlaylists([playlist, ...playlists])
+			};
+		};
 		return null;
 	};
 
