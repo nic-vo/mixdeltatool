@@ -34,7 +34,7 @@ export interface SpotAlbumObject extends BasicSpotObj {
 	type: 'album'
 }
 
-export interface SpotTrackObject extends BasicSpotObj { }
+export interface SpotTrackObject { track: Pick<BasicSpotObj, 'uri'> }
 
 export interface SpotUser extends BasicSpotObj {
 	display_name: string | null
@@ -139,4 +139,8 @@ export interface differInternalPlaylistPromise {
 export interface differInternalAddPromise {
 	partial: boolean,
 	total: number
+}
+
+export interface successState {
+	reasons: string[]
 }
