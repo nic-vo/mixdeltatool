@@ -133,7 +133,8 @@ export interface SpotTracksResponse extends BasicSpotApiResponse {
 export interface differInternalPlaylistPromise {
 	partial: boolean,
 	total: number,
-	items: string[]
+	items: string[],
+	apiNull: boolean
 }
 
 export interface differInternalAddPromise {
