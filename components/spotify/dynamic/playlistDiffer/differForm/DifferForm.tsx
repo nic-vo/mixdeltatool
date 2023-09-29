@@ -12,7 +12,7 @@ import { signIn } from 'next-auth/react';
 import { MyPlaylistObject, successState } from '@components/spotify/types';
 import { CLIENT_DIFF_TYPES } from '@consts/spotify';
 
-const radioArr = Object.keys(differTypesAndStrings);
+const radioArr = Object.keys(CLIENT_DIFF_TYPES);
 
 type typeState = 'adu' | 'odu' | 'otu' | 'bu' | 'stu';
 
@@ -177,7 +177,7 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 				<fieldset style={{ display: 'flex', flexDirection: 'column' }}>
 					<legend>What do you want to do to the target?</legend>
 					{
-						Object.entries(differTypesAndStrings).map((pair) => {
+						Object.entries(CLIENT_DIFF_TYPES).map((pair) => {
 							return (
 								<label htmlFor={pair[0]} key={pair[0]}>
 									<input
@@ -194,13 +194,13 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 					}
 				</fieldset>
 				<button
-					disabled={userLoading || specificLoading}
+					disabled={userLoading || specificLoading || loading}
 					type='submit'>Change it!</button>
 			</form>
 			<section>
 				<h3>Output</h3>
 				<p>
-					{type !== null && differTypesAndStrings[type]}
+					{type !== null && CLIENT_DIFF_TYPES[type]}
 				</p>
 				{
 					/*
