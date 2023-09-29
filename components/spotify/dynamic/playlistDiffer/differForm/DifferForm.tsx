@@ -107,6 +107,7 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 			|| differ === null
 			|| radioArr.includes(type) === false) return null;
 		setLoading(true);
+		setError(null);
 		try {
 			const raw = await fetch('/api/spotify/createDiffPlaylist', {
 				method: 'POST',
@@ -138,7 +139,7 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 			updateUserPlaylistsHandler(jsoned.playlist);
 			setSuccess(jsoned.part);
 		} catch (e: any) {
-			setError((typeof (e.error) === 'string' && e.error) || 'Unknown error');
+			setError(e.error || 'Unknown error');
 		};
 		setLoading(false);
 		return null;
@@ -199,6 +200,47 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 			</form>
 			<section>
 				<h3>Output</h3>
+				<section>
+					{
+						success !== null && (<>
+							<h4>Success{
+								error === null
+									|| (success !== null && success.reasons.length > 0) ?
+									'!' : '?'
+							}</h4>
+							<p>
+								{
+									error !== null && error
+								}
+								{
+									success === null ? '' : success.reasons.length > 0 ?
+										'Partial success' :
+										'Total success'
+								}
+							</p>
+							{
+								success !== null
+								&& success.reasons.length > 0
+								&& (
+									<figure>
+										<figcaption>Reasons</figcaption>
+										<ul>
+											{
+												success.reasons.map(
+													(reason, index) =>
+														<li key={`reason-${index}`}>{reason}</li>)
+											}
+										</ul>
+									</figure>
+								)
+							}
+						</>)
+					}
+				</section>
+
+			</section>
+			<section>
+				<h3>Preview</h3>
 				<p>
 					{type !== null && CLIENT_DIFF_TYPES[type]}
 				</p>
