@@ -9,20 +9,20 @@ import {
 	useMemo
 } from 'react';
 import { signIn } from 'next-auth/react';
-import { MyPlaylistObject } from '@components/spotify/types';
-import { differTypesAndStrings } from '@consts/spotify';
+import { MyPlaylistObject, successState } from '@components/spotify/types';
+import { CLIENT_DIFF_TYPES } from '@consts/spotify';
 
 const radioArr = Object.keys(differTypesAndStrings);
 
 type typeState = 'adu' | 'odu' | 'otu' | 'bu' | 'stu';
 
 export default function DifferForm(props: { children: React.ReactNode }) {
-	const [target, setTarget] = useState<string | ''>('');
-	const [differ, setDiffer] = useState<string | ''>('');
+	const [target, setTarget] = useState<MyPlaylistObject | null>(null);
+	const [differ, setDiffer] = useState<MyPlaylistObject | null>(null);
 	const [type, setType] = useState<typeState>('adu');
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
-	const [success, setSuccess] = useState<true | null>(null);
+	const [success, setSuccess] = useState<successState | null>(null);
 
 	const {
 		userPlaylists,
@@ -54,18 +54,42 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 
 	// Reset form values if playlists change
 	useEffect(() => {
-		if (target === '' && differ === '') return;
-		setTarget('');
-		setDiffer('');
+		if (target === null && differ === null) return;
+		setTarget(null);
+		setDiffer(null);
 	}, [userPlaylists, specificPlaylists]);
 
 	const targetChangeHandler = (e: ChangeEvent<HTMLSelectElement>) => {
-		setTarget(e.target.value);
+		const userMap = new Map();
+		if (userPlaylists !== null)
+			for (const playlist of userPlaylists)
+				userMap.set(playlist.id, playlist);
+
+		const specificMap = new Map();
+		if (specificPlaylists !== null)
+			for (const playlist of specificPlaylists)
+				specificMap.set(playlist.id, playlist);
+
+		const id = e.target.value
+		if (userMap.has(id)) setTarget(userMap.get(id))
+		else if (specificMap.has(id)) setTarget(specificMap.get(id));
 		return null;
 	};
 
 	const differChangeHandler = (e: ChangeEvent<HTMLSelectElement>) => {
-		setDiffer(e.target.value);
+		const userMap = new Map();
+		if (userPlaylists !== null)
+			for (const playlist of userPlaylists)
+				userMap.set(playlist.id, playlist);
+
+		const specificMap = new Map();
+		if (specificPlaylists !== null)
+			for (const playlist of specificPlaylists)
+				specificMap.set(playlist.id, playlist);
+
+		const id = e.target.value
+		if (userMap.has(id)) setDiffer(userMap.get(id))
+		else if (specificMap.has(id)) setDiffer(specificMap.get(id));
 		return null;
 	};
 
@@ -79,8 +103,8 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 		e.preventDefault();
 		if (userLoading === true
 			|| specificLoading === true
-			|| target === ''
-			|| differ === ''
+			|| target === null
+			|| differ === null
 			|| radioArr.includes(type) === false) return null;
 		setLoading(true);
 		try {
@@ -90,9 +114,19 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					target,
-					differ,
-					type
+					target: {
+						id: target.id,
+						type: target.type,
+						name: target.name,
+						owner: target.owner.display_name
+					},
+					differ: {
+						id: differ.id,
+						type: differ.type,
+						name: differ.name,
+						owner: differ.owner.display_name
+					},
+					type: type
 				})
 			});
 			if (raw.status === 401) signIn();
@@ -100,9 +134,9 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 				const jsoned = await raw.json();
 				throw jsoned.error as string;
 			};
-			const jsoned = await raw.json() as MyPlaylistObject;
-			updateUserPlaylistsHandler(jsoned);
-			setSuccess(true);
+			const jsoned = await raw.json() as { part: successState, playlist: MyPlaylistObject };
+			updateUserPlaylistsHandler(jsoned.playlist);
+			setSuccess(jsoned.part);
 		} catch (e: any) {
 			setError((typeof (e.error) === 'string' && e.error) || 'Unknown error');
 		};
@@ -121,7 +155,7 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 						required
 						name='target'
 						id='target'
-						value={target}
+						value={target !== null ? target.id : ''}
 						onChange={targetChangeHandler}>
 						<option value=''>Choose one</option>
 						{props.children}
@@ -134,7 +168,7 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 						required
 						name='differ'
 						id='differ'
-						value={differ}
+						value={differ !== null ? differ.id : ''}
 						onChange={differChangeHandler}>
 						<option value=''>Choose one</option>
 						{props.children}
@@ -172,33 +206,33 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 					/*
 						Really jank conditional rendering
 					*/
-					target !== '' && (
+					target !== null && (
 						<section>
 							<h4>Target</h4>
 							{
 								(
-									userMap?.has(target)
-									&& (<PlaylistSingle playlist={userMap.get(target)} />)
+									userMap?.has(target.id)
+									&& (<PlaylistSingle playlist={userMap.get(target.id)} />)
 								)
 								|| (
-									specificMap?.has(target)
-									&& (<PlaylistSingle playlist={specificMap.get(target)} />)
+									specificMap?.has(target.id)
+									&& (<PlaylistSingle playlist={specificMap.get(target.id)} />)
 								)
 							}
 						</section>
 					)
 				}
 				{
-					differ !== '' && (
+					differ !== null && (
 						<section>
 							<h4>Differ</h4>
 							{
 								(
-									userMap?.has(differ)
-									&& (<PlaylistSingle playlist={userMap.get(differ)} />)
+									userMap?.has(differ.id)
+									&& (<PlaylistSingle playlist={userMap.get(differ.id)} />)
 								)
-								|| (specificMap?.has(differ)
-									&& (<PlaylistSingle playlist={specificMap.get(differ)} />)
+								|| (specificMap?.has(differ.id)
+									&& (<PlaylistSingle playlist={specificMap.get(differ.id)} />)
 								)
 							}
 						</section>
