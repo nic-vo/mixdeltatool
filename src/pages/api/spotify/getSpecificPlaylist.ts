@@ -26,6 +26,11 @@ export default async function handler(
 		return res.status(504).json({ message: 'Server timed out' });
 	}, 9000);
 
+	const authTimeout = setTimeout(() => {
+		return res.status(504).json({ message: 'Server timed out' });
+	}, 3000);
+
+
 	try {
 		// Validate req method
 		if (req.method !== 'GET') throw new ReqMethodError('GET');
@@ -64,6 +69,7 @@ export default async function handler(
 			|| Date.now() - expiresAt < 3600 - SPOT_LOGIN_WINDOW)
 			throw new AuthError();
 
+		clearTimeout(authTimeout);
 		// Hit spotify API with retrieved access token
 		const data = await specificPlaylistGetter(
 			{
