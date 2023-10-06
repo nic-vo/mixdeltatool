@@ -43,27 +43,24 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 		setPlaylists(null);
 		setError(null);
 		return null;
-	};
+	}
 
 	// For use with input element
 	const getSpecificPlaylistHandler = async (
 		params: {
 			type: string, id: string
 		}) => {
-
-		console.log('get specific playlists clicked')
-
+		setError(null);
 		setLoading(true);
 		try {
 			const { id, type } = params;
-			if (type !== 'album' && id !== 'playlist') {
-				throw 'There is an error with this album / playlist link.'
-			};
-			const raw = await fetch(`/api/spotify/getSpecificPlaylist?id=${id}&type=${type}`)
+			if (type !== 'album' && type !== 'playlist') {
+				throw { message: 'There is an error with this album / playlist link.' }
+			}
+			const raw = await fetch(`/api/spotify/getSpecificPlaylist?id=${id}&type=${type}`);
 			if (raw.status === 401) {
 				signIn();
-				throw 'Unauthorized';
-			};
+			}
 			if (raw.ok === false) {
 				const jsoned = await raw.json();
 				throw jsoned.error as string;
@@ -81,13 +78,13 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 				if (currentMap.has(jsoned.id) === true) throw 'You have this playlist';
 				else currentMap.set(jsoned.id, jsoned);
 				setPlaylists(Array.from(currentMap.values()));
-			};
+			}
 		} catch (e: any) {
 			setError((typeof (e.error) === 'string' && e.error) || 'Unknown error');
 		};
 		setLoading(false);
 		return null;
-	};
+	}
 
 	return (
 		<SpecificPlaylistContext.Provider value={
@@ -101,7 +98,7 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 			{props.children}
 		</SpecificPlaylistContext.Provider>
 	);
-};
+}
 
 export {
 	SpecificPlaylistContext,
