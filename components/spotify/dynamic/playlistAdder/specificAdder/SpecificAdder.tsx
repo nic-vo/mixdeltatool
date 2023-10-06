@@ -10,7 +10,7 @@ Has to adapt the playlist context's specificPlaylistHandler to a <form>
 
 */
 
-export default function SpecificAdder() {
+export default function SpecificAdder(props: { children: React.ReactNode }) {
 	const [href, setHref] = useState<string | ''>('');
 
 	console.log('***SPECIFIC ADDER RENDER***')
@@ -75,6 +75,8 @@ export default function SpecificAdder() {
 				<p>specific {specificLoading ? 'loading' : 'idle'}</p>
 				<p>{specificError !== null && specificError}</p>
 			</section>
+			{props.children}
+			<button onClick={clearSpecificPlaylistsHandler}>Clear specific playlists</button>
 		</section>
 	);
 };

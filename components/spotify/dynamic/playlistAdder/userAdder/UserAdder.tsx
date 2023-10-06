@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { UserPlaylistContext } from '../../contexts/UserPlaylistProvider';
 
-export default function UserAdder() {
+export default function UserAdder(props: { children: React.ReactNode }) {
 
 	console.log('***USER ADDER RENDER***')
 
@@ -30,6 +30,15 @@ export default function UserAdder() {
 				<p>User {userLoading ? 'loading' : 'idle'}</p>
 				<p>{userError !== null && userError}</p>
 			</section>
+			{props.children}
+			<button
+				onClick={getUserPlaylistsHandler}
+				disabled={userLoading || userCurrentPage === null}>
+				Get your playlists</button>
+			<button
+				onClick={clearUserPlaylistsHandler}
+				disabled={userLoading}>
+				Clear your playlists</button>
 		</section>
 	);
 };

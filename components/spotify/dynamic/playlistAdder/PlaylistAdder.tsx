@@ -17,10 +17,12 @@ export default function PlaylistAdder() {
 	return (
 		<section>
 			<h2>Get some playlists for the tool</h2>
-			<UserAdder />
-			<PlaylistDisplay user={true} />
-			<SpecificAdder />
-			<PlaylistDisplay user={false} />
+			<UserAdder>
+				<PlaylistDisplay user={true} />
+			</UserAdder>
+			<SpecificAdder>
+				<PlaylistDisplay user={false} />
+			</SpecificAdder>
 		</section>
 	);
 };
