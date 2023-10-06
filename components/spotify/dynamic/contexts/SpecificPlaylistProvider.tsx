@@ -18,26 +18,22 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 	// TODO: This can be modified to remove unwanted playlists
 	const [playlists, setPlaylists] = useState<ProviderState>(null);
 	// Statuses
+	const [first, setFirst] = useState(true);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
 
-	// useEffect(() => {
-	// 	if (process.env.NEXT_PUBLIC_STORAGE_SALT === undefined) return () => {};
-	// 	const localExpires = localStorage.getItem(LOCAL_EXPIRES);
-	// 	if (localExpires === null || parseInt(localExpires) < Date.now()) {
-	// 		localStorage.setItem(LOCAL_EXPIRES, Date.now().toString());
-	// 		localStorage.setItem(LOCAL_END, '');
-	// 		localStorage.setItem(LOCAL_USER_LISTS, '');
-	// 		localStorage.setItem(LOCAL_CUSTOM_LISTS, '');
-	// 		return () => { }
-	// 	}
-	// 	const localEnd = localStorage.getItem(LOCAL_END)
-	// 	if (localEnd !== null) setUserCurrentPage(null);
-	// 	const localUserLists = localStorage.getItem(LOCAL_USER_LISTS)
-	// 	if (localUserLists !== null) {
-	// 		const loadedUserPlaylists = JSON.parse
-	// 	}
-	// }, []);
+	useEffect(() => {
+		if (first === true) {
+			const storageData = sessionStorage.getItem('SPECIFIC_PLAYLISTS');
+			if (storageData !== null) {
+				const sessionPlaylists = JSON.parse(storageData) as ProviderState;
+				setPlaylists(sessionPlaylists);
+			}
+			setFirst(false);
+		} else {
+			sessionStorage.setItem('SPECIFIC_PLAYLISTS', JSON.stringify(playlists));
+		}
+	}, [playlists]);
 
 	const clearSpecificPlaylistsHandler = () => {
 		setPlaylists(null);

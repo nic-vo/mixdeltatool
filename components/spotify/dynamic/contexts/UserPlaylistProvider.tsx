@@ -23,6 +23,7 @@ const UserPlaylistContext = createContext<UserContextSignature>(contextInit);
 function UserPlaylistProvider(props: { children: React.ReactNode }) {
 	// This will only ever be added to
 	const [playlists, setPlaylists] = useState<ProviderState>(null);
+	const [first, setFirst] = useState(true);
 	// Controls pagination, must be validated on back-end
 	const [page, setPage] = useState<number | null>(0);
 	const [loading, setLoading] = useState<boolean>(false);
@@ -72,24 +73,18 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 		return null;
 	}
 
-
-	// useEffect(() => {
-	// 	if (process.env.NEXT_PUBLIC_STORAGE_SALT === undefined) return () => { };
-	// 	const localExpires = localStorage.getItem(LOCAL_EXPIRES);
-	// 	if (localExpires === null || parseInt(localExpires) < Date.now()) {
-	// 		localStorage.setItem(LOCAL_EXPIRES, Date.now().toString());
-	// 		localStorage.setItem(LOCAL_END, '');
-	// 		localStorage.setItem(LOCAL_USER_LISTS, '');
-	// 		localStorage.setItem(LOCAL_CUSTOM_LISTS, '');
-	// 		return () => { }
-	// 	}
-	// 	const localEnd = localStorage.getItem(LOCAL_END)
-	// 	if (localEnd !== null) setPage(null);
-	// 	const localUserLists = localStorage.getItem(LOCAL_USER_LISTS)
-	// 	if (localUserLists !== null) {
-	// 		const loadedUserPlaylists = JSON.parse
-	// 	}
-	// }, []);
+	useEffect(() => {
+		if (first === true) {
+			const storageData = sessionStorage.getItem('USER_PLAYLISTS');
+			if (storageData !== null) {
+				const sessionPlaylists = JSON.parse(storageData) as ProviderState;
+				setPlaylists(sessionPlaylists);
+			}
+			setFirst(false);
+		} else {
+			sessionStorage.setItem('USER_PLAYLISTS', JSON.stringify(playlists));
+		}
+	}, [playlists]);
 
 	const clearUserPlaylistsHandler = () => {
 		setPlaylists(null);
