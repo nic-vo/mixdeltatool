@@ -86,6 +86,8 @@ export interface getSpecificPlaylistApiRequest
 	}
 }
 
+export type ActionType = 'adu' | 'odu' | 'otu' | 'bu' | 'stu'
+
 export interface createDiffPlaylistApiRequest extends NextApiRequest {
 	body: {
 		target: { id: string, type: 'album' | 'playlist' },
