@@ -1,24 +1,49 @@
-import { SPOT_LOGIN_WINDOW, SPOT_URL_BASE } from '@consts/spotify';
 import { routeKeyRetriever } from '@lib/auth/accessKey';
-import { authOptions } from '@lib/auth/options';
 import { getServerSession } from 'next-auth';
-
+import { createEmptyPlaylist, outputAdder, playlistGetter, userGetter } from '@lib/spotify/differPromises';
 import { diffBodyParser } from '@lib/spotify/validators';
 
-import { ZodError } from 'zod/lib';
+import {
+	SERVER_DIFF_TYPES,
+	SPOT_LOGIN_WINDOW,
+	SPOT_URL_BASE
+} from '@consts/spotify';
+import { authOptions } from '@lib/auth/options';
+
 import { NextApiResponse } from 'next';
+import { ZodError } from 'zod/lib';
 import {
 	MyPlaylistObject,
 	createDiffPlaylistApiRequest,
 } from '@components/spotify/types';
-import { outputAdder, playlistGetter } from '@lib/spotify/differPromises';
+import {
+	AuthError,
+	FetchError,
+	ForbiddenError,
+	MalformedError,
+	RateError,
+	ReqMethodError,
+	UnprocessableError
+} from '@lib/spotify/errors';
 
 export default async function handler(
 	req: createDiffPlaylistApiRequest, res: NextApiResponse
 ) {
+	const globalTimeoutMS = Date.now() + 9000;
+	const authTimeout = setTimeout(() => {
+		return res.status(504).json({ message: 'Server timed out' })
+	}, 3000);
+	const globalTimeout = setTimeout(() => {
+		if (newPlaylist !== undefined)
+			return res.status(200).json({ part, playlist: newPlaylist });
+		return res.status(504).json({ message: 'Server timed out' })
+	}, 9000);
+	let newPlaylist: MyPlaylistObject;
+	// Because of imeouts, allow partial flag and reasons
+	let part = { reasons: [] as string[] };
 	try {
 		// Validate req method
-		if (req.method !== 'POST') throw { status: 405, error: 'POST only' };
+		if (req.method !== 'POST') throw new ReqMethodError('POST');
 		// Validate body and body values
 		let target, differ, actionType;
 		try {
@@ -30,113 +55,89 @@ export default async function handler(
 			const error = e as ZodError;
 			const map = new Map();
 			for (const issue of error.issues) map.set(issue.code, issue);
-			if (map.has('unrecognized_keys') === true)
-				throw { status: 400, error: 'Bad request' };
-			else throw { status: 422, error: 'Bad request' };
-		};
+			if (map.has('unrecognized_keys') === true) throw new MalformedError();
+			else throw new UnprocessableError();
+		}
+
+		// Undefined check for TypeScript -_-
+		if (target === undefined
+			|| differ === undefined
+			|| actionType === undefined)
+			throw new MalformedError();
 
 		// Check next-auth session
 		const session = await getServerSession(req, res, authOptions);
 		// If no session, send 401 and client-side should redirect
 		if (session === null || session === undefined)
-			throw { status: 401, error: 'Unauthorized' };
+			throw new AuthError();
 
 		// Access token should never expire if there is a session
-		let token = null;
 		// Custom access token retriever outside of next-auth flow
 		// Network failure is possible here
-		try { token = await routeKeyRetriever(session.user.id) }
-		catch { throw { status: 502, error: 'Network error' } };
+		let token;
+		try {
+			token = await routeKeyRetriever(session.user.id);
+		} catch {
+			throw new FetchError('Server error; try again');
+		}
 		// No token means that user account somehow unlinked => client redirect
-		if (token === null) throw { status: 401, error: 'Unauthorized' };
+		if (token === null || token === undefined) throw new AuthError();
+		clearTimeout(authTimeout);
 
 		// Check if session is being accessed when access token might not be live
-		const { expires_at, access_token } = token;
-		if ((expires_at === undefined || expires_at === null)
-			|| (access_token === undefined || access_token === null)
-			|| Date.now() - expires_at < 3600 - SPOT_LOGIN_WINDOW)
-			throw { status: 401, error: 'Unauthorized' };
-
-		// At this point because of timeouts, allow partial success flag and details
-		let success = { type: 'full', reasons: [] as string[] };
+		const { expiresAt, accessToken } = token;
+		if ((expiresAt === undefined || expiresAt === null)
+			|| (accessToken === undefined || accessToken === null)
+			|| Date.now() - expiresAt < 3600 - SPOT_LOGIN_WINDOW)
+			throw new AuthError();
 
 		// Get user and create playlist
-		let newPlaylist: MyPlaylistObject;
-		try {
-			const headers = new Headers();
-			headers.append('Authorization', `Bearer ${access_token}`);
+		const userId = await userGetter({ accessToken, globalTimeoutMS });
+		newPlaylist = await createEmptyPlaylist({
+			accessToken,
+			actionType,
+			userId,
+			target,
+			differ,
+			globalTimeoutMS
+		});
 
-			const userRaw = await fetch(SPOT_URL_BASE.concat('me'), { headers });
-			if (userRaw.ok === false)
-				switch (userRaw.status) {
-					case 401:
-					case 403:
-						throw { status: 401, error: 'Unauthorized' };
-					case 429:
-						throw { status: 429, error: 'Try again in a few minutes' };
-					default:
-						throw { status: 500, error: 'Spotify error' };
-				};
-			const userJsoned = await userRaw.json();
-			headers.append('Content-Type', 'application/json')
-			const createPlaylistRaw = await fetch(
-				SPOT_URL_BASE.concat('users/', userJsoned.id, '/playlists'),
-				{
-					headers,
-					method: 'POST',
-					body: JSON.stringify({
-						name: `SuperUser ${actionType} ${Date.now()}`,
-						description: 'Created by the Spotify SuperUser playlist tool'
-					})
-				});
-			if (createPlaylistRaw.ok === false)
-				switch (createPlaylistRaw.status) {
-					case 401:
-					case 403:
-						throw { status: 401, error: 'Unauthorized' };
-					case 429:
-						throw { status: 429, error: 'Try again in a few minutes' };
-					default:
-						throw { status: 500, error: 'Spotify error' };
-				};
-			const createPlaylistJsoned = await createPlaylistRaw.json();
-			newPlaylist = {
-				id: createPlaylistJsoned.id,
-				name: createPlaylistJsoned.name,
-				owner: createPlaylistJsoned.owner,
-				image: createPlaylistJsoned.images[0],
-				type: 'playlist',
-				tracks: 0
+		let targetDetails, differDetails;
+		// Each one has 5 second timeout
+		const results = await Promise.all([
+			playlistGetter({
+				accessToken,
+				type: target.type,
+				id: target.id,
+				globalTimeoutMS
+			}),
+			playlistGetter({
+				accessToken,
+				type: differ.type,
+				id: differ.id,
+				globalTimeoutMS
+			})
+		]);
+		if (results[0].apiNull === true)
+			part = {
+				reasons: [
+					...part.reasons,
+					'The Spotify API returned empty info for some tracks for the target'
+				]
 			};
-		} catch (e: any) {
-			throw {
-				status: e.status || 500,
-				error: e.error || 'Unknown Spotify Error'
+		if (results[1].apiNull === true)
+			part = {
+				reasons: [
+					...part.reasons,
+					'The Spotify API returned empty info for some tracks for the differ'
+				]
 			};
-		};
-
-		let targetDetails, differDetails, bothTracks;
-		try {
-			const results = await Promise.all([
-				playlistGetter({ access_token, type: target.type, id: target.id }),
-				playlistGetter({ access_token, type: differ.type, id: differ.id })
-			]);
-			if (results[0].partial)
-				success = {
-					type: 'partial',
-					reasons: [...success.reasons, 'target get was incomplete']
-				};
-			if (results[1].partial)
-				success = {
-					type: 'partial',
-					reasons: [...success.reasons, 'differ get was incomplete']
-				};
-			targetDetails = results[0];
-			differDetails = results[1];
-			bothTracks = targetDetails.total + differDetails.total;
-		} catch (e: any) {
-			throw { status: e.status || 500, error: e.error || 'Unknown error' };
-		};
+		if (results[0].partial === true)
+			part = { reasons: [...part.reasons, 'target get was incomplete'] };
+		if (results[1].partial === true)
+			part = { reasons: [...part.reasons, 'differ get was incomplete'] };
+		targetDetails = results[0];
+		differDetails = results[1];
 
 		// Five sets: two originals, one for similarities, both uniques
 		const targetOriginal = new Set(targetDetails.items);
@@ -180,32 +181,25 @@ export default async function handler(
 				break;
 		};
 
-		try {
-			const newPlaylistAddResult = await outputAdder({
-				access_token,
-				id: newPlaylist.id,
-				items: diffResult
-			});
-			if (newPlaylistAddResult.partial === true)
-				success = {
-					type: 'partial',
-					reasons: [
-						...success.reasons,
-						'New playlist only has a partial result of the diffing operation'
-					]
-				};
-			newPlaylist.tracks = newPlaylistAddResult.total;
-		} catch (e: any) {
-			throw {
-				status: e.status || 500,
-				error: e.error || 'Unknown adding to playlist error'
-			}
-		}
+		const newPlaylistAddResult = await outputAdder({
+			accessToken,
+			id: newPlaylist.id,
+			items: diffResult,
+			globalTimeoutMS
+		});
+		if (newPlaylistAddResult.partial === true)
+			part = {
+				reasons: [
+					...part.reasons,
+					'New playlist only has a partial result of the diffing operation'
+				]
+			};
+		newPlaylist.tracks = newPlaylistAddResult.total;
 
-		return res.status(201).json({ success, playlist: newPlaylist });
-
+		clearTimeout(globalTimeout);
+		return res.status(201).json({ part, playlist: newPlaylist });
 	} catch (e: any) {
 		return res.status(e.status || 500)
-			.json({ error: e.error || 'Unknown error' });
+			.json({ message: e.message || 'Unknown error' });
 	};
 };
