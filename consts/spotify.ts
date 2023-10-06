@@ -12,4 +12,28 @@ export const CLIENT_DIFF_TYPES = {
 	'bu': 'Delete all similarities but keep all differences',
 	'stu': "Keep only what's similar to the differ"
 };
+
+export const SERVER_DIFF_TYPES = {
+	adu: (params: { target: { owner: string, name: string }, differ: { owner: string, name: string } }) => {
+		const { target, differ } = params;
+		return `Anything different in ${differ.owner}'s "${differ.name}" is added to ${target.owner}'s "${target.name}"`;
+	},
+	odu: (params: { target: { owner: string, name: string }, differ: { owner: string, name: string } }) => {
+		const { target, differ } = params;
+		return `All that remains is anything unique to ${differ.owner}'s "${differ.name}"`;
+	},
+	otu: (params: { target: { owner: string, name: string }, differ: { owner: string, name: string } }) => {
+		const { target, differ } = params;
+		return `All that remains is anything unique to ${target.owner}'s "${target.name}"`
+	},
+	bu: (params: { target: { owner: string, name: string }, differ: { owner: string, name: string } }) => {
+		const { target, differ } = params;
+		return `Any similarities between ${target.owner}'s "${target.name}" and ${differ.owner}'s "${differ.name}" are gone; only their uniques remain`;
+	},
+	stu: (params: { target: { owner: string, name: string }, differ: { owner: string, name: string } }) => {
+		const { target, differ } = params;
+		return `Only shared tracks between ${target.owner}'s "${target.name}" and ${differ.owner}'s "${differ.name}"`;
+	}
+};
+
 export const SPOT_URL_BASE = 'https://api.spotify.com/v1/'
