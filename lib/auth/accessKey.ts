@@ -39,8 +39,8 @@ export const routeKeyRetriever = async (id: string) => {
 			.select(['access_token', 'expires_at'])
 			.exec();
 		if (query !== null) token = {
-			access_token: query.access_token,
-			expires_at: query.expires_at
+			accessToken: query.access_token,
+			expiresAt: query.expires_at
 		};
 	} catch {
 		// The only errors should be at network level hopefully;
