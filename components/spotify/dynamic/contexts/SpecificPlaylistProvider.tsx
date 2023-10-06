@@ -63,8 +63,8 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 			}
 			if (raw.ok === false) {
 				const jsoned = await raw.json();
-				throw jsoned.error as string;
-			};
+				throw { message: jsoned.message };
+			}
 			const jsoned = await raw.json() as MyPlaylistObject;
 			if (playlists === null) {
 				setPlaylists([jsoned]);
@@ -75,13 +75,15 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 				for (const playlist of playlists)
 					currentMap.set(playlist.id, playlist);
 				// Check if map has new playlist's id
-				if (currentMap.has(jsoned.id) === true) throw 'You have this playlist';
+				if (currentMap.has(jsoned.id) === true) throw { error: 'You have this playlist' };
 				else currentMap.set(jsoned.id, jsoned);
 				setPlaylists(Array.from(currentMap.values()));
 			}
 		} catch (e: any) {
-			setError((typeof (e.error) === 'string' && e.error) || 'Unknown error');
-		};
+			console.log('error client')
+			console.log(e);
+			setError(e.message || 'Unknown error');
+		}
 		setLoading(false);
 		return null;
 	}

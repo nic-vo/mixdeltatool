@@ -30,21 +30,17 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 
 
 	const getUserPlaylistsHandler = async () => {
-		console.log('get user playlists clicked')
 		setLoading(true);
 		try {
 			// If either 50th page of results or no next, cancel
 			if (page === null) throw 'No more';
 			const raw = await fetch(`/api/spotify/getUserPlaylists?page=${page}`);
-			if (raw.status === 401) {
-				signIn();
-				throw 'Unauthorized';
-			};
+			if (raw.status === 401) signIn();
 			if (raw.ok === false) {
 				const jsoned = await raw.json();
 				// TODO: define a standard error interface (?)
-				throw jsoned.error as string;
-			};
+				throw { message: jsoned.message };
+			}
 			const jsoned = await raw.json() as MyUserAPIRouteResponse;
 			if (playlists === null) {
 				setPlaylists(jsoned.playlists);
@@ -65,16 +61,16 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 						currentMap.set(key, newMap.get(key));
 				// Set new playlist state from the ones that pass
 				setPlaylists(Array.from(currentMap.values()));
-			};
+			}
 			// Disable fetching if no more pages
 			if (jsoned.next === null) setPage(null);
 			else setPage(prev => prev! + 1);
 		} catch (e: any) {
-			setError((typeof (e.error) === 'string' && e.error) || 'Unknown error');
-		};
+			setError(e.message || 'Unknown error');
+		}
 		setLoading(false);
 		return null;
-	};
+	}
 
 
 	// useEffect(() => {
@@ -96,12 +92,11 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 	// }, []);
 
 	const clearUserPlaylistsHandler = () => {
-		console.log('clear user playlists clicked')
 		setPlaylists(null);
 		setError(null);
 		setPage(0);
 		return null;
-	};
+	}
 
 	const updateUserPlaylistsHandler = (playlist: MyPlaylistObject) => {
 		const set = new Set();
@@ -109,10 +104,10 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 			for (const playlist of playlists) set.add(playlist.id);
 			if (set.has(playlist.id) === false) {
 				setPlaylists([playlist, ...playlists])
-			};
-		};
+			}
+		}
 		return null;
-	};
+	}
 
 	return (
 		<UserPlaylistContext.Provider value={
@@ -129,7 +124,7 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 			{props.children}
 		</UserPlaylistContext.Provider>
 	);
-};
+}
 
 export {
 	UserPlaylistContext,
