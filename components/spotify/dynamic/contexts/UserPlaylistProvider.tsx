@@ -34,7 +34,7 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 		setLoading(true);
 		try {
 			// If either 50th page of results or no next, cancel
-			if (page === null) throw 'No more';
+			if (page === null) throw { message: 'No more' };
 			const raw = await fetch(`/api/spotify/getUserPlaylists?page=${page}`);
 			if (raw.status === 401) signIn();
 			if (raw.ok === false) {
@@ -74,16 +74,16 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 	}
 
 	useEffect(() => {
-		if (first === true) {
-			const storageData = sessionStorage.getItem('USER_PLAYLISTS');
-			if (storageData !== null) {
-				const sessionPlaylists = JSON.parse(storageData) as ProviderState;
-				setPlaylists(sessionPlaylists);
-			}
-			setFirst(false);
-		} else {
+		if (first === false) {
 			sessionStorage.setItem('USER_PLAYLISTS', JSON.stringify(playlists));
+			return;
 		}
+		const storageData = sessionStorage.getItem('USER_PLAYLISTS');
+		if (storageData !== null) {
+			const sessionPlaylists = JSON.parse(storageData) as ProviderState;
+			setPlaylists(sessionPlaylists);
+		}
+		setFirst(false);
 	}, [playlists]);
 
 	const clearUserPlaylistsHandler = () => {
@@ -97,9 +97,8 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 		const set = new Set();
 		if (playlists !== null) {
 			for (const playlist of playlists) set.add(playlist.id);
-			if (set.has(playlist.id) === false) {
-				setPlaylists([playlist, ...playlists])
-			}
+			if (set.has(playlist.id) === false)
+				setPlaylists([playlist, ...playlists]);
 		}
 		return null;
 	}

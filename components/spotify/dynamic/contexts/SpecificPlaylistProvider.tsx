@@ -23,16 +23,16 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		if (first === true) {
-			const storageData = sessionStorage.getItem('SPECIFIC_PLAYLISTS');
-			if (storageData !== null) {
-				const sessionPlaylists = JSON.parse(storageData) as ProviderState;
-				setPlaylists(sessionPlaylists);
-			}
-			setFirst(false);
-		} else {
-			sessionStorage.setItem('SPECIFIC_PLAYLISTS', JSON.stringify(playlists));
+		if (first === false) {
+			sessionStorage.setItem('SPEC_PLAYLISTS', JSON.stringify(playlists));
+			return;
 		}
+		const storageData = sessionStorage.getItem('SPEC_PLAYLISTS');
+		if (storageData !== null) {
+			const sessionPlaylists = JSON.parse(storageData) as ProviderState;
+			setPlaylists(sessionPlaylists);
+		}
+		setFirst(false);
 	}, [playlists]);
 
 	const clearSpecificPlaylistsHandler = () => {
@@ -50,9 +50,9 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 		setLoading(true);
 		try {
 			const { id, type } = params;
-			if (type !== 'album' && type !== 'playlist') {
-				throw { message: 'There is an error with this album / playlist link.' }
-			}
+			if (type !== 'album' && type !== 'playlist')
+				throw { message: 'There is an error with this album / playlist link.' };
+
 			const raw = await fetch(`/api/spotify/getSpecificPlaylist?id=${id}&type=${type}`);
 			if (raw.status === 401) signIn();
 			if (raw.ok === false) {
@@ -74,8 +74,6 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 				setPlaylists(Array.from(currentMap.values()));
 			}
 		} catch (e: any) {
-			console.log('error client')
-			console.log(e);
 			setError(e.message || 'Unknown error');
 		}
 		setLoading(false);
