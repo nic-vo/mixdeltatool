@@ -11,7 +11,6 @@ export default function PlaylistDisplay(props: { user: boolean }) {
 	let memoized;
 	if (user === true) {
 		memoized = useMemo(() => {
-			console.log(`***${user ? 'USER' : 'SPECIFIC'} DISPLAY RENDER***`)
 			return (
 				<section>
 					<h2>{user ? 'Your' : 'Specific'} Playlists</h2>
@@ -37,7 +36,6 @@ export default function PlaylistDisplay(props: { user: boolean }) {
 		}, [userPlaylists]);
 	} else {
 		memoized = useMemo(() => {
-			console.log(`***${user ? 'USER' : 'SPECIFIC'} LIST RENDER***`)
 			return (
 				<section>
 					<h2>{user ? 'Your' : 'Specific'} Playlists</h2>

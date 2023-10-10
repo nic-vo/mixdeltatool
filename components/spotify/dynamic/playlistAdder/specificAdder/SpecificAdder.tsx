@@ -12,9 +12,6 @@ Has to adapt the playlist context's specificPlaylistHandler to a <form>
 
 export default function SpecificAdder(props: { children: React.ReactNode }) {
 	const [href, setHref] = useState<string | ''>('');
-
-	console.log('***SPECIFIC ADDER RENDER***')
-
 	// Ref for non-stateful input
 	const fieldRef = useRef<HTMLInputElement | null>(null);
 

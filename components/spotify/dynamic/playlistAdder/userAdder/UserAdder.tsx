@@ -2,9 +2,6 @@ import { useContext } from 'react';
 import { UserPlaylistContext } from '../../contexts/UserPlaylistProvider';
 
 export default function UserAdder(props: { children: React.ReactNode }) {
-
-	console.log('***USER ADDER RENDER***')
-
 	// Basically dump most of the context here because it requires every bit
 	const {
 		userCurrentPage,
