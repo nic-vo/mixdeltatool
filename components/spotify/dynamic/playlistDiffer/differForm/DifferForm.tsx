@@ -36,7 +36,6 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 
 	const userMap = useMemo(() => {
 		if (userPlaylists === null) return null;
-		console.log('re-calculate user differ memo');
 		const map = new Map();
 		for (const playlist of userPlaylists)
 			map.set(playlist.id, playlist);
@@ -45,7 +44,6 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 
 	const specificMap = useMemo(() => {
 		if (specificPlaylists === null) return null;
-		console.log('re-calculate specific differ memo');
 		const map = new Map();
 		for (const playlist of specificPlaylists)
 			map.set(playlist.id, playlist);
