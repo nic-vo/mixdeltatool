@@ -8,9 +8,11 @@ export default function SpotifyEntry() {
 		const { email, image, name } = data.user;
 		return (
 			<>
-				<h1>Hello there {email?.split('@')[0] || name}!</h1>
-				{image !== null && <img src={image} alt='' />}
-				<button onClick={() => signOut()}>Sign out</button>
+				<header>
+					<h1>Hello there {email?.split('@')[0] || name}!</h1>
+					{image !== null && <img src={image} alt='' />}
+					<button onClick={() => signOut()}>Sign out</button>
+				</header>
 				<SpotifyMain />
 			</>
 		);
