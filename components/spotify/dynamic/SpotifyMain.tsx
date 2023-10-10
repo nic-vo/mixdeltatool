@@ -1,15 +1,14 @@
-import PlaylistAdder from './playlistAdder';
-import PlaylistDiffer from './playlistDiffer';
 import { SpecificPlaylistProvider } from './contexts/SpecificPlaylistProvider';
 import { UserPlaylistProvider } from './contexts/UserPlaylistProvider';
+import SpotifyRouter from './SpotifyRouter';
 
 const SpotifyMain = () => {
+
 	return (
 		<>
 			<UserPlaylistProvider>
 				<SpecificPlaylistProvider>
-					<PlaylistAdder />
-					<PlaylistDiffer />
+					<SpotifyRouter />
 				</SpecificPlaylistProvider>
 			</UserPlaylistProvider>
 		</>

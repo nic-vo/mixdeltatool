@@ -1,4 +1,4 @@
-import SpotifyEntry from './entry';
+import SpotifyEntry from './SpotifyEntry';
 
 export {
 	SpotifyEntry
