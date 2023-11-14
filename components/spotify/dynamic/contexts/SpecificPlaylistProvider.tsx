@@ -69,7 +69,8 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 				for (const playlist of playlists)
 					currentMap.set(playlist.id, playlist);
 				// Check if map has new playlist's id
-				if (currentMap.has(jsoned.id) === true) throw { error: 'You have this playlist' };
+				if (currentMap.has(jsoned.id) === true)
+					throw { message: 'You have this playlist' };
 				else currentMap.set(jsoned.id, jsoned);
 				setPlaylists(Array.from(currentMap.values()));
 			}
