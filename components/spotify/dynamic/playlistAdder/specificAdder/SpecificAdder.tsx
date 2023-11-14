@@ -1,6 +1,8 @@
 import { useContext, useRef, useState } from 'react';
 import { SpecificPlaylistContext } from '../../contexts/SpecificPlaylistProvider';
 
+import styles from '../PlaylistAdder.module.scss';
+
 /*
 
 This is basically just a UI for adding playlists to the current session;
@@ -50,8 +52,8 @@ export default function SpecificAdder(props: { children: React.ReactNode }) {
 
 	return (
 		<section>
-			<h3>Get random playlists</h3>
-			<section>
+			<h3 className={styles.heading}>Get random playlists</h3>
+			<section className={styles.innerContainer}>
 				<form
 					name='getSpecificPlaylist'
 					onSubmit={specificPlaylistFormHandler}>
