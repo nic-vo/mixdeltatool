@@ -1,0 +1,15 @@
+@use '@styles/globals.module.scss' as g;
+
+.container {
+	@include g.flexCenter;
+	flex-direction: column;
+}
+
+.heading {
+	text-align: center;
+}
+
+.innerContainer {
+	@include g.flexCenter;
+	gap: 2vmin;
+}

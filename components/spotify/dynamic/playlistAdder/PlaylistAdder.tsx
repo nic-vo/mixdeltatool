@@ -15,7 +15,7 @@ Has to adapt the playlist context's specificPlaylistHandler to a <form>
 
 export default function PlaylistAdder() {
 	return (
-		<section>
+		<section className={styles.container}>
 			<h2>Get some playlists for the tool</h2>
 			<UserAdder>
 				<PlaylistDisplay user={true} />
