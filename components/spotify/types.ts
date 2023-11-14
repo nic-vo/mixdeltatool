@@ -105,7 +105,7 @@ export interface createDiffPlaylistApiRequest extends NextApiRequest {
 */
 
 export interface UserContextSignature {
-	userPlaylists: MyPlaylistObject[] | null,
+	userPlaylists: MyPlaylistObject[],
 	userCurrentPage: number | null,
 	userError: string | null,
 	userLoading: boolean,
@@ -115,7 +115,7 @@ export interface UserContextSignature {
 };
 
 export interface SpecificContextSignature {
-	specificPlaylists: MyPlaylistObject[] | null,
+	specificPlaylists: MyPlaylistObject[],
 	specificError: string | null,
 	specificLoading: boolean,
 	getSpecificPlaylistHandler: (params:
@@ -124,7 +124,7 @@ export interface SpecificContextSignature {
 	clearSpecificPlaylistsHandler: () => null,
 }
 
-export type ProviderState = MyPlaylistObject[] | null;
+export type ProviderState = MyPlaylistObject[];
 
 export interface SpotTracksResponse extends BasicSpotApiResponse {
 	next: string,

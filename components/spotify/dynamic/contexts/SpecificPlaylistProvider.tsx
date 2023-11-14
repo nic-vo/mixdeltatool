@@ -5,7 +5,7 @@ import { signIn } from 'next-auth/react';
 import type { SpecificContextSignature, ProviderState } from '../../types';
 
 const contextInit = {
-	specificPlaylists: null,
+	specificPlaylists: [],
 	specificLoading: false,
 	specificError: null,
 	getSpecificPlaylistHandler: async () => null,
@@ -16,7 +16,7 @@ const SpecificPlaylistContext = createContext<SpecificContextSignature>(contextI
 
 function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 	// TODO: This can be modified to remove unwanted playlists
-	const [playlists, setPlaylists] = useState<ProviderState>(null);
+	const [playlists, setPlaylists] = useState<ProviderState>([]);
 	// Statuses
 	const [first, setFirst] = useState(true);
 	const [loading, setLoading] = useState<boolean>(false);
@@ -36,7 +36,7 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 	}, [playlists]);
 
 	const clearSpecificPlaylistsHandler = () => {
-		setPlaylists(null);
+		setPlaylists([]);
 		setError(null);
 		return null;
 	}

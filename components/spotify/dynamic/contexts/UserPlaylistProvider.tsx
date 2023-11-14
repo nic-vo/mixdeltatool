@@ -9,7 +9,7 @@ import type {
 } from '../../types';
 
 const contextInit = {
-	userPlaylists: null,
+	userPlaylists: [],
 	userCurrentPage: 0,
 	userError: null,
 	userLoading: false,
@@ -22,7 +22,7 @@ const UserPlaylistContext = createContext<UserContextSignature>(contextInit);
 
 function UserPlaylistProvider(props: { children: React.ReactNode }) {
 	// This will only ever be added to
-	const [playlists, setPlaylists] = useState<ProviderState>(null);
+	const [playlists, setPlaylists] = useState<ProviderState>([]);
 	const [first, setFirst] = useState(true);
 	// Controls pagination, must be validated on back-end
 	const [page, setPage] = useState<number | null>(0);
@@ -87,7 +87,7 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 	}, [playlists]);
 
 	const clearUserPlaylistsHandler = () => {
-		setPlaylists(null);
+		setPlaylists([]);
 		setError(null);
 		setPage(0);
 		return null;
