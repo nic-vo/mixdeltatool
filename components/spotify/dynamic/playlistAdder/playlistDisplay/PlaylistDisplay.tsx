@@ -8,57 +8,52 @@ export default function PlaylistDisplay(props: { user: boolean }) {
 	const { user } = props;
 	const { userPlaylists } = useContext(UserPlaylistContext);
 	const { specificPlaylists } = useContext(SpecificPlaylistContext);
+
 	let memoized;
 	if (user === true) {
 		memoized = useMemo(() => {
-			return (
-				<section>
-					<h2>{user ? 'Your' : 'Specific'} Playlists</h2>
-					{userPlaylists !== null &&
-						userPlaylists !== undefined &&
-						<ul>
-							{userPlaylists.map((playlist) => {
-								return (
-									<li key={playlist.id}>
-										<p>{playlist.name}</p>
-										<p>{playlist.owner.display_name}</p>
-										<p>Tracks: {playlist.tracks}</p>
-										{playlist.image !== null &&
-											playlist.image !== undefined &&
-											<img src={playlist.image.url} alt='' />}
-									</li>
-								);
-							})}
-						</ul>
-					}
-				</section>
-			)
-		}, [userPlaylists]);
+			return userPlaylists;
+		}, [userPlaylists.length]);
 	} else {
 		memoized = useMemo(() => {
-			return (
-				<section>
-					<h2>{user ? 'Your' : 'Specific'} Playlists</h2>
-					{specificPlaylists !== null &&
-						specificPlaylists !== undefined &&
-						<ul>
-							{specificPlaylists.map((playlist) => {
+			return specificPlaylists;
+		}, [specificPlaylists.length]);
+	}
+
+	return (
+		<section className={styles.container}>
+			<h2 className={styles.heading}>
+				{user === true ? 'Your' : 'Specific'} Playlists
+			</h2>
+			<div className={styles.listContainer}>
+				{memoized.length === 0 ?
+					<p>Nothing yet</p>
+					:
+					(<ul className={styles.list}>
+						{
+							memoized.map((playlist) => {
+								const { id, name, owner, tracks, image } = playlist;
 								return (
-									<li key={playlist.id}>
-										<p>{playlist.name}</p>
-										<p>{playlist.owner.display_name}</p>
-										<p>Tracks: {playlist.tracks}</p>
-										{playlist.image !== null &&
-											playlist.image !== undefined &&
-											<img src={playlist.image.url} alt='' />}
+									<li key={id} className={styles.item}>
+										{
+											image !== null &&
+											image !== undefined &&
+											<img
+												src={image.url}
+												alt={`${name}'s album art`}
+												className={styles.image} />
+										}
+										<ul className={styles.info}>
+											<li>Name: {name}</li>
+											<li>Owner: {owner.display_name}</li>
+											<li>Tracks: {tracks}</li>
+										</ul>
 									</li>
 								);
 							})}
-						</ul>
-					}
-				</section>
-			)
-		}, [specificPlaylists]);
-	};
-	return memoized;
+					</ul>)
+				}
+			</div>
+		</section>
+	);
 };
