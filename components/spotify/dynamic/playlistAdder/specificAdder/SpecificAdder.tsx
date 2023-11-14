@@ -75,7 +75,6 @@ export default function SpecificAdder(props: { children: React.ReactNode }) {
 				<p>{specificError !== null && specificError}</p>
 			</section>
 			{props.children}
-			<button onClick={clearSpecificPlaylistsHandler}>Clear specific playlists</button>
 		</section>
 	);
 };
