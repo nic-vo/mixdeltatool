@@ -2,7 +2,7 @@ import { useContext, memo, useMemo } from 'react';
 import { UserPlaylistContext } from '../../contexts/UserPlaylistProvider';
 import { SpecificPlaylistContext } from '../../contexts/SpecificPlaylistProvider';
 
-import styles from './PlaylistDisplay.module.scss';
+import look from './PlaylistDisplay.module.scss';
 
 export default function PlaylistDisplay(props: { user: boolean }) {
 	const { user } = props;
@@ -21,20 +21,20 @@ export default function PlaylistDisplay(props: { user: boolean }) {
 	}
 
 	return (
-		<section className={styles.container}>
-			<h2 className={styles.heading}>
+		<section className={look.container}>
+			<h2 className={look.heading}>
 				{user === true ? 'Your' : 'Specific'} Playlists
 			</h2>
-			<div className={styles.listContainer}>
+			<div className={look.listContainer}>
 				{memoized.length === 0 ?
 					<p>Nothing yet</p>
 					:
-					(<ul className={styles.list}>
+					(<ul className={look.list}>
 						{
 							memoized.map((playlist) => {
 								const { id, name, owner, tracks, image } = playlist;
 								return (
-									<li key={id} className={styles.item}>
+									<li key={id} className={look.item}>
 										{
 											image !== null &&
 											image !== undefined &&
@@ -43,10 +43,10 @@ export default function PlaylistDisplay(props: { user: boolean }) {
 												alt={`${name}'s album art`}
 												className={styles.image} />
 										}
-										<ul className={styles.info}>
-											<li>Name: {name}</li>
-											<li>Owner: {owner.display_name}</li>
-											<li>Tracks: {tracks}</li>
+										<ul className={look.info}>
+											<li>{name}</li>
+											<li>Owner by {owner.display_name}</li>
+											<li>{tracks} tracks</li>
 										</ul>
 									</li>
 								);
