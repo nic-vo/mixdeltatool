@@ -2,27 +2,25 @@ import { MyUserAPIRouteResponse } from '@components/spotify/types';
 import { createContext, useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 
-import type {
-	UserContextSignature,
-	ProviderState,
-	MyPlaylistObject
-} from '../../types';
+import { MyPlaylistObject } from '../../types';
 
-const contextInit = {
-	userPlaylists: [],
-	userCurrentPage: 0,
-	userError: null,
+const UserContextInit = {
+	userPlaylists: [] as MyPlaylistObject[],
+	userCurrentPage: 0 as number | null,
+	userError: null as null | string,
 	userLoading: false,
 	clearUserPlaylistsHandler: () => null,
 	getUserPlaylistsHandler: async () => null,
-	updateUserPlaylistsHandler: () => null
+	updateUserPlaylistsHandler: (playlist: MyPlaylistObject) => null
 };
 
-const UserPlaylistContext = createContext<UserContextSignature>(contextInit);
+type UserContextSignature = typeof UserContextInit;
+
+const UserPlaylistContext = createContext<UserContextSignature>(UserContextInit);
 
 function UserPlaylistProvider(props: { children: React.ReactNode }) {
 	// This will only ever be added to
-	const [playlists, setPlaylists] = useState<ProviderState>([]);
+	const [playlists, setPlaylists] = useState<MyPlaylistObject[]>([]);
 	const [first, setFirst] = useState(true);
 	// Controls pagination, must be validated on back-end
 	const [page, setPage] = useState<number | null>(0);
@@ -80,7 +78,7 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 		}
 		const storageData = sessionStorage.getItem('USER_PLAYLISTS');
 		if (storageData !== null) {
-			const sessionPlaylists = JSON.parse(storageData) as ProviderState;
+			const sessionPlaylists = JSON.parse(storageData) as MyPlaylistObject[];
 			setPlaylists(sessionPlaylists);
 		}
 		setFirst(false);

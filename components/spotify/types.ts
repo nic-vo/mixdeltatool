@@ -104,28 +104,6 @@ export interface createDiffPlaylistApiRequest extends NextApiRequest {
 	'stu' === 'keep only similarities'
 */
 
-export interface UserContextSignature {
-	userPlaylists: MyPlaylistObject[],
-	userCurrentPage: number | null,
-	userError: string | null,
-	userLoading: boolean,
-	clearUserPlaylistsHandler: () => null,
-	getUserPlaylistsHandler: () => Promise<null>,
-	updateUserPlaylistsHandler: (playlist: MyPlaylistObject) => null
-};
-
-export interface SpecificContextSignature {
-	specificPlaylists: MyPlaylistObject[],
-	specificError: string | null,
-	specificLoading: boolean,
-	getSpecificPlaylistHandler: (params:
-		{ id: string, type: string }
-	) => Promise<null>,
-	clearSpecificPlaylistsHandler: () => null,
-}
-
-export type ProviderState = MyPlaylistObject[];
-
 export interface SpotTracksResponse extends BasicSpotApiResponse {
 	next: string,
 	total: number,

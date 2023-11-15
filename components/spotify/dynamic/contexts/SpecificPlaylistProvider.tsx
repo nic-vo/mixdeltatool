@@ -1,22 +1,25 @@
-import { MyPlaylistObject } from '../../types';
 import { createContext, useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 
-import type { SpecificContextSignature, ProviderState } from '../../types';
+import type { MyPlaylistObject } from '../../types';
 
-const contextInit = {
-	specificPlaylists: [],
+const SpecificContextInit = {
+	specificPlaylists: [] as MyPlaylistObject[],
 	specificLoading: false,
-	specificError: null,
-	getSpecificPlaylistHandler: async () => null,
-	clearSpecificPlaylistsHandler: () => null,
+	specificError: null as null | string,
+	getSpecificPlaylistHandler: async (params: {
+		type: string, id: string
+	}) => null,
+	clearSpecificPlaylistsHandler: () => null
 };
 
-const SpecificPlaylistContext = createContext<SpecificContextSignature>(contextInit);
+type SpecificContextSignature = typeof SpecificContextInit;
+
+const SpecificPlaylistContext = createContext<SpecificContextSignature>(SpecificContextInit);
 
 function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 	// TODO: This can be modified to remove unwanted playlists
-	const [playlists, setPlaylists] = useState<ProviderState>([]);
+	const [playlists, setPlaylists] = useState<MyPlaylistObject[]>([]);
 	// Statuses
 	const [first, setFirst] = useState(true);
 	const [loading, setLoading] = useState<boolean>(false);
@@ -29,7 +32,7 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 		}
 		const storageData = sessionStorage.getItem('SPEC_PLAYLISTS');
 		if (storageData !== null) {
-			const sessionPlaylists = JSON.parse(storageData) as ProviderState;
+			const sessionPlaylists = JSON.parse(storageData) as MyPlaylistObject[];
 			setPlaylists(sessionPlaylists);
 		}
 		setFirst(false);
