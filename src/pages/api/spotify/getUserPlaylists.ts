@@ -82,6 +82,6 @@ export default async function handler(
 		clearTimeout(authTimeout);
 		clearTimeout(globalTimeout);
 		return res.status(e.status || 500)
-			.json({ error: e.message || 'Unknown error' });
+			.json({ message: e.message || 'Unknown error' });
 	}
 }
