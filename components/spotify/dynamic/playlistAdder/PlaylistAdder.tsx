@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import UserAdder from './userAdder/UserAdder';
 import SpecificAdder from './specificAdder/SpecificAdder';
 import PlaylistDisplay from './playlistDisplay/PlaylistDisplay';
@@ -14,15 +15,25 @@ Has to adapt the playlist context's specificPlaylistHandler to a <form>
 */
 
 export default function PlaylistAdder() {
+	const [onUser, setOnUser] = useState(true);
+
 	return (
 		<section className={styles.container}>
-			<h2>Get some playlists for the tool</h2>
-			<UserAdder>
-				<PlaylistDisplay user={true} />
-			</UserAdder>
-			<SpecificAdder>
-				<PlaylistDisplay user={false} />
-			</SpecificAdder>
-		</section>
+			<h1>Get some playlists for the tool</h1>
+			<section>
+				<button onClick={() => setOnUser(true)}>Your playlists</button>
+				<button onClick={() => setOnUser(false)}>Other playlists</button>
+			</section>
+			{
+				onUser ?
+					<UserAdder>
+						<PlaylistDisplay user={true} />
+					</UserAdder>
+					:
+					<SpecificAdder>
+						<PlaylistDisplay user={false} />
+					</SpecificAdder>
+			}
+		</section >
 	);
 };
