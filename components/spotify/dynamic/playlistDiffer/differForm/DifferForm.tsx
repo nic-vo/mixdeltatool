@@ -137,7 +137,7 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 			updateUserPlaylistsHandler(jsoned.playlist);
 			setSuccess(jsoned.part);
 		} catch (e: any) {
-			setError(e.error || 'Unknown error');
+			setError(e.message || 'Unknown error');
 		};
 		setLoading(false);
 		return null;
