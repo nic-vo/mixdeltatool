@@ -1,6 +1,7 @@
-import { useContext, memo, useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import { UserPlaylistContext } from '../../contexts/UserPlaylistProvider';
 import { SpecificPlaylistContext } from '../../contexts/SpecificPlaylistProvider';
+import { sanitize } from 'dompurify';
 
 import look from './PlaylistDisplay.module.scss';
 
@@ -39,9 +40,9 @@ export default function PlaylistDisplay(props: { user: boolean }) {
 											image !== null &&
 											image !== undefined &&
 											<img
-												src={image.url}
-												alt={`${name}'s album art`}
-												className={styles.image} />
+												src={sanitize(image.url)}
+												alt={`${sanitize(name)}'s album art`}
+												className={look.image} />
 										}
 										<ul className={look.info}>
 											<li>{name}</li>
