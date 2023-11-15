@@ -199,6 +199,8 @@ export default async function handler(
 		clearTimeout(globalTimeout);
 		return res.status(201).json({ part, playlist: newPlaylist });
 	} catch (e: any) {
+		clearTimeout(authTimeout);
+		clearTimeout(globalTimeout);
 		return res.status(e.status || 500)
 			.json({ message: e.message || 'Unknown error' });
 	};
