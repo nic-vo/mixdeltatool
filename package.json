@@ -1,6 +1,6 @@
 {
   "name": "superuser-actions",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -13,6 +13,7 @@
     "@trpc/client": "^10",
     "@trpc/react-query": "^10",
     "@trpc/server": "^10",
+    "dompurify": "^3",
     "mongodb": "^5",
     "mongoose": "^8",
     "next": "^13",
@@ -24,6 +25,7 @@
     "zod": "^3"
   },
   "devDependencies": {
+    "@types/dompurify": "^3",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
