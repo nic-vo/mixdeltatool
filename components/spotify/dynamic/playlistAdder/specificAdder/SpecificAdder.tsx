@@ -52,7 +52,7 @@ export default function SpecificAdder(props: { children: React.ReactNode }) {
 
 	return (
 		<section>
-			<h3 className={styles.heading}>Get random playlists</h3>
+			<h2 className={styles.heading}>Get random playlists</h2>
 			<section className={styles.innerContainer}>
 				<form
 					name='getSpecificPlaylist'

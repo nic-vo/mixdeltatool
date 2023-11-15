@@ -15,7 +15,7 @@ export default function UserAdder(props: { children: React.ReactNode }) {
 
 	return (
 		<section>
-			<h3 className={styles.heading}>Browse your playlists</h3>
+			<h2 className={styles.heading}>Browse your playlists</h2>
 			<section className={styles.innerContainer}>
 				<button
 					onClick={getUserPlaylistsHandler}
