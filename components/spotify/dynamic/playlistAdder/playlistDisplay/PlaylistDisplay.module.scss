@@ -1,50 +1,79 @@
 @use '@styles/globals.module.scss' as g;
 
-.heading {
-	display: block;
-}
-
 .container {
 	@include g.flexCenter;
 	flex-direction: column;
+	justify-content: flex-start;
+	gap: 5svh;
 	max-width: 90svw;
-	height: 40svh;
+	max-height: 70svh;
+	padding: 2svh;
+	overflow-y: hidden;
 }
 
 .listContainer {
 	display: flex;
-	justify-content: center;
+	flex-direction: column;
 	align-items: center;
 	width: 100%;
-	height: 80%;
+	height: 100%;
+	padding: 2svh;
+	overflow: hidden;
 }
 
 .list {
-	display: flex;
-	flex-direction: row;
-	gap: 2vmin;
+	display: grid;
+	grid-template-columns: auto;
+	gap: 2svh;
 	width: 100%;
+	max-width: 1000px;
+	padding: 2vmin;
 	height: 100%;
-	overflow: auto;
 	list-style: none;
+	overflow: auto;
 	scrollbar-width: thin;
+	background-color: transparent;
+}
+
+@media (min-aspect-ratio: 1.33) {
+	.list {
+		grid-template-columns: calc(50% - 2vmin) calc(50% - 2vmin);
+	}
 }
 
 .item {
 	display: flex;
 	align-items: center;
-	justify-content: center;
-	gap: 2vmin;
+	justify-content: flex-start;
+	gap: 4svh;
 	height: 100%;
+	width: 100%;
 	padding: 2vmin;
+	background-color: transparent;
+	backdrop-filter: blur(3px) brightness(1.5);
+	border-radius: 20px;
+	animation: 0.25s ease both itemfadein;
+}
+
+@keyframes itemfadein {
+	0% {
+		opacity: 0;
+	}
+
+	100% {
+		opacity: 1;
+	}
 }
 
 .image {
-	height: 75%;
+	width: 50%;
+	max-width: 300px;
+	height: auto;
 }
 
 .info {
-	p {
-		white-space: nowrap;
-	}
+	display: flex;
+	flex-direction: column;
+	list-style: none;
+	gap: 1rem;
 }
