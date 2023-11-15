@@ -66,7 +66,9 @@ export default async function handler(
 		// Check if session is being accessed when access token might not be live
 		const { expiresAt, accessToken } = token;
 		if (expiresAt === undefined
+			|| expiresAt === null
 			|| accessToken === undefined
+			|| accessToken === null
 			|| (Date.now() - expiresAt) < (3600 - SPOT_LOGIN_WINDOW))
 			throw new AuthError();
 
