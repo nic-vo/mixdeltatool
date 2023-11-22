@@ -8,6 +8,7 @@ export default function PlaylistOptions() {
 	const memoized = useMemo(() => {
 		return (
 			<>
+				<option value=''>Choose one</option>
 				<optgroup label='Your Playlists'>
 					{
 						userPlaylists !== null &&
