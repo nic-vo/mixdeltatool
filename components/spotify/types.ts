@@ -63,7 +63,7 @@ export interface SpotUserPlaylistsResponse
 
 export interface MyPlaylistObject
 	extends Pick<SpotPlaylistObject, 'id' | 'name' | 'owner'> {
-	image: SpotImageObject,
+	image?: SpotImageObject,
 	tracks: number,
 	type: 'album' | 'playlist'
 }
@@ -111,17 +111,17 @@ export interface SpotTracksResponse extends BasicSpotApiResponse {
 }
 
 export interface differInternalPlaylistPromise {
-	partial: boolean,
 	total: number,
+	completed: number,
 	items: string[],
-	apiNull: boolean
+}
+
+export interface differRouteResponse {
+	part: string[],
+	playlist: MyPlaylistObject
 }
 
 export interface differInternalAddPromise {
-	partial: boolean,
-	total: number
-}
-
-export interface successState {
-	reasons: string[]
+	total: number,
+	completed: number
 }
