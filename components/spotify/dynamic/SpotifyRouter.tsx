@@ -6,12 +6,14 @@ const SpotifyRouter = () => {
 	const [nav, setNav] = useState('add');
 
 	return (
-		<section>
-			<button onClick={() => setNav('add')}>Add</button>
-			<button onClick={() => setNav('diff')}>Diff</button>
+		<>
+			<div>
+				<button onClick={() => setNav('add')}>Add</button>
+				<button onClick={() => setNav('diff')}>Diff</button>
+			</div>
 			{nav === 'add' && <PlaylistAdder />}
 			{nav === 'diff' && <PlaylistDiffer />}
-		</section>
+		</>
 	);
 }
 
