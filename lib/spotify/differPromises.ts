@@ -1,4 +1,4 @@
-import { SERVER_DIFF_TYPES, SPOT_URL_BASE } from '@consts/spotify';
+import { SPOT_URL_BASE } from '@consts/spotify';
 import {
 	ActionType,
 	MyPlaylistObject,
@@ -40,7 +40,7 @@ const userGetter = async (args: {
 						case 401:
 							throw new AuthError();
 						case 403:
-							throw new ForbiddenError(`For some reason we can't see your data`);
+							throw new ForbiddenError(`For some reason we can't find you`);
 						default:
 							throw new FetchError('Spotify had an error');
 					}
@@ -61,17 +61,14 @@ const createEmptyPlaylist = async (args: {
 	accessToken: string,
 	userId: string,
 	actionType: ActionType,
-	target: { id: string, owner: string, name: string },
-	differ: { id: string, owner: string, name: string },
+	baseDescStr: string,
 	globalTimeoutMS: number
 }): Promise<MyPlaylistObject> => {
 	const { accessToken,
 		userId,
 		actionType,
 		globalTimeoutMS,
-		target,
-		differ } = args;
-	const descStr = SERVER_DIFF_TYPES[actionType];
+		baseDescStr } = args;
 	const url = SPOT_URL_BASE.concat('users/', userId, '/playlists');
 	const headers = new Headers();
 	headers.append('Authorization', `Bearer ${accessToken}`);
@@ -86,7 +83,7 @@ const createEmptyPlaylist = async (args: {
 					method: 'POST',
 					body: JSON.stringify({
 						name: `SuperUser ${actionType} ${Math.floor(Date.now() / 1000)}`,
-						description: descStr({ target, differ })
+						description: baseDescStr
 					})
 				});
 				if (raw.status === 429) {
@@ -134,8 +131,8 @@ const playlistGetter = async (args: {
 	globalTimeoutMS: number
 }) => {
 	const { accessToken, type, id, globalTimeoutMS } = args;
-	const localTimeoutMS = globalTimeoutMS - 2200;
 	return new Promise<differInternalPlaylistPromise>(async (res, rej) => {
+		const localTimeoutMS = globalTimeoutMS - 2200;
 		// Initial url for fetching
 		const base = SPOT_URL_BASE.concat(type, 's/', id, '/tracks?');
 		const params = new URLSearchParams();
@@ -150,23 +147,20 @@ const playlistGetter = async (args: {
 
 		// Await random interval so hopefully calls aren't stacked too much
 		await new Promise(
-			async r => setTimeout(r, Math.floor(Math.random() * 100 + 50))
+			async r => setTimeout(r, Math.floor(Math.random() * 50 + 50))
 		);
 
 		// To allow return of partial data in case playlists are too big
 		// This promise is part of a global 9 second timeout
 		const set: Set<string> = new Set();
-		let partial = true;
 		// For fetches that are successful but Spotify API returns null for a track
 		// For some reason, not sure what causes that
-		let apiNull = false;
+		let completed = 0;
 		let total = 0;
-		const localTimeoutMS = globalTimeoutMS - 2200;
 		const localTimeout = setTimeout(() => {
 			res({
-				partial,
 				total,
-				apiNull,
+				completed,
 				items: Array.from(set)
 			});
 		}, globalTimeoutMS - Date.now() - 2200);
@@ -188,18 +182,20 @@ const playlistGetter = async (args: {
 						await new Promise(async r => setTimeout(r, retry));
 						continue;
 					} else {
-						// If rate error hits but some data exists, resolve with that data
+						// If retry isn't possible but some data exists, resolve with that data
 						const items = Array.from(set);
 						if (items.length > 0) {
 							res({
-								partial,
 								total,
-								apiNull,
+								completed,
 								items
 							});
 							break;
 						}
-						else throw new RateError();
+						else {
+							oneRetry = false;
+							throw new RateError();
+						}
 					}
 				}
 
@@ -207,11 +203,14 @@ const playlistGetter = async (args: {
 					// This is if somehow after all this, Spotify detects something wrong
 					switch (raw.status) {
 						case 401:
+							oneRetry = false;
 							throw new AuthError();
 						case 403:
+							oneRetry = false;
 							throw new ForbiddenError(`For some reason, you can't access `
 								+ `one of those playlists`);
 						default:
+							oneRetry = false;
 							throw new FetchError('Spotify had an error');
 					}
 				}
@@ -219,20 +218,27 @@ const playlistGetter = async (args: {
 				// Add this iteration to set
 				// Set next to either new url or null
 				const jsoned = await raw.json() as SpotTracksResponse;
-				next = jsoned.next;
-				total = jsoned.total;
 				for (const item of jsoned.items) {
 					// Filter for existing and local files;
 					// Local files have really weird URIs;
 					// Sometimes spotify returns null for a weird non-existing track
 					// And this whole thing throws
-					if (item === null || item.track.uri === null)
-						apiNull = true;
-					else if (
+					if (item === null
+						|| item.track === null
+						|| item.track.uri === null) {
+						continue;
+					}
+					// Show that some tracks returned null for some reason
+					// Don't increment completed
+					if (
 						/local/.test(item.track.uri) === false
-						&& set.has(item.track.uri) === false)
+						&& set.has(item.track.uri) === false) {
 						set.add(item.track.uri);
+						completed += 1;
+					}
 				}
+				next = jsoned.next;
+				total = total === 0 ? jsoned.total : total;
 				// Reset one retry
 				oneRetry = true;
 			} catch (e: any) {
@@ -248,11 +254,9 @@ const playlistGetter = async (args: {
 			}
 		}
 		clearTimeout(localTimeout);
-		partial = false;
 		res({
-			partial,
-			apiNull,
 			total,
+			completed,
 			items: Array.from(set) as string[]
 		});
 	});
@@ -276,7 +280,7 @@ const outputAdder = (params: {
 		for (let i = 0; i < hundreds; i++)
 			fetches.push(uris.slice(0 + (100 * i), 100 + (100 * i)));
 		// Add remainder if necessary
-		if (remain !== 0) fetches.push(uris.slice(0 - remain - 1));
+		if (remain !== 0) fetches.push(uris.slice(0 - remain));
 
 		const headers = new Headers();
 		headers.append('Authorization', `Bearer ${accessToken}`);
@@ -285,11 +289,11 @@ const outputAdder = (params: {
 		// Create partial flag and total because successive fetches may fail
 		// Retry one flag in case of random fails
 		let iterations = 1;
-		let total = 0;
-		let partial = true;
+		let total = uris.length;
+		let completed = 0;
 		let retryOne = true;
 		const localTimeoutMS = globalTimeoutMS - 200;
-		const localTimeout = setTimeout(() => res({ total, partial }),
+		const localTimeout = setTimeout(() => res({ total, completed }),
 			globalTimeoutMS - Date.now() - 200);
 
 		for (const uriArr of fetches) {
@@ -314,36 +318,42 @@ const outputAdder = (params: {
 							continue;
 						} else {
 							// If rate error hits but data exists, resolve with that data
-							if (total > 0) {
+							if (completed > 0) {
 								res({
-									partial,
-									total
+									total,
+									completed
 								});
 								break;
 							}
-							else throw new RateError();
+							else {
+								retryOne = false;
+								throw new RateError();
+							}
 						}
 					}
 
 					if (raw.ok === false) {
 						switch (raw.status) {
 							case 401:
+								retryOne = false;
 								throw new AuthError();
 							case 403:
+								retryOne = false;
 								throw new ForbiddenError(`For some reason, you can't access `
-									+ `one of those playlists`);
+									+ `this playlist`);
 							default:
+								retryOne = false;
 								throw new FetchError('Spotify had an error');
 						}
 					}
 
-					// Add new number to total, either a hundred or the remainder
-					if (iterations <= hundreds) total += 100;
-					else if (remain > 0) total += remain;
-					iterations++;
+					// Add new number to completed, either a hundred or the remainder
+					if (iterations <= hundreds) completed += 100;
+					else if (remain > 0) completed += remain;
+					iterations += 1;
 					// Reset retry one flag
 					retryOne = true;
-					await new Promise(async r => setTimeout(r, 150));
+					await new Promise(async r => setTimeout(r, 50));
 					break;
 				} catch (e: any) {
 					if (retryOne === true && e.status === undefined) {
@@ -357,17 +367,73 @@ const outputAdder = (params: {
 			}
 		}
 		clearTimeout(localTimeout);
-		partial = false;
 		res({
-			partial,
-			total
+			total,
+			completed
 		});
 	});
+}
+
+const updateDescription = (params: {
+	accessToken: string,
+	globalTimeoutMS: number,
+	id: string,
+	baseDescStr: string,
+	reasons: string[]
+}): Promise<string | null> => {
+	const {
+		accessToken,
+		id,
+		globalTimeoutMS,
+		reasons,
+		baseDescStr
+	} = params;
+	const headers = new Headers();
+	headers.append('Authorization', `Bearer ${accessToken}`);
+	headers.append('Content-Type', 'application/json');
+	const failMsg = "Diff completed but couldn't update playlist description";
+	return new Promise(async res => {
+		const localTimeoutMS = globalTimeoutMS - 200;
+		const localTimeout = setTimeout(() => res(failMsg),
+			globalTimeoutMS - Date.now() - 200);
+		while (true) {
+			try {
+				const raw = await fetch(SPOT_URL_BASE.concat('playlists/', id), {
+					method: 'PUT',
+					headers,
+					body: JSON.stringify(
+						{ description: baseDescStr.concat(' ', reasons.join(' ')) }
+					)
+				})
+
+				if (raw.status === 429) {
+					const retryRaw = raw.headers.get('Retry-After');
+					const retry = retryRaw !== null ? parseInt(retryRaw) * 1000 : 2000;
+					// Throw rate error if wait would pass the timeout time
+					if ((Date.now() + retry) < localTimeoutMS) {
+						// Await retry if within timeout time
+						await new Promise(async r => setTimeout(r, retry));
+						continue;
+					} else throw '';
+				}
+
+				if (raw.ok === false) throw '';
+
+				res(null);
+				break;
+			} catch {
+				clearTimeout(localTimeout);
+				res(failMsg);
+				break;
+			}
+		}
+	})
 }
 
 export {
 	userGetter,
 	createEmptyPlaylist,
 	playlistGetter,
-	outputAdder
+	outputAdder,
+	updateDescription
 };
