@@ -3,7 +3,7 @@ import UserAdder from './userAdder/UserAdder';
 import SpecificAdder from './specificAdder/SpecificAdder';
 import PlaylistDisplay from './playlistDisplay/PlaylistDisplay';
 
-import styles from './PlaylistAdder.module.scss';
+import look from './PlaylistAdder.module.scss';
 
 /*
 
@@ -18,7 +18,7 @@ export default function PlaylistAdder() {
 	const [onUser, setOnUser] = useState(true);
 
 	return (
-		<section className={styles.container}>
+		<section className={look.container}>
 			<h1>Get some playlists for the tool</h1>
 			<section>
 				<button onClick={() => setOnUser(true)}>Your playlists</button>
