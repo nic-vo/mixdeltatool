@@ -1,7 +1,6 @@
 import { MyPlaylistObject } from '@components/spotify/types';
-import { sanitize } from 'dompurify';
 
-import styles from './PlaylistSingleDisplay.module.scss';
+import look from './PlaylistSingleDisplay.module.scss';
 
 export default function PlaylistSingle(props: { playlist: MyPlaylistObject }) {
 	const { name, owner, tracks, image } = props.playlist
@@ -14,8 +13,9 @@ export default function PlaylistSingle(props: { playlist: MyPlaylistObject }) {
 				image !== null &&
 				image !== undefined &&
 				<img
-					src={sanitize(image.url)}
-					alt={`${sanitize(name)}'s album art`} />
+					src={image.url}
+					alt={`${name}'s album art`}
+					loading='lazy' />
 			}
 		</div>
 	);
