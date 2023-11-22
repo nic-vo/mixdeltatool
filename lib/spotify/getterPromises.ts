@@ -1,6 +1,7 @@
 import { SPOT_PLAYLIST_ITER_INT, SPOT_URL_BASE } from '@consts/spotify';
 import {
 	AuthError,
+	CustomError,
 	FetchError,
 	ForbiddenError,
 	RateError,
@@ -38,7 +39,7 @@ const userPlaylistGetter = async (args: {
 	return new Promise(async (res, rej) => {
 		const localTimeout = setTimeout(
 			() => rej(new TimeoutError()),
-			globalTimeoutMS - Date.now()
+			globalTimeoutMS - Date.now() - 100
 		);
 
 		while (true) {
@@ -46,6 +47,7 @@ const userPlaylistGetter = async (args: {
 				const raw = await fetch(url, { headers });
 				if (raw.status === 429) {
 					const retryRaw = raw.headers.get('Retry-After');
+					// Retry based on Retry-After header in sec, otherwise 2s wait
 					const retry = retryRaw !== null ? parseInt(retryRaw) * 1000 : 2000;
 					// Throw rate error if wait would pass the timeout time
 					if ((Date.now() + retry) >= globalTimeoutMS)
@@ -53,6 +55,7 @@ const userPlaylistGetter = async (args: {
 					else {
 						// Await retry if within timeout time
 						await new Promise(async r => setTimeout(r, retry));
+						// Continue for while loop
 						continue;
 					}
 				}
@@ -63,8 +66,7 @@ const userPlaylistGetter = async (args: {
 						case 401:
 							throw new AuthError();
 						case 403:
-							throw new ForbiddenError(`For some reason, you can't access `
-								+ `your own playlists`);
+							throw new ForbiddenError(`Forbidden by Spotify`);
 						default:
 							throw new FetchError('Spotify had an error');
 					}
@@ -112,7 +114,7 @@ const specificPlaylistGetter = async (args: {
 	return new Promise(async (res, rej) => {
 		const localTimeout = setTimeout(
 			() => rej(new TimeoutError()),
-			globalTimeoutMS - Date.now()
+			globalTimeoutMS - Date.now() - 100
 		);
 
 		while (true) {
@@ -138,8 +140,9 @@ const specificPlaylistGetter = async (args: {
 						case 401:
 							throw new AuthError();
 						case 403:
-							throw new ForbiddenError(`For some reason, you can't access `
-								+ `your own playlists`);
+							throw new ForbiddenError(`Forbidden by Spotify`);
+						case 404:
+							throw new CustomError(404, 'That Spotify ID does not exist');
 						default:
 							throw new FetchError('Spotify had an error');
 					}
