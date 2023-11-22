@@ -4,9 +4,10 @@ import { createEmptyPlaylist, outputAdder, playlistGetter, userGetter } from '@l
 import { diffBodyParser } from '@lib/spotify/validators';
 
 import {
+	AUTH_WINDOW,
+	GLOBAL_EXECUTION_WINDOW,
 	SERVER_DIFF_TYPES,
-	SPOT_LOGIN_WINDOW,
-	SPOT_URL_BASE
+	SPOT_LOGIN_WINDOW
 } from '@consts/spotify';
 import { authOptions } from '@lib/auth/options';
 
@@ -19,9 +20,7 @@ import {
 import {
 	AuthError,
 	FetchError,
-	ForbiddenError,
 	MalformedError,
-	RateError,
 	ReqMethodError,
 	UnprocessableError
 } from '@lib/spotify/errors';
@@ -29,15 +28,16 @@ import {
 export default async function handler(
 	req: createDiffPlaylistApiRequest, res: NextApiResponse
 ) {
-	const globalTimeoutMS = Date.now() + 9000;
+	const globalTimeoutMS = Date.now() + GLOBAL_EXECUTION_WINDOW;
 	const authTimeout = setTimeout(() => {
 		return res.status(504).json({ message: 'Server timed out' })
-	}, 3000);
+	}, AUTH_WINDOW);
 	const globalTimeout = setTimeout(() => {
 		if (newPlaylist !== undefined)
 			return res.status(200).json({ part, playlist: newPlaylist });
 		return res.status(504).json({ message: 'Server timed out' })
-	}, 9000);
+	}, GLOBAL_EXECUTION_WINDOW);
+
 	let newPlaylist: MyPlaylistObject;
 	// Because of imeouts, allow partial flag and reasons
 	let part = { reasons: [] as string[] };
@@ -65,11 +65,15 @@ export default async function handler(
 			|| actionType === undefined)
 			throw new MalformedError();
 
+		let session;
 		// Check next-auth session
-		const session = await getServerSession(req, res, authOptions);
+		try {
+			session = await getServerSession(req, res, authOptions);
+		} catch {
+			throw new FetchError('Server error; try again');
+		}
 		// If no session, send 401 and client-side should redirect
-		if (session === null || session === undefined)
-			throw new AuthError();
+		if (session === null || session === undefined) throw new AuthError();
 
 		// Access token should never expire if there is a session
 		// Custom access token retriever outside of next-auth flow
@@ -88,7 +92,7 @@ export default async function handler(
 		const { expiresAt, accessToken } = token;
 		if ((expiresAt === undefined || expiresAt === null)
 			|| (accessToken === undefined || accessToken === null)
-			|| Date.now() - expiresAt < 3600 - SPOT_LOGIN_WINDOW)
+			|| (Date.now() - expiresAt) < (3600 - SPOT_LOGIN_WINDOW))
 			throw new AuthError();
 
 		// Get user and create playlist
@@ -201,7 +205,7 @@ export default async function handler(
 	} catch (e: any) {
 		clearTimeout(authTimeout);
 		clearTimeout(globalTimeout);
-		return res.status(e.status || 500)
-			.json({ message: e.message || 'Unknown error' });
+		return res.status(e.status ? e.status : 500)
+			.json({ message: e.message ? e.message : 'Unknown error' });
 	};
 };
