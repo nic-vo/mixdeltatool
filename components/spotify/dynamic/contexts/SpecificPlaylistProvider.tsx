@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
+import { sanitize } from 'dompurify';
 
 import type { MyPlaylistObject } from '../../types';
 
@@ -26,16 +27,43 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
+		// If not first load, set sessionStorage to new playlist object
 		if (first === false) {
 			sessionStorage.setItem('SPEC_PLAYLISTS', JSON.stringify(playlists));
 			return;
 		}
+
+		// If first load, set playlist to sessionStorage
 		const storageData = sessionStorage.getItem('SPEC_PLAYLISTS');
-		if (storageData !== null) {
+		// If sessionStorage is empty, no big deal
+		if (storageData === null) return;
+
+		try {
 			const sessionPlaylists = JSON.parse(storageData) as MyPlaylistObject[];
-			setPlaylists(sessionPlaylists);
+			// Map over playlists to sanitize their name and image.url if defined
+			const sanitizedPlaylists = sessionPlaylists.map(
+				playlist => {
+					if (playlist.image === undefined) {
+						return {
+							...playlist,
+							name: sanitize(playlist.name)
+						};
+					}
+					return {
+						...playlist,
+						name: sanitize(playlist.name),
+						image: {
+							...playlist.image,
+							url: sanitize(playlist.image.url)
+						}
+					};
+				});
+			setPlaylists(sanitizedPlaylists);
+			setFirst(false);
+		} catch {
+			// In case of weird non-parseable JSON
+			return;
 		}
-		setFirst(false);
 	}, [playlists]);
 
 	const clearSpecificPlaylistsHandler = () => {
@@ -63,9 +91,8 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 				throw { message: jsoned.message };
 			}
 			const jsoned = await raw.json() as MyPlaylistObject;
-			if (playlists === null) {
-				setPlaylists([jsoned]);
-			} else {
+			if (playlists === null) setPlaylists([jsoned]);
+			else {
 				// Check to see if existing playlists contain new one
 				const currentMap = new Map();
 				// Put current playlists into map

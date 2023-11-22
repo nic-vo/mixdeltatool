@@ -1,6 +1,7 @@
 import { MyUserAPIRouteResponse } from '@components/spotify/types';
 import { createContext, useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
+import { sanitize } from 'dompurify';
 
 import { MyPlaylistObject } from '../../types';
 
@@ -27,7 +28,6 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
 
-
 	const getUserPlaylistsHandler = async () => {
 		setLoading(true);
 		try {
@@ -41,29 +41,30 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 				throw { message: jsoned.message };
 			}
 			const jsoned = await raw.json() as MyUserAPIRouteResponse;
+			// Disable fetching if no more pages, else page++
+			setPage(prev => jsoned.next === null ? null : prev! + 1);
+			// First request means empty state
 			if (playlists === null) {
 				setPlaylists(jsoned.playlists);
-			} else {
-				// Only add non-duplicate playlists
-				const currentMap = new Map();
-				const newMap = new Map();
-				// Put current playlists in map
-				for (const playlist of playlists)
-					currentMap.set(playlist.id, playlist);
-				// Put new playlists in their own map
-				for (const playlist of jsoned.playlists)
-					if (newMap.has(playlist.id) === false)
-						newMap.set(playlist.id, playlist);
-				// Compare the maps
-				for (const key of newMap.keys())
-					if (currentMap.has(key) === false)
-						currentMap.set(key, newMap.get(key));
-				// Set new playlist state from the ones that pass
-				setPlaylists(Array.from(currentMap.values()));
+				return null;
 			}
-			// Disable fetching if no more pages
-			if (jsoned.next === null) setPage(null);
-			else setPage(prev => prev! + 1);
+			// Else, compare attempt to add new playlists
+			// Only add non-duplicate playlists
+			const currentMap = new Map();
+			const newMap = new Map();
+			// Put current playlists in map
+			for (const playlist of playlists)
+				currentMap.set(playlist.id, playlist);
+			// Put new playlists in their own map
+			for (const playlist of jsoned.playlists)
+				if (newMap.has(playlist.id) === false)
+					newMap.set(playlist.id, playlist);
+			// Compare the maps
+			for (const key of newMap.keys())
+				if (currentMap.has(key) === false)
+					currentMap.set(key, newMap.get(key));
+			// Set new playlist state from the ones that pass
+			setPlaylists(Array.from(currentMap.values()));
 		} catch (e: any) {
 			setError(e.message || 'Unknown error');
 		}
@@ -72,16 +73,42 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 	}
 
 	useEffect(() => {
+		// If not first load, set sessionStorage to new playlist object
 		if (first === false) {
 			sessionStorage.setItem('USER_PLAYLISTS', JSON.stringify(playlists));
 			return;
 		}
+
+		// If first load, set playlist to sessionStorage
 		const storageData = sessionStorage.getItem('USER_PLAYLISTS');
-		if (storageData !== null) {
+		// If sessionStorage is empty, no big deal
+		if (storageData === null) return;
+
+		try {
 			const sessionPlaylists = JSON.parse(storageData) as MyPlaylistObject[];
-			setPlaylists(sessionPlaylists);
+			// Map over playlists to sanitize their name and image.url if defined
+			const sanitizedPlaylists = sessionPlaylists.map(playlist => {
+				if (playlist.image === undefined) {
+					return {
+						...playlist,
+						name: sanitize(playlist.name)
+					};
+				}
+				return {
+					...playlist,
+					name: sanitize(playlist.name),
+					image: {
+						...playlist.image,
+						url: sanitize(playlist.image.url)
+					}
+				};
+			});
+			setPlaylists(sanitizedPlaylists);
+			setFirst(false);
+		} catch {
+			// In case of weird non-parseable JSON
+			return;
 		}
-		setFirst(false);
 	}, [playlists]);
 
 	const clearUserPlaylistsHandler = () => {
@@ -92,12 +119,15 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 	}
 
 	const updateUserPlaylistsHandler = (playlist: MyPlaylistObject) => {
-		const set = new Set();
-		if (playlists !== null) {
-			for (const playlist of playlists) set.add(playlist.id);
-			if (set.has(playlist.id) === false)
-				setPlaylists([playlist, ...playlists]);
+		// Gets called after a successful diff, I think
+		if (playlists === null) {
+			setPlaylists([playlist]);
+			return null;
 		}
+		const set = new Set();
+		for (const playlist of playlists) set.add(playlist.id);
+		if (set.has(playlist.id) === false)
+			setPlaylists([playlist, ...playlists]);
 		return null;
 	}
 
