@@ -46,12 +46,14 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 					if (playlist.image === undefined) {
 						return {
 							...playlist,
-							name: sanitize(playlist.name)
+							name: sanitize(playlist.name),
+							id: sanitize(playlist.id)
 						};
 					}
 					return {
 						...playlist,
 						name: sanitize(playlist.name),
+						id: sanitize(playlist.id),
 						image: {
 							...playlist.image,
 							url: sanitize(playlist.image.url)
