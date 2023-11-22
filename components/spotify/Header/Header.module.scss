@@ -1,0 +1,92 @@
+@use '@styles/globals.module.scss' as global;
+
+.header {
+	position: fixed;
+	height: 100svh;
+	background-color: #AAA;
+	padding: 2svw;
+	translate: -100%;
+	transition: all global.$easeLength;
+	transition-timing-function: ease;
+}
+
+.active {
+	translate: 0;
+}
+
+.toggler {
+	cursor: pointer;
+	position: absolute;
+	right: 0;
+	display: flex;
+	align-items: center;
+	border: 2px solid global.$white;
+	border-radius: global.$rounded;
+	padding: 1rem;
+	transform: translateX(200%);
+	color: global.$white;
+	z-index: 2;
+
+	svg {
+		color: global.$black;
+	}
+}
+
+.toggler:hover {
+	background-color: global.$white;
+	color: global.$black;
+}
+
+.returner {
+	display: none;
+	position: absolute;
+	right: 0;
+	translate: 100%;
+	height: 100svh;
+	width: 100svw;
+	background-color: transparent;
+	backdrop-filter: brightness(0.5);
+}
+
+.active .returner{
+	display: block;
+	animation-name: returnerfadein;
+	animation-duration: global.$easeLength;
+	animation-timing-function: ease;
+	animation-fill-mode: both;
+}
+
+@keyframes returnerfadein {
+	0% {
+		opacity: 0;
+	}
+
+	100% {
+		opacity: 1;
+	}
+}
+
+.modal {
+	margin: auto;
+	padding: 4rem;
+
+	* {
+		color: global.$black;
+	}
+}
+
+.container {
+	@include global.flexCenter;
+	flex-direction: column;
+	gap: 2svw;
+}
+
+.info {
+	@include global.flexCenter;
+	flex-direction: column;
+	gap: 2svw;
+}
+
+.button {
+	padding: 1rem;
+}
