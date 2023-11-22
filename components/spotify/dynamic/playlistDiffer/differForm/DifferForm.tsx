@@ -24,7 +24,7 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 	const [type, setType] = useState<ActionType>('adu');
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
-	const [success, setSuccess] = useState<successState | null>(null);
+	const [success, setSuccess] = useState<string[] | null>(null);
 
 	const {
 		userPlaylists,
@@ -214,7 +214,7 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 						success !== null && (<>
 							<h4>Success{
 								error === null
-									|| (success !== null && success.reasons.length > 0) ?
+									|| (success !== null && success.length > 0) ?
 									'!' : '?'
 							}</h4>
 							<p>
@@ -222,20 +222,20 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 									error !== null && error
 								}
 								{
-									success === null ? '' : success.reasons.length > 0 ?
+									success === null ? '' : success.length > 0 ?
 										'Partial success' :
 										'Total success'
 								}
 							</p>
 							{
 								success !== null
-								&& success.reasons.length > 0
+								&& success.length > 0
 								&& (
 									<figure>
 										<figcaption>Reasons</figcaption>
 										<ul>
 											{
-												success.reasons.map(
+												success.map(
 													(reason, index) =>
 														<li key={`reason-${index}`}>{reason}</li>)
 											}
