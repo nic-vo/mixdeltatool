@@ -4,7 +4,11 @@ import { routeKeyRetriever } from '@lib/auth/accessKey'
 import { userPlaylistGetter } from '@lib/spotify/getterPromises';
 
 import { authOptions } from '@lib/auth/options';
-import { SPOT_LOGIN_WINDOW } from '@consts/spotify';
+import {
+	AUTH_WINDOW,
+	GLOBAL_EXECUTION_WINDOW,
+	SPOT_LOGIN_WINDOW
+} from '@consts/spotify';
 import {
 	AuthError,
 	FetchError,
@@ -22,15 +26,15 @@ export default async function handler(
 	req: getUserPlaylistsApiRequest,
 	res: NextApiResponse
 ) {
-	const globalTimeoutMS = Date.now() + 9000;
+	const globalTimeoutMS = Date.now() + GLOBAL_EXECUTION_WINDOW;
 	const globalTimeout = setTimeout(() => {
 		return res.status(504).json({ message: 'Server timed out' });
-	}, 9000);
+	}, GLOBAL_EXECUTION_WINDOW);
 
 	const authTimeout = setTimeout(() => {
 		clearTimeout(globalTimeout);
 		return res.status(504).json({ message: 'Server timed out' });
-	}, 4000);
+	}, AUTH_WINDOW);
 
 	try {
 		// Validate req method
@@ -46,7 +50,12 @@ export default async function handler(
 
 		// Check next-auth session
 		// If no session, send 401 and client-side should redirect
-		const session = await getServerSession(req, res, authOptions);
+		let session;
+		try {
+			session = await getServerSession(req, res, authOptions);
+		} catch {
+			throw new FetchError('Server error; try again');
+		}
 		if (session === null || session === undefined) throw new AuthError();
 
 		// Access token should never expire if there is a session
@@ -60,7 +69,7 @@ export default async function handler(
 		}
 		// No token means that user account somehow unlinked => client redirect
 		if (token === null || token === undefined) throw new AuthError();
-		// Auth cleared within 4 seconds, add remaining time to new timeout
+		// Auth cleared within 4 seconds
 		clearTimeout(authTimeout);
 
 		// Check if session is being accessed when access token might not be live
@@ -81,7 +90,7 @@ export default async function handler(
 	} catch (e: any) {
 		clearTimeout(authTimeout);
 		clearTimeout(globalTimeout);
-		return res.status(e.status || 500)
-			.json({ message: e.message || 'Unknown error' });
+		return res.status(e.status ? e.status : 500)
+			.json({ message: e.message ? e.message : 'Unknown error' });
 	}
 }
