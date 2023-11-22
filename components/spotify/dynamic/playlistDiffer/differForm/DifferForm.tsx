@@ -155,10 +155,10 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 	};
 
 	return (
-		<section>
-			<h2>Diff a playlist!</h2>
-			<form onSubmit={formSubmitHandler}>
-				<label htmlFor='target'>
+		<section className={look.container}>
+			<form onSubmit={formSubmitHandler} className={look.form}>
+				<h2 className={look.heading}>Diff a playlist!</h2>
+				<label htmlFor='target' className={look.selectLabel}>
 					Target:
 					<select
 						autoComplete='off'
@@ -171,8 +171,8 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 						{props.children}
 					</select>
 				</label>
-				<label htmlFor='differ'>
-					differ:
+				<label htmlFor='differ' className={look.selectLabel}>
+					Differ:
 					<select
 						autoComplete='off'
 						required
@@ -184,7 +184,7 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 						{props.children}
 					</select>
 				</label>
-				<fieldset style={{ display: 'flex', flexDirection: 'column' }}>
+				<fieldset className={look.fieldset}>
 					<legend>What do you want to do to the target?</legend>
 					{
 						Object.entries(CLIENT_DIFF_TYPES).map((pair) => {
