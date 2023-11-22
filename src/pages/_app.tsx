@@ -4,8 +4,6 @@ import '@styles/globals.css';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
 	return (
-		<main>
-			<Component {...pageProps} />
-		</main>
+		<Component {...pageProps} />
 	);
 };
