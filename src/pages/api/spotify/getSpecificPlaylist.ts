@@ -46,7 +46,12 @@ export default async function handler(
 		}
 
 		// Check next-auth session
-		const session = await getServerSession(req, res, authOptions);
+		let session;
+		try {
+			session = await getServerSession(req, res, authOptions);
+		} catch {
+			throw new FetchError('Server error; try again');
+		}
 		// If no session, send 401 and client-side should redirect
 		if (session === null || session === undefined) throw new AuthError();
 
@@ -57,10 +62,11 @@ export default async function handler(
 		try {
 			token = await routeKeyRetriever(session.user.id);
 		} catch {
-			throw new FetchError('There was a server error, please try again');
+			throw new FetchError('Server error; try again');
 		}
 		// No token means that user account somehow unlinked => client redirect
 		if (token === null || token === undefined) throw new AuthError();
+		clearTimeout(authTimeout);
 
 		// Check if session is being accessed when access token might not be live
 		const { expiresAt, accessToken } = token;
@@ -68,10 +74,9 @@ export default async function handler(
 			|| expiresAt === null
 			|| accessToken === undefined
 			|| accessToken === null
-			|| Date.now() - expiresAt < 3600 - SPOT_LOGIN_WINDOW)
+			|| (Date.now() - expiresAt) < (3600 - SPOT_LOGIN_WINDOW))
 			throw new AuthError();
 
-		clearTimeout(authTimeout);
 		// Hit spotify API with retrieved access token
 		const data = await specificPlaylistGetter(
 			{
@@ -86,7 +91,7 @@ export default async function handler(
 	} catch (e: any) {
 		clearTimeout(authTimeout);
 		clearTimeout(globalTimeout);
-		return res.status(e.status || 500)
-			.json({ message: e.message || 'Unknown error' });
+		return res.status(e.status ? e.status : 500)
+			.json({ message: e.message ? e.message : 'Unknown error' });
 	}
 }
