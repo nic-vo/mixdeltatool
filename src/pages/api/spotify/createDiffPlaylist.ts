@@ -1,6 +1,12 @@
 import { routeKeyRetriever } from '@lib/auth/accessKey';
 import { getServerSession } from 'next-auth';
-import { createEmptyPlaylist, outputAdder, playlistGetter, userGetter } from '@lib/spotify/differPromises';
+import {
+	createEmptyPlaylist,
+	outputAdder,
+	playlistGetter,
+	updateDescription,
+	userGetter
+} from '@lib/spotify/differPromises';
 import { diffBodyParser } from '@lib/spotify/validators';
 
 import {
@@ -40,7 +46,7 @@ export default async function handler(
 
 	let newPlaylist: MyPlaylistObject;
 	// Because of imeouts, allow partial flag and reasons
-	let part = { reasons: [] as string[] };
+	let part = [] as string[];
 	try {
 		// Validate req method
 		if (req.method !== 'POST') throw new ReqMethodError('POST');
@@ -97,18 +103,17 @@ export default async function handler(
 
 		// Get user and create playlist
 		const userId = await userGetter({ accessToken, globalTimeoutMS });
+		const baseDescStr = SERVER_DIFF_TYPES[actionType]({ target, differ });
 		newPlaylist = await createEmptyPlaylist({
 			accessToken,
 			actionType,
 			userId,
-			target,
-			differ,
+			baseDescStr,
 			globalTimeoutMS
 		});
 
-		let targetDetails, differDetails;
 		// Each one has 5 second timeout
-		const results = await Promise.all([
+		const [targetDetails, differDetails] = await Promise.all([
 			playlistGetter({
 				accessToken,
 				type: target.type,
@@ -122,27 +127,14 @@ export default async function handler(
 				globalTimeoutMS
 			})
 		]);
-		if (results[0].apiNull === true)
-			part = {
-				reasons: [
-					...part.reasons,
-					'The Spotify API returned empty info for some tracks for the target'
-				]
-			};
-		if (results[1].apiNull === true)
-			part = {
-				reasons: [
-					...part.reasons,
-					'The Spotify API returned empty info for some tracks for the differ'
-				]
-			};
-		if (results[0].partial === true)
-			part = { reasons: [...part.reasons, 'target get was incomplete'] };
-		if (results[1].partial === true)
-			part = { reasons: [...part.reasons, 'differ get was incomplete'] };
-		targetDetails = results[0];
-		differDetails = results[1];
-
+		if (targetDetails.completed % targetDetails.total !== 0) {
+			const { completed, total } = targetDetails;
+			part.push(`Spotify returned ${completed}/${total} tracks for the target.`);
+		}
+		if (differDetails.completed % differDetails.total !== 0) {
+			const { completed, total } = differDetails;
+			part.push(`Spotify returned ${completed}/${total} tracks for the differ.`);
+		}
 		// Five sets: two originals, one for similarities, both uniques
 		const targetOriginal = new Set(targetDetails.items);
 		const differOriginal = new Set(differDetails.items);
@@ -185,21 +177,25 @@ export default async function handler(
 				break;
 		};
 
-		const newPlaylistAddResult = await outputAdder({
+		const addedToPlaylist = await outputAdder({
 			accessToken,
 			id: newPlaylist.id,
 			items: diffResult,
 			globalTimeoutMS
 		});
-		if (newPlaylistAddResult.partial === true)
-			part = {
-				reasons: [
-					...part.reasons,
-					'New playlist only has a partial result of the diffing operation'
-				]
-			};
-		newPlaylist.tracks = newPlaylistAddResult.total;
-
+		if (addedToPlaylist.completed % addedToPlaylist.total !== 0) {
+			const { completed, total } = addedToPlaylist;
+			part.push(`New playlist has ${completed}/${total} tracks from the comparison.`);
+		}
+		newPlaylist.tracks = addedToPlaylist.total;
+		const updatedDescription = await updateDescription({
+			accessToken,
+			globalTimeoutMS,
+			baseDescStr,
+			id: newPlaylist.id,
+			reasons: part
+		})
+		if (updatedDescription !== null) part.push(updatedDescription);
 		clearTimeout(globalTimeout);
 		return res.status(201).json({ part, playlist: newPlaylist });
 	} catch (e: any) {
