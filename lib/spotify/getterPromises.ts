@@ -4,9 +4,15 @@ import {
 	CustomError,
 	FetchError,
 	ForbiddenError,
-	RateError,
-	TimeoutError
+	RateError
 } from './errors';
+
+import { localTimeout } from './commonPromises';
+import {
+	spotAlbumObjectParser,
+	spotPlaylistObjectParser,
+	userPlaylistResponseParser
+} from './validators';
 
 import {
 	MyPlaylistObject,
@@ -22,7 +28,7 @@ const userPlaylistGetter = async (args: {
 	page: number,
 	accessToken: string,
 	globalTimeoutMS: number
-}) => {
+}): Promise<MyUserAPIRouteResponse> => {
 	// Timeout MS reflects global timeout in Next.js Handler
 	// Unknown how long it would take to get to this fetch function
 	// So calculate local timeout based on whenever control gets passed to this
@@ -38,13 +44,9 @@ const userPlaylistGetter = async (args: {
 	headers.append('Authorization', `Bearer ${accessToken}`);
 	const url = `${SPOT_URL_BASE}me/playlists?${params.toString()}`;
 
-	return new Promise(async (res, rej) => {
-		const localTimeout = setTimeout(
-			() => rej(new TimeoutError()),
-			globalTimeoutMS - Date.now() - 100
-		);
-
-		while (true) {
+	return Promise.race([
+		localTimeout<MyUserAPIRouteResponse>(globalTimeoutMS, 100),
+		new Promise<MyUserAPIRouteResponse>(async (res, rej) => {
 			try {
 				const raw = await fetch(url, { headers });
 				if (raw.status === 429) {
@@ -89,17 +91,11 @@ const userPlaylistGetter = async (args: {
 							type
 						};
 					})
-				} as MyUserAPIRouteResponse;
-				clearTimeout(localTimeout);
-				res(returner);
-				break;
+				} as MyUserAPIRouteResponse);
 			} catch (e: any) {
-				clearTimeout(localTimeout);
-				rej(e);
-				break;
+				return rej(e);
 			}
-		}
-	});
+		})]);
 }
 
 const specificPlaylistGetter = async (args: {
@@ -107,19 +103,15 @@ const specificPlaylistGetter = async (args: {
 	id: string,
 	accessToken: string,
 	globalTimeoutMS: number
-}) => {
+}): Promise<MyPlaylistObject> => {
 	const { accessToken, type, id, globalTimeoutMS } = args;
 	const headers = new Headers();
 	headers.append('Authorization', `Bearer ${accessToken}`);
 	const url = `${SPOT_URL_BASE}${type}s/${id}`;
 
-	return new Promise(async (res, rej) => {
-		const localTimeout = setTimeout(
-			() => rej(new TimeoutError()),
-			globalTimeoutMS - Date.now() - 100
-		);
-
-		while (true) {
+	return Promise.race([
+		localTimeout<MyPlaylistObject>(globalTimeoutMS, 100),
+		new Promise<MyPlaylistObject>(async (res, rej) => {
 			try {
 				let returner: MyPlaylistObject;
 				const raw = await fetch(url, { headers: headers });
@@ -178,17 +170,11 @@ const specificPlaylistGetter = async (args: {
 						type: rp.type
 					};
 				}
-
-				clearTimeout(localTimeout);
-				res(returner);
-				break;
+				return res(returner);
 			} catch (e: any) {
-				clearTimeout(localTimeout);
-				rej(e);
-				break;
+				return rej(e);
 			}
-		}
-	});
+		})]);
 }
 
 export {
