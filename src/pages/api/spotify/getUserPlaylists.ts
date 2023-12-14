@@ -56,7 +56,7 @@ export default async function handler(
 		} catch {
 			throw new FetchError('Server error; try again');
 		}
-		if (session === null || session === undefined) throw new AuthError();
+		if (session === null) throw new AuthError();
 
 		// Access token should never expire if there is a session
 		// Custom access token retriever outside of next-auth flow
