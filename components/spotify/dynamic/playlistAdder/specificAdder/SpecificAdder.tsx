@@ -1,7 +1,8 @@
 import { useContext, useRef, useState } from 'react';
 import { SpecificPlaylistContext } from '../../contexts/SpecificPlaylistProvider';
 
-import styles from '../PlaylistAdder.module.scss';
+import local from '../PlaylistAdder.module.scss';
+import global from '@styles/globals.module.scss';
 
 /*
 
@@ -51,9 +52,8 @@ export default function SpecificAdder(props: { children: React.ReactNode }) {
 	};
 
 	return (
-		<section>
-			<h2 className={styles.heading}>Get random playlists</h2>
-			<section className={styles.innerContainer}>
+		<>
+			<section className={local.innerContainer}>
 				<form
 					name='getSpecificPlaylist'
 					onSubmit={specificPlaylistFormHandler}>
@@ -68,13 +68,15 @@ export default function SpecificAdder(props: { children: React.ReactNode }) {
 						ref={fieldRef} />
 					<button
 						type='submit'
-						disabled={specificLoading}>Get playlist</button>
+						disabled={specificLoading}
+						className={global.emptyButton}>Get playlist</button>
 				</form>
-				<button onClick={clearSpecificPlaylistsHandler}>Clear specific playlists</button>
+				<button onClick={clearSpecificPlaylistsHandler}
+					className={global.emptyButton}>Clear specific playlists</button>
 				<p>specific {specificLoading ? 'loading' : 'idle'}</p>
 				<p>{specificError !== null && specificError}</p>
 			</section>
 			{props.children}
-		</section>
+		</>
 	);
 };
