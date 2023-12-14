@@ -3,7 +3,9 @@
 .container {
 	@include global.flexCenter;
 	flex-direction: column;
+	gap: 2svh;
 	width: 90%;
+	height: 90%;
 	max-width: 1000px;
 }
 

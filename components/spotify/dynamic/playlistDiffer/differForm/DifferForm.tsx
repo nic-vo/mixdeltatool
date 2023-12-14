@@ -65,6 +65,7 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 			setTarget('');
 			return null;
 		}
+		setSuccess(null);
 		const userMap = new Map();
 		if (userPlaylists !== null)
 			for (const playlist of userPlaylists)
@@ -87,6 +88,7 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 			setDiffer('');
 			return null;
 		}
+		setSuccess(null);
 		const userMap = new Map();
 		if (userPlaylists !== null)
 			for (const playlist of userPlaylists)
@@ -207,87 +209,90 @@ export default function DifferForm(props: { children: React.ReactNode }) {
 					disabled={userLoading || specificLoading || loading}
 					type='submit'>Change it!</button>
 			</form>
-			<section>
-				<h3>Output</h3>
-				<section>
-					{
-						success !== null && (<>
-							<h4>Success{
-								error === null
-									|| (success !== null && success.length > 0) ?
-									'!' : '?'
-							}</h4>
-							<p>
-								{
-									error !== null && error
-								}
-								{
-									success === null ? '' : success.length > 0 ?
-										'Partial success' :
-										'Total success'
-								}
-							</p>
+			<section style={{
+				height: '50%',
+				overflow: 'auto',
+				scrollbarWidth: 'thin'
+			}}>
+				{
+					success !== null ? (<>
+						<h3>Output</h3>
+						<h4>Success{
+							error === null
+								|| (success !== null && success.length > 0) ?
+								'!' : '?'
+						}</h4>
+						<p>
 							{
-								success !== null
-								&& success.length > 0
-								&& (
-									<figure>
-										<figcaption>Reasons</figcaption>
-										<ul>
+								error !== null && error
+							}
+							{
+								success === null ? '' : success.length > 0 ?
+									'Partial success' :
+									'Total success'
+							}
+						</p>
+						{
+							success !== null
+							&& success.length > 0
+							&& (
+								<figure>
+									<figcaption>Reasons</figcaption>
+									<ul>
+										{
+											success.map(
+												(reason, index) =>
+													<li key={`reason-${index}`}>{reason}</li>)
+										}
+									</ul>
+								</figure>
+							)
+						}
+					</>)
+						: (
+							<>
+								<h3>Preview</h3>
+								<p>
+									{type !== null && CLIENT_DIFF_TYPES[type]}
+								</p>
+								{
+									/*
+										Really jank conditional rendering
+									*/
+									target !== '' && (
+										<section>
+											<h4>Target</h4>
 											{
-												success.map(
-													(reason, index) =>
-														<li key={`reason-${index}`}>{reason}</li>)
+												(
+													userMap?.has(target.id)
+													&& (<PlaylistSingle playlist={userMap.get(target.id)} />)
+												)
+												|| (
+													specificMap?.has(target.id)
+													&& (<PlaylistSingle playlist={specificMap.get(target.id)} />)
+												)
 											}
-										</ul>
-									</figure>
-								)
-							}
-						</>)
-					}
-				</section>
-
-			</section>
-			<section>
-				<h3>Preview</h3>
-				<p>
-					{type !== null && CLIENT_DIFF_TYPES[type]}
-				</p>
-				{
-					/*
-						Really jank conditional rendering
-					*/
-					target !== '' && (
-						<section>
-							<h4>Target</h4>
-							{
-								(
-									userMap?.has(target.id)
-									&& (<PlaylistSingle playlist={userMap.get(target.id)} />)
-								)
-								|| (
-									specificMap?.has(target.id)
-									&& (<PlaylistSingle playlist={specificMap.get(target.id)} />)
-								)
-							}
-						</section>
-					)
-				}
-				{
-					differ !== '' && (
-						<section>
-							<h4>Differ</h4>
-							{
-								(
-									userMap?.has(differ.id)
-									&& (<PlaylistSingle playlist={userMap.get(differ.id)} />)
-								)
-								|| (specificMap?.has(differ.id)
-									&& (<PlaylistSingle playlist={specificMap.get(differ.id)} />)
-								)
-							}
-						</section>
-					)
+										</section>
+									)
+								}
+								{
+									differ !== '' && (
+										<section>
+											<h4>Differ</h4>
+											{
+												(
+													userMap?.has(differ.id)
+													&& (<PlaylistSingle playlist={userMap.get(differ.id)} />)
+												)
+												|| (specificMap?.has(differ.id)
+													&& (<PlaylistSingle playlist={specificMap.get(differ.id)} />)
+												)
+											}
+										</section>
+									)
+								}
+							</>
+						)
 				}
 			</section>
 		</section >
