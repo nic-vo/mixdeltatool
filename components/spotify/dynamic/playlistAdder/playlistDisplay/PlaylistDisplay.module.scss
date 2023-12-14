@@ -5,20 +5,9 @@
 	flex-direction: column;
 	justify-content: flex-start;
 	gap: 5svh;
-	max-width: 90svw;
-	max-height: 70svh;
 	padding: 2svh;
-	overflow-y: hidden;
-}
-
-.listContainer {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	width: 100%;
+	flex-shrink: 1;
 	height: 100%;
-	padding: 2svh;
-	overflow: hidden;
 }
 
 .list {
@@ -26,13 +15,14 @@
 	grid-template-columns: auto;
 	gap: 2svh;
 	width: 100%;
+	height: 100%;
+	overflow-y: auto;
 	max-width: 1000px;
 	padding: 2vmin;
-	height: 100%;
 	list-style: none;
-	overflow: auto;
 	scrollbar-width: thin;
 	background-color: transparent;
+	flex-shrink: 1;
 }
 
 @media (min-aspect-ratio: 1.33) {

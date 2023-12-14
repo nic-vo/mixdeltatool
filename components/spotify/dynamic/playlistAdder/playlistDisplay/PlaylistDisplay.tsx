@@ -25,36 +25,34 @@ export default function PlaylistDisplay(props: { user: boolean }) {
 			<h2 className={look.heading}>
 				{user === true ? 'Your' : 'Specific'} Playlists
 			</h2>
-			<div className={look.listContainer}>
-				{memoized.length === 0 ?
-					<p>Nothing yet</p>
-					:
-					(<ul className={look.list}>
-						{
-							memoized.map((playlist) => {
-								const { id, name, owner, tracks, image } = playlist;
-								return (
-									<li key={id} className={look.item}>
-										{
-											image !== null &&
-											image !== undefined &&
-											<img
-												src={image.url}
-												alt={`${name}'s album art`}
-												className={look.image}
-												loading='lazy' />
-										}
-										<ul className={look.info}>
-											<li>{name}</li>
-											<li>Owner by {owner.display_name}</li>
-											<li>{tracks} tracks</li>
-										</ul>
-									</li>
-								);
-							})}
-					</ul>)
-				}
-			</div>
+			{memoized.length === 0 ?
+				<p>Nothing yet</p>
+				:
+				(<ul className={look.list}>
+					{
+						memoized.map((playlist) => {
+							const { id, name, owner, tracks, image } = playlist;
+							return (
+								<li key={id} className={look.item}>
+									{
+										image !== null &&
+										image !== undefined &&
+										<img
+											src={image.url}
+											alt={`${name}'s album art`}
+											className={look.image}
+											loading='lazy' />
+									}
+									<ul className={look.info}>
+										<li>{name}</li>
+										<li>Owner by {owner.display_name}</li>
+										<li>{tracks} tracks</li>
+									</ul>
+								</li>
+							);
+						})}
+				</ul>)
+			}
 		</section>
 	);
 };
