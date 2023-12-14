@@ -40,15 +40,14 @@ export interface SpotUser extends BasicSpotObj {
 	display_name: string | null
 }
 
-export interface SpotArtistObject
-	extends Omit<SpotUser, 'display_name'> {
+export interface SpotArtistObject extends BasicSpotObj {
 	name: string,
 }
 
 export interface SpotImageObject {
 	url: string,
-	height: number,
-	width: number
+	height: number | null,
+	width: number | null
 }
 
 export interface BasicSpotApiResponse {
