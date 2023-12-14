@@ -26,25 +26,27 @@ const userGetter = async (args: {
 		new Promise<string>(async (res, rej) => {
 			try {
 				let response;
+				let networkRetry = true;
 				while (true) {
 					try {
 						response = await fetch(url, { headers });
 					} catch {
-						throw new FetchError('There was an error reaching Spotify');
+						if (networkRetry === false)
+							throw new FetchError('There was an error reaching Spotify');
+						networkRetry = false;
+						continue;
 					}
+					networkRetry = true;
 					if (response.status === 429) {
 						const tryHeader = response.headers.get('Retry-After');
 						// Retry based on Retry-After header in sec, otherwise 2s wait
 						const retry = tryHeader !== null ? parseInt(tryHeader) * 1000 : 2000;
 						// Throw rate error if wait would pass the timeout time
-						if ((Date.now() + retry) >= localTimeoutMS)
-							throw new RateError();
-						else {
-							// Await retry if within timeout time
-							await new Promise(async r => setTimeout(r, retry));
-							// Continue for while loop
-							continue;
-						}
+						if ((Date.now() + retry) >= localTimeoutMS) throw new RateError();
+						// Await retry if within timeout time
+						await new Promise(async r => setTimeout(r, retry));
+						// Continue for while loop
+						continue;
 					}
 					break;
 				}
@@ -101,6 +103,7 @@ const createEmptyPlaylist = async (args: {
 		new Promise<MyPlaylistObject>(async (res, rej) => {
 			try {
 				let response;
+				let networkRetry = true;
 				while (true) {
 					try {
 						response = await fetch(url, {
@@ -112,20 +115,21 @@ const createEmptyPlaylist = async (args: {
 							})
 						});
 					} catch {
-						throw new FetchError('There was an error creating a new playlist');
+						if (networkRetry === false)
+							throw new FetchError('There was an error creating a new playlist');
+						networkRetry = false;
+						continue;
 					}
+					networkRetry = true;
 					if (response.status === 429) {
 						const header = response.headers.get('Retry-After');
 						const wait = header !== null ? parseInt(header) * 1000 : 1000;
 						if (Date.now() + wait >= localTimeoutMS) throw new RateError();
-						else {
-							await new Promise(r => setTimeout(r, wait));
-							continue;
-						}
+						await new Promise(r => setTimeout(r, wait));
+						continue;
 					}
 					break;
 				}
-
 				if (!response)
 					throw new FetchError('There was an error reaching Spotify');
 				if (response.ok === false) {
@@ -184,11 +188,6 @@ const playlistGetter = async (args: {
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
 
-			// Await random interval so hopefully calls aren't stacked too much
-			await new Promise(
-				async r => setTimeout(r, Math.floor(Math.random() * 50 + 50))
-			);
-
 			// To allow return of partial data in case playlists are too big
 			// This promise is part of a global 9 second timeout
 			const set: Set<string> = new Set();
@@ -202,20 +201,20 @@ const playlistGetter = async (args: {
 			// random playlists, the fetch instantly throws
 			try {
 				while (next !== null && (Date.now() + 500) < localTimeoutMS) {
-					let retryOne = true;
 					let response;
+					let networkRetry = true;
 					while (true) {
 						try {
 							response = await fetch(next, { headers });
-							retryOne = true;
 						} catch {
-							if (retryOne === false)
+							if (networkRetry === false)
 								throw new FetchError('There was an error getting a playlist');
-							retryOne = false;
+							networkRetry = false;
 							continue;
 						}
 						break;
 					}
+					networkRetry = true;
 					if (response.status === 429) {
 						const header = response.headers.get('Retry-After');
 						const wait = header !== null ? parseInt(header) * 1000 : 2000;
@@ -246,7 +245,6 @@ const playlistGetter = async (args: {
 					if (!response)
 						throw new FetchError('There was an error getting a response ' +
 							'from Spotify');
-
 					// Add this iteration to set
 					// Set next to either new url or null
 					const jsoned = await response.json() as SpotTracksResponse;
@@ -318,9 +316,10 @@ const outputAdder = (params: {
 			let completed = 0;
 
 			for (const uriArr of fetches) {
+				// Arbitrary early break just in case time might go over
 				if (Date.now() + 220 > localTimeoutMS) break;
-				let retryOne = true;
 				let response;
+				let networkRetry = true;
 				while (true) {
 					try {
 						response = await fetch(url,
@@ -330,16 +329,16 @@ const outputAdder = (params: {
 								body: JSON.stringify({ uris: uriArr })
 							}
 						);
-						retryOne = true;
-						break;
 					} catch {
-						if (retryOne === false)
+						if (networkRetry === false)
 							throw new FetchError('There was an error adding tracks to the'
 								+ 'new playlist');
-						retryOne = false;
+						networkRetry = false;
 						continue;
 					}
+					break;
 				}
+				networkRetry = true;
 				if (response.status === 429) {
 					const header = response.headers.get('Retry-After');
 					const wait = header !== null ? parseInt(header) * 1000 : 2000;
@@ -359,8 +358,8 @@ const outputAdder = (params: {
 						case 401:
 							throw new AuthError();
 						case 403:
-							throw new ForbiddenError(`For some reason, you can't access that`
-								+ ` playlist`);
+							throw new ForbiddenError(`For some reason, you can't access the `
+								+ `playlist`);
 						default:
 							throw new FetchError('There was an error populating the playlist');
 					}
@@ -372,8 +371,6 @@ const outputAdder = (params: {
 				if (iterations <= hundreds) completed += 100;
 				else if (remain > 0) completed += remain;
 				iterations += 1;
-				// Reset retry one flag
-				await new Promise(async r => setTimeout(r, 50));
 			}
 			return res({
 				total,

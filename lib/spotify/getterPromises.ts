@@ -48,25 +48,27 @@ const userPlaylistGetter = async (args: {
 		new Promise<MyUserAPIRouteResponse>(async (res, rej) => {
 			try {
 				let response;
+				let networkRetry = true;
 				while (true) {
 					try {
 						response = await fetch(url, { headers });
 					} catch {
-						throw new FetchError('There was an error reaching Spotify');
+						if (networkRetry === false)
+							throw new FetchError('There was an error reaching Spotify');
+						networkRetry = false;
+						continue;
 					}
+					networkRetry = true;
 					if (response.status === 429) {
 						const header = response.headers.get('Retry-After');
 						// Retry based on Retry-After header in sec, otherwise 2s wait
 						const wait = header !== null ? parseInt(header) * 1000 : 2000;
 						// Throw rate error if wait would pass the timeout time
-						if ((Date.now() + wait) >= globalTimeoutMS)
-							throw new RateError();
-						else {
-							// Await retry if within timeout time
-							await new Promise(async r => setTimeout(r, wait));
-							// Continue for while loop
-							continue;
-						}
+						if ((Date.now() + wait) >= globalTimeoutMS) throw new RateError();
+						// Await retry if within timeout time
+						await new Promise(async r => setTimeout(r, wait));
+						// Continue for while loop
+						continue;
 					}
 					break;
 				}
@@ -78,7 +80,7 @@ const userPlaylistGetter = async (args: {
 						case 401:
 							throw new AuthError();
 						case 403:
-							throw new ForbiddenError(`Forbidden by Spotify`);
+							throw new ForbiddenError(`Can't access your playlists`);
 						default:
 							throw new FetchError('There was an error reaching Spotify');
 					}
@@ -97,14 +99,11 @@ const userPlaylistGetter = async (args: {
 				return res({
 					next,
 					playlists: items.map(item => {
-						const { id, images, name, owner, tracks, type } = item;
+						const { images, tracks } = item;
 						return {
-							id,
+							...item,
 							image: images[0],
-							name,
-							owner,
 							tracks: tracks.total,
-							type
 						};
 					})
 				} as MyUserAPIRouteResponse);
@@ -130,25 +129,27 @@ const specificPlaylistGetter = async (args: {
 		new Promise<MyPlaylistObject>(async (res, rej) => {
 			try {
 				let response;
+				let networkRetry = true;
 				while (true) {
 					try {
 						response = await fetch(url, { headers });
 					} catch {
-						throw new FetchError('There was an error reaching Spotify');
+						if (networkRetry === false)
+							throw new FetchError('There was an error reaching Spotify');
+						networkRetry = false;
+						continue;
 					}
+					networkRetry = true;
 					if (response.status === 429) {
 						const header = response.headers.get('Retry-After');
 						// Retry based on Retry-After header in sec, otherwise 2s wait
 						const wait = header !== null ? parseInt(header) * 1000 : 2000;
 						// Throw rate error if wait would pass the timeout time
-						if ((Date.now() + wait) >= globalTimeoutMS)
-							throw new RateError();
-						else {
-							// Await retry if within timeout time
-							await new Promise(async r => setTimeout(r, wait));
-							// Continue for while loop
-							continue;
-						}
+						if ((Date.now() + wait) >= globalTimeoutMS) throw new RateError();
+						// Await retry if within timeout time
+						await new Promise(async r => setTimeout(r, wait));
+						// Continue for while loop
+						continue;
 					}
 					break;
 				}
@@ -160,7 +161,7 @@ const specificPlaylistGetter = async (args: {
 						case 401:
 							throw new AuthError();
 						case 403:
-							throw new ForbiddenError(`Forbidden by Spotify`);
+							throw new ForbiddenError(`Spotify forbids that playlist`);
 						case 404:
 							throw new CustomError(404, 'That Spotify ID does not exist');
 						default:
