@@ -8,8 +8,6 @@ import { SPOT_LOGIN_WINDOW } from '@consts/spotify';
 
 const SPOTIFY_SCOPES = [
 	'user-read-email',
-	'user-read-currently-playing',
-	'user-read-recently-played',
 	'user-top-read',
 	'user-library-read',
 	'playlist-read-private',
