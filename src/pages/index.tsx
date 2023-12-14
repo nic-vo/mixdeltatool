@@ -1,7 +1,11 @@
-export default function Home() {
+import { SpotEUA } from '@components/legal';
+import { Background } from '@components/misc';
 
+import local from '@styles/Home.module.scss';
+
+export default function Home() {
 	return (
-		<main>
+		<main className={local.main}>
 			<h1>Homepage</h1>
 			<section>
 				<h2>What this is</h2>
@@ -15,6 +19,9 @@ export default function Home() {
 			</section>
 			<br /><br /><br />
 			<a href='/spotify'>Here's a link to the tool</a>
+			<a href='/privacypolicy'>Here's a link to the privacy policy</a>
+			<SpotEUA />
+			<Background />
 		</main>
 	);
 }
