@@ -8,3 +8,20 @@ $white: #EDEDED;
 $black: #121218;
 $rounded: 10px;
 $easeLength: 0.25s;
+$buttonPadding: 0.5rem;
+
+.emptyButton {
+	cursor: pointer;
+	padding: $buttonPadding;
+	border: 2px solid $white;
+	border-radius: $rounded;
+	background-color: transparent;
+	color: $white;
+}
+
+.emptyButton:hover,
+.emptyButton:focus,
+.emptyButton:active {
+	color: $black;
+	background-color: $white;
+}
