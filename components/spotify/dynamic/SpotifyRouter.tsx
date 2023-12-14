@@ -2,18 +2,30 @@ import { useState } from 'react';
 import PlaylistAdder from './playlistAdder';
 import PlaylistDiffer from './playlistDiffer';
 
+import global from '@styles/globals.module.scss';
+import local from './Router.module.scss';
+
 const SpotifyRouter = () => {
 	const [nav, setNav] = useState('add');
 
 	return (
-		<>
-			<div>
-				<button onClick={() => setNav('add')}>Add</button>
-				<button onClick={() => setNav('diff')}>Diff</button>
-			</div>
-			{nav === 'add' && <PlaylistAdder />}
-			{nav === 'diff' && <PlaylistDiffer />}
-		</>
+		<section className={local.container}>
+			{nav === 'add' ? (
+				<>
+					<button
+						onClick={() => setNav('diff')}
+						className={global.emptyButton}>Go diff</button>
+					<PlaylistAdder />
+				</>
+			) : (
+				<>
+					<button
+						onClick={() => setNav('add')}
+						className={global.emptyButton}>Return to add</button>
+					<PlaylistDiffer />
+				</>
+			)}
+		</section >
 	);
 }
 
