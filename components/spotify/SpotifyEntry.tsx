@@ -1,16 +1,26 @@
-import { useSession } from 'next-auth/react';
 import { SpotifyMain } from './dynamic';
 import Header from './Header/Header';
+import { SpotEUA } from '@components/legal';
+import { Background } from '@components/misc';
 
 export default function SpotifyEntry() {
-	const { data, status } = useSession({ required: true });
-	if (status === 'authenticated' && data.user) {
-		return (
-			<>
-				<Header />
+	return (
+		<>
+			<Header />
+			<main style={{
+				position: 'relative',
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent:'space-around',
+				flexDirection: 'column',
+				width: '100svw',
+				height: '100svh',
+				zIndex: 1
+			}}>
+				<SpotEUA />
 				<SpotifyMain />
-			</>
-		);
-	}
-	return <h1>Loading...</h1>
+				<Background />
+			</main>
+		</>
+	);
 }
