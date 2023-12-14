@@ -1,4 +1,3 @@
-export const SPOT_PLAYLIST_ITER_INT = 10;
 export const SPOT_PLAYLIST_PAGE_LIMIT = 49;
 export const SPOT_LOGIN_WINDOW = 50 * 60;
 export const AUTH_WINDOW = 4000;

@@ -1,4 +1,4 @@
-import { SPOT_PLAYLIST_ITER_INT, SPOT_URL_BASE } from '@consts/spotify';
+import { SPOT_URL_BASE } from '@consts/spotify';
 import {
 	AuthError,
 	CustomError,
@@ -15,6 +15,8 @@ import {
 	SpotPlaylistObject,
 	SpotUserPlaylistsResponse
 } from '@components/spotify/types';
+
+const SPOT_PLAYLIST_ITER_INT = 10;
 
 const userPlaylistGetter = async (args: {
 	page: number,
