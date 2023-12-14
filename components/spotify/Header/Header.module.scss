@@ -3,11 +3,16 @@
 .header {
 	position: fixed;
 	height: 100svh;
+	@include global.flexCenter;
+	flex-direction: column;
+	justify-content: space-between;
 	background-color: #AAA;
 	padding: 2svw;
 	translate: -100%;
 	transition: all global.$easeLength;
 	transition-timing-function: ease;
+	z-index: 2;
+	gap: 4svh;
 }
 
 .active {
@@ -20,27 +25,34 @@
 	right: 0;
 	display: flex;
 	align-items: center;
-	border: 2px solid global.$white;
+	border: 4px solid global.$white;
 	border-radius: global.$rounded;
+	background-color: rgba(10, 10, 10, 0.7);
 	padding: 1rem;
-	transform: translateX(200%);
+	transform: translateX(calc(100% + 2svw));
 	color: global.$white;
 	z-index: 2;
 
-	svg {
-		color: global.$black;
+	* {
+		color: global.$white;
 	}
 }
 
-.toggler:hover {
+.toggler:hover,
+.toggler:focus,
+.toggler:active {
 	background-color: global.$white;
-	color: global.$black;
+
+	* {
+		color: global.$black;
+	}
 }
 
 .returner {
 	display: none;
 	position: absolute;
 	right: 0;
+	top: 0;
 	translate: 100%;
 	height: 100svh;
 	width: 100svw;
@@ -48,7 +60,7 @@
 	backdrop-filter: brightness(0.5);
 }
 
-.active .returner{
+.active .returner {
 	display: block;
 	animation-name: returnerfadein;
 	animation-duration: global.$easeLength;
@@ -75,10 +87,19 @@
 	}
 }
 
-.container {
+.hidden {
+	@include global.flexCenter;
+	height: 100%;
+	flex-grow: 1;
+	flex-direction: column;
+	justify-content: flex-start;
+	gap: 1rem;
+}
+
+.innerContainer {
 	@include global.flexCenter;
 	flex-direction: column;
-	gap: 2svw;
+	gap: 1rem;
 }
 
 .info {
