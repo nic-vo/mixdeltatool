@@ -58,6 +58,7 @@
 	width: 100svw;
 	background-color: transparent;
 	backdrop-filter: brightness(0.5);
+	z-index: 1;
 }
 
 .active .returner {
