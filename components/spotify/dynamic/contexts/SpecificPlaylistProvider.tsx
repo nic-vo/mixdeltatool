@@ -36,7 +36,10 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 		// If first load, set playlist to sessionStorage
 		const storageData = sessionStorage.getItem('SPEC_PLAYLISTS');
 		// If sessionStorage is empty, no big deal
-		if (storageData === null) return;
+		if (storageData === null) {
+			setFirst(false);
+			return;
+		};
 
 		try {
 			const sessionPlaylists = JSON.parse(storageData) as MyPlaylistObject[];
@@ -61,11 +64,10 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 					};
 				});
 			setPlaylists(sanitizedPlaylists);
-			setFirst(false);
 		} catch {
 			// In case of weird non-parseable JSON
-			return;
 		}
+		setFirst(false);
 	}, [playlists]);
 
 	const clearSpecificPlaylistsHandler = () => {
