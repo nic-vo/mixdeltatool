@@ -45,11 +45,13 @@ class TimeoutError extends Error {
 class RateError extends Error {
 	status: number;
 	message: string;
+	retryTime: number
 
-	constructor() {
+	constructor(retryTime: number) {
 		super();
 		this.status = 429;
-		this.message = 'Please try again in a few minutes';
+		this.message = `Servers under load. Try again in a few minutes`;
+		this.retryTime = retryTime;
 	}
 }
 
