@@ -20,6 +20,7 @@ declare global {
 	};
 
 	var _mongoClientPromise: Promise<MongoClient>
+	var hcaptcha
 }
 
 export { };
