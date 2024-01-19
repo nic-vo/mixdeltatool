@@ -5,12 +5,16 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 # Changelog
 (the commit history sucks because this started out as an experiment)
 
-## 0.10.0
+## 0.11.0
+  - Separate playlist lists from parent
+  - Separate differ styling from adder's styling entirely
+
+### 0.10.0
   - Implement very basic rate limiting via Redis (a drop-in promise for routes)
-	- Implement account deletion dialog
-	- Implement universal clear playlist button
-	- Implement route to update global status
-	- Implement contact form
+  - Implement account deletion dialog
+  - Implement universal clear playlist button
+  - Implement route to update global status
+  - Implement contact form
 
 ### 0.9.0
   - Abstract differ logic to a context so it persists when the view changes
