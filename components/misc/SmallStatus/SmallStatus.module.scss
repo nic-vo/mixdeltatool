@@ -1,0 +1,31 @@
+@use '@styles/globals.module.scss' as g;
+
+.statusBox {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	font-size: 1rem;
+	gap: 0.5em;
+	padding: 0.4em;
+	width: 100%;
+	overflow-x: hidden;
+
+	* {
+		font-size: inherit;
+	}
+
+	:not(p) {
+		color: rgb(234, 95, 61);
+	}
+}
+
+.errorMsgContainer {
+	overflow: hidden;
+
+	p {
+		color: g.$white;
+		display: flex;
+		align-items: center;
+		white-space: nowrap;
+	}
+}
