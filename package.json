@@ -10,9 +10,7 @@
   },
   "dependencies": {
     "@next-auth/mongodb-adapter": "^1",
-    "@trpc/client": "^10",
-    "@trpc/react-query": "^10",
-    "@trpc/server": "^10",
+    "@upstash/redis": "^1.28.1",
     "dompurify": "^3",
     "mongodb": "^5",
     "mongoose": "^8",
