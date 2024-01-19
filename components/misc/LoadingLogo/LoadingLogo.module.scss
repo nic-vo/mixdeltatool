@@ -1,0 +1,115 @@
+$animationLength: 5s;
+
+@mixin animationdeets {
+	animation-duration: 3s;
+	animation-timing-function: ease-out;
+	animation-iteration-count: infinite;
+}
+
+.left {
+	animation-name: leftwiggle;
+	@include animationdeets;
+}
+
+.middle {
+	animation-name: middlewiggle;
+	@include animationdeets;
+	animation-delay: 0.4s;
+}
+
+.right {
+	animation-name: rightwiggle;
+	@include animationdeets;
+	animation-delay: 0.2s;
+
+}
+
+@keyframes leftwiggle {
+	0% {
+		transform: translate(0);
+	}
+
+	20% {
+		filter: brightness(1) saturate(1);
+		transform: translate(0);
+	}
+
+	30% {
+		filter: brightness(0.5) saturate(0.5);
+		transform: translate(-5%, -10%);
+	}
+
+	45% {
+		filter: brightness(0.5) saturate(0.5);
+		transform: translate(-5%, -10%);
+	}
+
+	55% {
+		filter: brightness(1) saturate(1);
+		transform: translate(0);
+	}
+
+	100% {
+		transform: translate(0);
+	}
+}
+
+@keyframes rightwiggle {
+	0% {
+		transform: translate(0);
+	}
+
+	20% {
+		filter: brightness(1) saturate(1);
+		transform: translate(0);
+	}
+
+	30% {
+		filter: brightness(0.5) saturate(0.5);
+		transform: translate(5%, -10%);
+	}
+
+	45% {
+		filter: brightness(0.5) saturate(0.5);
+		transform: translate(5%, -10%);
+	}
+
+	55% {
+		filter: brightness(1) saturate(1);
+		transform: translate(0);
+	}
+
+	100% {
+		transform: translate(0);
+	}
+}
+
+@keyframes middlewiggle {
+	0% {
+		transform: translate(0);
+	}
+
+	20% {
+		filter: brightness(1) saturate(1);
+		transform: translate(0);
+	}
+
+	30% {
+		filter: brightness(0.5) saturate(0.5);
+		transform: translate(0, 10%);
+	}
+
+	45% {
+		filter: brightness(0.5) saturate(0.5);
+		transform: translate(0%, 10%);
+	}
+
+	55% {
+		filter: brightness(1) saturate(1);
+		transform: translate(0);
+	}
+
+	100% {
+		transform: translate(0);
+	}
+}
