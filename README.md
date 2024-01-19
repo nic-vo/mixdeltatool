@@ -5,7 +5,14 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 # Changelog
 (the commit history sucks because this started out as an experiment)
 
-## 0.9.0
+## 0.10.0
+  - Implement very basic rate limiting via Redis (a drop-in promise for routes)
+	- Implement account deletion dialog
+	- Implement universal clear playlist button
+	- Implement route to update global status
+	- Implement contact form
+
+### 0.9.0
   - Abstract differ logic to a context so it persists when the view changes
   - Differ form now just consumes and updates context by rotating inputs
   - Move the pending state of the diff operation to its own component
