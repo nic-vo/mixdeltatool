@@ -1,0 +1,35 @@
+@use '@styles/globals.module.scss' as g;
+
+.footer {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	min-height: 10svh;
+	color: g.$white;
+	padding: 1rem;
+	z-index: 1;
+	background: linear-gradient(0deg, g.$black, transparent);
+
+}
+
+.spacer {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	* {
+		color: inherit;
+		padding: 1rem;
+	}
+
+	a {
+		border-left: 1px solid g.$white;
+	}
+
+	a:hover,
+	a:focus,
+	a:active {
+		text-decoration: underline;
+	}
+}
