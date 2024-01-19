@@ -5,7 +5,15 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 # Changelog
 (the commit history sucks because this started out as an experiment)
 
-## 0.7.0
+## 0.8.0
+  - Implement basic footer
+  - Implement base logo for animation
+  - Implement animated logo
+  - Implement component to display status of the various getters
+  - Implement component to display a global service status
+  - Implement component to handle image loading
+
+### 0.7.0
   - Add some static assets
   - Remove tRPC
   - Prepare for rate limiting with redis
