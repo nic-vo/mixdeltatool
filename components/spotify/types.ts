@@ -34,7 +34,10 @@ export interface SpotAlbumObject extends BasicSpotObj {
 	type: 'album'
 }
 
-export interface SpotTrackObject { track: Pick<BasicSpotObj, 'uri'> }
+export interface SpotPlaylistTrackObject {
+	track: Pick<BasicSpotObj, 'uri'>,
+	is_local: boolean
+}
 
 export interface SpotUser extends BasicSpotObj {
 	display_name: string | null
