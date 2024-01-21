@@ -49,8 +49,8 @@ export interface SpotArtistObject extends BasicSpotObj {
 
 export interface SpotImageObject {
 	url: string,
-	height: number | null,
-	width: number | null
+	height?: number | null,
+	width?: number | null
 }
 
 export interface BasicSpotApiResponse {
@@ -106,8 +106,7 @@ export interface createDiffPlaylistApiRequest extends NextApiRequest {
 	'stu' === 'keep only similarities'
 */
 
-export interface SpotTracksResponse extends BasicSpotApiResponse {
-	next: string,
+export interface SpotPlaylistTracksResponse extends BasicSpotApiResponse {
 	total: number,
 	items: SpotTrackObject[]
 }
@@ -115,7 +114,7 @@ export interface SpotTracksResponse extends BasicSpotApiResponse {
 export interface differInternalPlaylistPromise {
 	total: number,
 	completed: number,
-	items: string[],
+	items: Set<string>,
 }
 
 export interface differRouteResponse {
