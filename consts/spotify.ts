@@ -14,26 +14,36 @@ export const CLIENT_DIFF_TYPES = {
 	'bu': "Only the differences between the target and the differ; no shared.",
 };
 
-export const SERVER_DIFF_TYPES = {
-	adu: (params: { target: { owner: string, name: string }, differ: { owner: string, name: string } }) => {
-		const { target, differ } = params;
-		return `Anything different in ${differ.owner}'s "${differ.name}" is added to ${target.owner}'s "${target.name}".`;
+export function SERVER_DIFF_TYPES(params: {
+	target: {
+		name: string,
+		owner: string
 	},
-	odu: (params: { target: { owner: string, name: string }, differ: { owner: string, name: string } }) => {
-		const { target, differ } = params;
-		return `All that remains of ${target.owner}'s ${target.name} is anything unique to ${differ.owner}'s "${differ.name}".`;
+	differ: {
+		name: string,
+		owner: string
 	},
-	otu: (params: { target: { owner: string, name: string }, differ: { owner: string, name: string } }) => {
-		const { target, differ } = params;
-		return `All that remains is anything unique to ${target.owner}'s "${target.name}".`;
-	},
-	bu: (params: { target: { owner: string, name: string }, differ: { owner: string, name: string } }) => {
-		const { target, differ } = params;
-		return `Any similarities between ${target.owner}'s "${target.name}" and ${differ.owner}'s "${differ.name}" are gone; only their uniques remain.`;
-	},
-	stu: (params: { target: { owner: string, name: string }, differ: { owner: string, name: string } }) => {
-		const { target, differ } = params;
-		return `Only shared tracks between ${target.owner}'s "${target.name}" and ${differ.owner}'s "${differ.name}".`;
+	actionType: ActionType
+}) {
+	const { target, differ, actionType } = params;
+	switch (actionType) {
+		case 'adu':
+			return `Tracks from ${differ.owner}'s "${differ.name}" were added to `
+				+ `${target.owner} 's "${target.name}".`;
+		case 'odu':
+			return `${target.owner}'s ${target.name} was replaced entirely by `
+				+ `tracks unique to ${differ.owner}'s "${differ.name}".`;
+		case 'otu':
+			return `Any similarities between ${target.owner}'s "${target.name}" and `
+				+ `${differ.owner}'s "${differ.name}" have been removed `
+				+ `from "${target.name}"; only tracks unique to it remain.`;
+		case 'bu':
+			return `Any similarities between ${target.owner}'s "${target.name}" `
+				+ `and ${differ.owner}'s "${differ.name}" have been removed from `
+				+ `"${target.name}"; only tracks unique to either playlist remain.`;
+		case 'stu':
+			return `Only tracks that exist in both ${target.owner}'s `
+				+ `"${target.name}" and ${differ.owner}'s "${differ.name}" remain.`;
 	}
 };
 
