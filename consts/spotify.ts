@@ -1,13 +1,17 @@
+import { ActionType, MyPlaylistObject } from '@components/spotify/types';
+import MixDeltaLogo from './mdl.svg';
+import SpotifyLogo from './Spotify_Logo_RGB_White.png';
+
 export const SPOT_PLAYLIST_PAGE_LIMIT = 49;
 export const SPOT_LOGIN_WINDOW = 50 * 60;
 export const AUTH_WINDOW = 4000;
 export const GLOBAL_EXECUTION_WINDOW = 9500;
 export const CLIENT_DIFF_TYPES = {
-	'adu': "Add what's different to the target",
-	'odu': "Delete everything except what's unique to the differ",
-	'otu': "Delete everything except what's unique to the target",
-	'bu': 'Delete all similarities but keep all differences',
-	'stu': "Keep only what's similar to the differ"
+	'stu': "Only tracks that are in BOTH the target and differ.",
+	'odu': "Tracks that exist only in the differ.",
+	'otu': "Tracks that exist only in the target.",
+	'adu': "The original target + anything new from the differ.",
+	'bu': "Only the differences between the target and the differ; no shared.",
 };
 
 export const SERVER_DIFF_TYPES = {
@@ -33,4 +37,12 @@ export const SERVER_DIFF_TYPES = {
 	}
 };
 
-export const SPOT_URL_BASE = 'https://api.spotify.com/v1/'
+export const SPOT_URL_BASE = 'https://api.spotify.com/v1/';
+export const APP_NAME = 'MixDelta';
+export const MAIN_TITLE = `Compare Spotify playlists and make bulk changes | ${APP_NAME}`;
+export const MAIN_DESC = 'A tool for Spotify users to compare playlists and edit them based on the comparisons.';
+
+export {
+	MixDeltaLogo,
+	SpotifyLogo
+}
