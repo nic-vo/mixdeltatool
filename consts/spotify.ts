@@ -1,7 +1,7 @@
 export const SPOT_PLAYLIST_PAGE_LIMIT = 49;
 export const SPOT_LOGIN_WINDOW = 50 * 60;
 export const AUTH_WINDOW = 4000;
-export const GLOBAL_EXECUTION_WINDOW = 9000;
+export const GLOBAL_EXECUTION_WINDOW = 9500;
 export const CLIENT_DIFF_TYPES = {
 	'adu': "Add what's different to the target",
 	'odu': "Delete everything except what's unique to the differ",
