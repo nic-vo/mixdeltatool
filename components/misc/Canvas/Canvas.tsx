@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 const Canvas = (props: {
+	fps: number,
 	draw: (args: { ctx: CanvasRenderingContext2D, startTime: number, init: any }) => void,
 	initializer: (args: { height: number, width: number }) => {},
 	predraw?: (ctx: CanvasRenderingContext2D) => void,
@@ -27,13 +28,17 @@ const Canvas = (props: {
 		}
 		const startTime = Date.now();
 		let animationFrameId: number;
+		let last = Date.now();
 		const init = props.initializer({ height, width });
-		console.log(init)
 
 		const render = () => {
-			if (predraw) predraw(context);
-			draw({ ctx: context, startTime, init });
-			animationFrameId = window.requestAnimationFrame(render);
+			const rn = Date.now();
+			if (rn - last > 1000 / props.fps) {
+				last = rn;
+				if (predraw) predraw(context);
+				draw({ ctx: context, startTime, init });
+			}
+			animationFrameId = requestAnimationFrame(render);
 		}
 		render();
 
@@ -43,17 +48,37 @@ const Canvas = (props: {
 	}, [draw, predraw, postdraw, width, height, error]);
 
 	useEffect(() => {
-		const canvas = canvasRef.current;
-		if (canvas === null) {
-			setError('There was an error with the canvas');
-			return;
-		}
+		// const canvas = canvasRef.current;
+		// if (canvas === null) {
+		// 	setError('There was an error with the canvas');
+		// 	return;
+		// }
+		// const resizeObserver = new ResizeObserver(() => {
+		// 	setWidth(canvas.clientWidth);
+		// 	setHeight(canvas.clientHeight);
+		// });
+
+		// resizeObserver.observe(canvas);
+		// return () => resizeObserver.disconnect();
+
 		const callback = (e?: UIEvent) => {
-			setHeight(document.documentElement.clientHeight);
-			setWidth(document.documentElement.clientWidth);
+			const canvas = canvasRef.current;
+			if (canvas === null) {
+				setError('There was an error with the canvas');
+				return;
+			}
+			const parent = canvas.parentElement;
+			const newWidth = parent !== null ?
+				parent.getBoundingClientRect().width : window.innerWidth;
+			const newHeight = parent !== null ?
+				Math.max(parent.getBoundingClientRect().height, window.innerHeight)
+				: window.innerHeight;
+			setWidth(newWidth);
+			setHeight(newHeight);
 		}
 		callback();
 		window.addEventListener('resize', callback);
+		return () => window.removeEventListener('resize', callback);
 	}, []);
 
 	useEffect(() => {
