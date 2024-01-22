@@ -43,9 +43,9 @@ const Background = () => {
 		const { height, width } = args;
 		// EVERYTHING is percents
 		let empty: FieldsInitValues[] = [];
-		for (let i = 0; i < 12; i++) {
-			const size = Math.floor((0.05 + (Math.random() * 0.05)) * width);
-			const rawX = Math.random() > 0.5 ? width - (Math.random() * 1.4 * size)
+		for (let i = 0; i < 24; i++) {
+			const size = Math.floor((0.04 + (Math.random() * 0.04)) * width);
+			const rawX = Math.random() >= 0.5 ? width - (Math.random() * 1.4 * size)
 				: (Math.random() * 1.4 * size) - size;
 			const predrawY = Math.floor(Math.random() * (height + size));
 			const totalY = height + size;
@@ -72,7 +72,7 @@ const Background = () => {
 	}
 
 	return (
-		<Canvas predraw={predraw} initializer={drawInit} draw={draw} />
+		<Canvas fps={30} predraw={predraw} initializer={drawInit} draw={draw} />
 	);
 }
 
