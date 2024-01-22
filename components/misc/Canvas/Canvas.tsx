@@ -102,7 +102,7 @@ const Canvas = (props: {
 			<canvas
 				ref={canvasRef}
 				style={{
-					backgroundColor: '#111',
+					backgroundColor: '#121218',
 					position: 'absolute',
 					top: 0,
 					left: 0,
