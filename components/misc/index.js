@@ -5,8 +5,9 @@ import SmallStatus from './SmallStatus/SmallStatus';
 import ServiceStatus from './ServiceStatus/ServiceStatus';
 import ListItem from './listItem/ListItem';
 import LogoToAnimate from './LogoToAnimate/LogoToAnimate';
-import LoadingLogo from './LoadingLogo/LoadingLogo';
+import ImageLoadingLogo from './ImageLoadingLogo/ImageLoadingLogo';
 import Footer from './Footer/Footer';
+import InProgressLogo from './InProgressLogo/InProgressLogo';
 
 export {
 	Background,
@@ -16,6 +17,7 @@ export {
 	ServiceStatus,
 	ListItem,
 	LogoToAnimate,
-	LoadingLogo,
+	ImageLoadingLogo,
+	InProgressLogo,
 	Footer
 };

@@ -1,4 +1,4 @@
-import LoadingLogo from '../LoadingLogo/LoadingLogo';
+import ImageLoadingLogo from '../ImageLoadingLogo/ImageLoadingLogo';
 
 export default function LoadingForDynamic(props: {
 	error?: Error | null,
@@ -12,7 +12,7 @@ export default function LoadingForDynamic(props: {
 	return (
 		<div style={{height:'20svh', maxWidth: '50%'}}>
 			<h1 style={{ alignSelf: 'center' }}>
-				<LoadingLogo /> Loading...
+				<ImageLoadingLogo /> Loading...
 			</h1>
 		</div>
 	);

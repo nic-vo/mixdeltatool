@@ -4,7 +4,7 @@ import { FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 
 import local from './PendingWindow.module.scss';
 import global from '@styles/globals.module.scss';
-import { ListItem, LoadingLogo } from '@components/misc';
+import { ListItem, InProgressLogo } from '@components/misc';
 
 const PendingWindow = () => {
 	const {
@@ -36,7 +36,7 @@ const PendingWindow = () => {
 				{target !== '' && <ListItem playlist={target} />}
 				<div className={sectionClasser}>
 					{
-						loading ? <LoadingLogo />
+						loading ? <InProgressLogo />
 							: error !== null ? <FaExclamationCircle />
 								: <FaCheckCircle />
 					}
@@ -55,7 +55,7 @@ const PendingWindow = () => {
 				disabled={loading}
 				onClick={() => goToForm()}
 				className={global.emptyButton}>
-				Do it again...
+				Return
 			</button>}
 		</section>
 	);

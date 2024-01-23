@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { MixDeltaLogo } from '@consts/spotify';
 
 import local from './ImageLoader.module.scss';
-import LoadingLogo from '../LoadingLogo/LoadingLogo';
+import ImageLoadingLogo from '../ImageLoadingLogo/ImageLoadingLogo';
 
 const ImageLoader = (props: { url?: string | null | undefined, alt?: string }) => {
 	const [loaded, setLoaded] = useState(false);
@@ -34,7 +34,7 @@ const ImageLoader = (props: { url?: string | null | undefined, alt?: string }) =
 
 	return (
 		<div className={containerClass}>
-			{!loaded && <LoadingLogo />}
+			{!loaded && <ImageLoadingLogo />}
 			<img
 				src={props.url !== null ? props.url : ''}
 				alt={props.alt ? props.alt : ''}
