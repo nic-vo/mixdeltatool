@@ -64,7 +64,11 @@ export interface SpotUserPlaylistsResponse
 }
 
 export interface MyPlaylistObject
-	extends Pick<SpotPlaylistObject, 'id' | 'name' | 'owner'> {
+	extends Pick<SpotPlaylistObject, 'id' | 'name'> {
+	owner: {
+		name: string,
+		id: string
+	}[],
 	image?: SpotImageObject,
 	tracks: number,
 	type: 'album' | 'playlist'
@@ -92,8 +96,8 @@ export type ActionType = 'adu' | 'odu' | 'otu' | 'bu' | 'stu'
 
 export interface createDiffPlaylistApiRequest extends NextApiRequest {
 	body: {
-		target: { id: string, type: 'album' | 'playlist' },
-		differ: { id: string, type: 'album' | 'playlist' },
+		target: MyPlaylistObject,
+		differ: MyPlaylistObject,
 		type: 'adu' | 'odu' | 'otu' | 'bu' | 'stu'
 	}
 }
@@ -108,7 +112,14 @@ export interface createDiffPlaylistApiRequest extends NextApiRequest {
 
 export interface SpotPlaylistTracksResponse extends BasicSpotApiResponse {
 	total: number,
-	items: SpotTrackObject[]
+	items: SpotPlaylistTrackObject[]
+}
+
+export interface SpotAlbumTracksResponse extends BasicSpotApiResponse {
+	total: number,
+	items: {
+		uri: string
+	}[]
 }
 
 export interface differInternalPlaylistPromise {
