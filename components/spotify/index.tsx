@@ -1,5 +1,7 @@
-import SpotifyEntry from './SpotifyEntry';
+import SpotifyFrame from './SpotifyFrame';
+import Header from './Header/Header';
 
 export {
-	SpotifyEntry
+	SpotifyFrame,
+	Header
 };
