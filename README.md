@@ -5,7 +5,11 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 # Changelog
 (the commit history sucks because this started out as an experiment)
 
-## 0.17.0
+## 0.18.0
+  - Disable specific ESLint stuff
+  - Fix privacy policy copy
+
+### 0.17.0
   - Add animated logo variation
   - Make differ disclaimer more apparent
   - Add contact info to relevant area in privacy policy
@@ -32,7 +36,7 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
     - Make the form multi-stage
     - Add interactive progress bar
 
-## 0.14.0
+### 0.14.0
   - Privacy Policy
     - Update contact info
     - Escape HTML entities
