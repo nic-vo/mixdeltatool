@@ -249,8 +249,7 @@ const SpotEUA = (props: {
 						</li>
 						<li>
 							<h3>Contact Information</h3>
-							{/* TODO HERE */}
-							<p>For support or inquiries, please contact [provide contact details].</p>
+							<p>For support or inquiries, please email us at <a href='mailto:mixdeltatool@gmail.com' target='_blank'>mixdeltatool@gmail.com</a> or message us via <a href='/contact' target='_blank'>our contact form.</a></p>
 						</li>
 						<li>
 							<h3>Spotify as a Third-Party Beneficiary</h3>
@@ -260,10 +259,10 @@ const SpotEUA = (props: {
 						</li>
 					</ol>
 				</div>
-				{/* TODO HERE */}
+				<p className={local.ppLink}>{APP_NAME}&apos;s <a href='/privacypolicy'>privacy policy.</a></p>
 				<label htmlFor='check'>
 					<input type='checkbox' name='check' id='check' required />
-					I have read, understood, and agreed to these terms and conditions as well as the terms and conditions set forth by the privacy policy. [Link to privacy policy]
+					I have read, understood, and agreed to these terms and conditions as well as the terms and conditions set forth by the privacy policy.
 				</label>
 
 				<button className={global.emptyButton} type='submit'>Submit</button>
