@@ -6,78 +6,6 @@ import {
 	differInternalAddPromise,
 	differInternalPlaylistPromise
 } from '@components/spotify/types';
-import { AuthError, CustomError, FetchError, ForbiddenError, RateError } from './errors';
-import { localTimeout } from './commonPromises';
-import { spotPlaylistObjectParser, spotUserObjectParser } from './validators';
-
-const userGetter = async (args: {
-	accessToken: string,
-	globalTimeoutMS: number
-}): Promise<string> => {
-	const { accessToken, globalTimeoutMS } = args;
-	const localLimit = 2200;
-	const localTimeoutMS = globalTimeoutMS - localLimit;
-	const url = SPOT_URL_BASE.concat('me');
-	const headers = new Headers();
-	headers.append('Authorization', `Bearer ${accessToken}`);
-
-	return Promise.race([
-		localTimeout<string>(globalTimeoutMS, localLimit),
-		new Promise<string>(async (res, rej) => {
-			try {
-				let response;
-				let networkRetry = true;
-				while (true) {
-					try {
-						response = await fetch(url, { headers });
-					} catch {
-						if (networkRetry === false)
-							throw new FetchError('There was an error reaching Spotify');
-						networkRetry = false;
-						continue;
-					}
-					networkRetry = true;
-					if (response.status === 429) {
-						const tryHeader = response.headers.get('Retry-After');
-						// Retry based on Retry-After header in sec, otherwise 2s wait
-						const retry = tryHeader !== null ? parseInt(tryHeader) * 1000 : 2000;
-						// Throw rate error if wait would pass the timeout time
-						if ((Date.now() + retry) >= localTimeoutMS) throw new RateError();
-						// Await retry if within timeout time
-						await new Promise(async r => setTimeout(r, retry));
-						// Continue for while loop
-						continue;
-					}
-					break;
-				}
-				if (!response)
-					throw new FetchError('There was an error reaching Spotify');
-				if (response.ok === false) {
-					// This is if somehow after all this, Spotify detects something wrong
-					switch (response.status) {
-						case 401:
-							throw new AuthError();
-						case 403:
-							throw new ForbiddenError(`We can't find you`);
-						default:
-							throw new FetchError('There was an error reaching Spotify');
-					}
-				}
-
-				let id;
-				try {
-					const jsoned = await response.json();
-					const parsed = spotUserObjectParser.parse(jsoned);
-					id = parsed.id;
-				} catch {
-					throw new FetchError("There was an error with Spotify's response");
-				}
-				return res(id as string);
-			} catch (e: any) {
-				return rej(e);
-			}
-		})]);
-}
 
 const createEmptyPlaylist = async (args: {
 	accessToken: string,
@@ -101,6 +29,21 @@ const createEmptyPlaylist = async (args: {
 	return Promise.race([
 		localTimeout<MyPlaylistObject>(globalTimeoutMS, localLimit),
 		new Promise<MyPlaylistObject>(async (res, rej) => {
+			let userId: string | undefined;
+			try {
+				userId = await userGetter({ globalTimeoutMS, accessToken });
+			}
+			catch (e: any) {
+				return rej(e)
+			}
+
+			if (userId === undefined)
+				return rej(new FetchError("For some reason you couldn't be found on Spotify."));
+
+			const url = SPOT_URL_BASE.concat('users/', userId, '/playlists');
+			const headers = new Headers();
+			headers.append('Authorization', `Bearer ${accessToken}`);
+			headers.append('Content-Type', 'application/json');
 			try {
 				let response;
 				let networkRetry = true;
