@@ -43,7 +43,7 @@ const PrivacyPolicy = () => {
 					</section>
 					<section>
 						<h3>IP Address Usage</h3>
-						<p>{APP_NAME} collects and temporarily stores IP addresses for the purpose of rate limiting API requests. This is done to ensure fair usage and protect against misuse of our services. These IP addresses are not associated with users' Spotify information in any way.</p>
+						<p>{APP_NAME} collects and temporarily stores IP addresses for the purpose of rate limiting API requests. This is done to ensure fair usage and protect against misuse of our services. These IP addresses are not associated with users&apos; Spotify information in any way.</p>
 					</section>
 					<section className={look.section}>
 						<h3>Playlist Information</h3>
@@ -102,7 +102,7 @@ const PrivacyPolicy = () => {
 						<li>
 							<h3>Use of Cookies</h3>
 							<p>
-								We use cookies for user authentication. These cookies are the bare minimum for this app's primary functionaltiy. By using {APP_NAME}, you agree to the use of cookies for this purpose.
+								We use cookies for user authentication. These cookies are the bare minimum for this app&apos;s primary functionality. By using {APP_NAME}, you agree to the use of cookies for this purpose.
 							</p>
 						</li>
 						<li>
