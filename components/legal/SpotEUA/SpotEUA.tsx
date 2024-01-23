@@ -1,38 +1,54 @@
-import { FormEventHandler, useEffect, useRef } from 'react';
+import {
+	FormEventHandler,
+	useEffect,
+	useState,
+	useRef
+} from 'react';
 
-import look from './SpotEUA.module.scss';
+import { APP_NAME } from '@consts/spotify';
+
+import local from './SpotEUA.module.scss';
+import global from '@styles/globals.module.scss';
 
 const LOCAL_EXPIRY_KEY = 'SUPERUSER_EUA';
-const LOCAL_EXPIRY_LENGTH = 1000 * 5;
-const APP_NAME = 'SUPERUSER ACTIONS';
+const LOCAL_EXPIRY_LENGTH = 1000 * 60 * 60 * 24 * 7;
+// const LOCAL_EXPIRY_LENGTH = 1000 * 5;
+const UPDATED = 'January 18, 2024'
 
 const SpotEUA = (props: {
 	submitter?: () => void
 }) => {
-
-	const modalRef = useRef<HTMLDialogElement>(null);
+	const dialogRef = useRef<HTMLDialogElement>(null);
+	const [accepted, setAccepted] = useState<boolean | null>(null);
 
 	useEffect(() => {
-		const modal = modalRef.current;
-		if (modal === null) return;
 		try {
 			const local = localStorage.getItem(LOCAL_EXPIRY_KEY);
 			if (local === null) throw null;
 			const expiry = parseInt(local) * 1000;
 			if (expiry === undefined || Date.now() > expiry) throw null;
 			if (props.submitter) props.submitter();
+			setAccepted(true);
 		} catch {
-			modal.showModal();
+			setAccepted(false);
 		}
 	}, []);
 
+	useEffect(() => {
+		if (accepted === true) return;
+		if (dialogRef.current !== null)
+			dialogRef.current.showModal();
+	}, [accepted]);
+
 	const formSubmit: FormEventHandler = (e) => {
 		e.preventDefault();
-		localStorage.setItem(LOCAL_EXPIRY_KEY, Math.floor(
-			(Date.now() + LOCAL_EXPIRY_LENGTH) / 1000)
-			.toString());
-		modalRef.current!.close();
+		localStorage.setItem(
+			LOCAL_EXPIRY_KEY,
+			Math.floor((Date.now() + LOCAL_EXPIRY_LENGTH) / 1000).toString()
+		);
 		if (props.submitter) props.submitter();
+		dialogRef.current!.close();
+		setAccepted(true);
 		return null;
 	}
 
