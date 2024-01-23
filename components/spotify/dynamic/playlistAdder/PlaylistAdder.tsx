@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import UserAdder from './userAdder/UserAdder';
 import SpecificAdder from './specificAdder/SpecificAdder';
-import PlaylistDisplay from './playlistDisplay/PlaylistDisplay';
+import UserList from './playlistDisplay/UserList';
+import SpecificList from './playlistDisplay/SpecificList';
+import ClearPlaylistButton from './ClearPlaylistButton/ClearPlaylistButton';
 
-import styles from './PlaylistAdder.module.scss';
+import local from './PlaylistAdder.module.scss';
 
 /*
 
@@ -14,15 +17,34 @@ Has to adapt the playlist context's specificPlaylistHandler to a <form>
 */
 
 export default function PlaylistAdder() {
+	const [onUser, setOnUser] = useState(true);
+	const leftClasses = [local.button, local.leftButton, local.active];
+	const rightClasses = [local.button, local.rightButton, local.active];
+	const leftClasser = leftClasses.slice(0, !onUser ? 3 : 2).join(' ');
+	const rightClasser = rightClasses.slice(0, onUser ? 3 : 2).join(' ');
+
 	return (
-		<section>
-			<h2>Get some playlists for the tool</h2>
-			<UserAdder>
-				<PlaylistDisplay user={true} />
-			</UserAdder>
-			<SpecificAdder>
-				<PlaylistDisplay user={false} />
-			</SpecificAdder>
-		</section>
+		<section className={local.container}>
+			<h2 className={local.router}>
+				<a
+					href='#'
+					tabIndex={0}
+					onClick={() => setOnUser(false)}
+					className={leftClasser}>Specific</a>
+				<a
+					href='#'
+					tabIndex={0}
+					onClick={() => setOnUser(true)}
+					className={rightClasser}>Your</a>
+				playlists:
+			</h2>
+			<div className={local.controls}>
+				{onUser ? <UserAdder /> : <SpecificAdder />}
+			</div>
+			<div className={local.list}>
+				{onUser ? <UserList /> : <SpecificList />}
+				<ClearPlaylistButton user={onUser} />
+			</div>
+		</section >
 	);
 };

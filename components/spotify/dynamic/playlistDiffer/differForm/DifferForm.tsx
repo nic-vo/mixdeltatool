@@ -1,286 +1,203 @@
-import PlaylistSingle from './PlaylistSingle/PlaylistSingle';
 import { UserPlaylistContext } from '../../contexts/UserPlaylistProvider';
 import { SpecificPlaylistContext } from '../../contexts/SpecificPlaylistProvider';
-import {
-	useState,
-	useContext,
-	ChangeEvent,
-	useEffect,
-	useMemo
-} from 'react';
-import { signIn } from 'next-auth/react';
-import { MyPlaylistObject, successState } from '@components/spotify/types';
+import { useContext, useState, useCallback } from 'react';
+import { DifferContext } from '../../contexts/DifferProvider';
+import { FaAngleLeft, FaAngleRight, FaExclamationCircle } from 'react-icons/fa';
+import { ListItem } from '@components/misc';
+
 import { CLIENT_DIFF_TYPES } from '@consts/spotify';
 
-const radioArr = Object.keys(CLIENT_DIFF_TYPES);
+import local from './DifferForm.module.scss';
+import global from '@styles/globals.module.scss';
 
-type typeState = 'adu' | 'odu' | 'otu' | 'bu' | 'stu';
+const lengthComplaint = 'has more than 500 tracks, so it may be truncated.';
 
-export default function DifferForm(props: { children: React.ReactNode }) {
-	const [target, setTarget] = useState<MyPlaylistObject | null>(null);
-	const [differ, setDiffer] = useState<MyPlaylistObject | null>(null);
-	const [type, setType] = useState<typeState>('adu');
-	const [loading, setLoading] = useState<boolean>(false);
-	const [error, setError] = useState<string | null>(null);
-	const [success, setSuccess] = useState<successState | null>(null);
+export default function DifferForm(props: {
+	children: React.ReactNode
+}) {
+	const [stage, setStage] = useState(0);
+	const { target,
+		differ,
+		loading,
+		type,
+		targetChangeHandler,
+		differChangeHandler,
+		radioHandler,
+		submitHandler } = useContext(DifferContext);
 
-	const {
-		userPlaylists,
-		userLoading,
-		updateUserPlaylistsHandler
-	} = useContext(UserPlaylistContext);
-	const {
-		specificPlaylists,
-		specificLoading
-	} = useContext(SpecificPlaylistContext);
+	const { userLoading } = useContext(UserPlaylistContext);
+	const { specificLoading } = useContext(SpecificPlaylistContext);
 
-	const userMap = useMemo(() => {
-		if (userPlaylists === null) return null;
-		console.log('re-calculate user differ memo');
-		const map = new Map();
-		for (const playlist of userPlaylists)
-			map.set(playlist.id, playlist);
-		return map;
-	}, [userPlaylists]);
-
-	const specificMap = useMemo(() => {
-		if (specificPlaylists === null) return null;
-		console.log('re-calculate specific differ memo');
-		const map = new Map();
-		for (const playlist of specificPlaylists)
-			map.set(playlist.id, playlist);
-		return map;
-	}, [specificPlaylists]);
-
-	// Reset form values if playlists change
-	useEffect(() => {
-		if (target === null && differ === null) return;
-		setTarget(null);
-		setDiffer(null);
-	}, [userPlaylists, specificPlaylists]);
-
-	const targetChangeHandler = (e: ChangeEvent<HTMLSelectElement>) => {
-		const userMap = new Map();
-		if (userPlaylists !== null)
-			for (const playlist of userPlaylists)
-				userMap.set(playlist.id, playlist);
-
-		const specificMap = new Map();
-		if (specificPlaylists !== null)
-			for (const playlist of specificPlaylists)
-				specificMap.set(playlist.id, playlist);
-
-		const id = e.target.value
-		if (userMap.has(id)) setTarget(userMap.get(id))
-		else if (specificMap.has(id)) setTarget(specificMap.get(id));
-		return null;
-	};
-
-	const differChangeHandler = (e: ChangeEvent<HTMLSelectElement>) => {
-		const userMap = new Map();
-		if (userPlaylists !== null)
-			for (const playlist of userPlaylists)
-				userMap.set(playlist.id, playlist);
-
-		const specificMap = new Map();
-		if (specificPlaylists !== null)
-			for (const playlist of specificPlaylists)
-				specificMap.set(playlist.id, playlist);
-
-		const id = e.target.value
-		if (userMap.has(id)) setDiffer(userMap.get(id))
-		else if (specificMap.has(id)) setDiffer(specificMap.get(id));
-		return null;
-	};
-
-	const radioHandler = (e: ChangeEvent<HTMLInputElement>) => {
-		const newval = e.target.value as typeState;
-		setType(newval);
-		return null;
-	};
-
-	const formSubmitHandler = async (e: React.FormEvent) => {
+	const formHandler = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		if (userLoading === true
-			|| specificLoading === true
-			|| target === null
-			|| differ === null
-			|| radioArr.includes(type) === false) return null;
-		setLoading(true);
-		setError(null);
-		try {
-			const raw = await fetch('/api/spotify/createDiffPlaylist', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					target: {
-						id: target.id,
-						type: target.type,
-						name: target.name,
-						owner: target.owner.display_name
-					},
-					differ: {
-						id: differ.id,
-						type: differ.type,
-						name: differ.name,
-						owner: differ.owner.display_name
-					},
-					type: type
-				})
-			});
-			if (raw.status === 401) signIn();
-			if (raw.ok === false) {
-				const jsoned = await raw.json();
-				throw jsoned.error as string;
-			};
-			const jsoned = await raw.json() as { part: successState, playlist: MyPlaylistObject };
-			updateUserPlaylistsHandler(jsoned.playlist);
-			setSuccess(jsoned.part);
-		} catch (e: any) {
-			setError(e.error || 'Unknown error');
-		};
-		setLoading(false);
-		return null;
-	};
+		await submitHandler(e);
+	}
+
+	const dummy = [target, differ, type];
+	const progClasser = useCallback((value: typeof target | typeof type) => {
+		if (value === '') return [local.progressSeg, local.missing];
+		return [
+			local.progressSeg,
+			typeof (value) === 'string' || value.type === 'playlist' ?
+				local.playlist : local.album];
+	}, []);
 
 	return (
-		<section>
-			<h2>Diff a playlist!</h2>
-			<form onSubmit={formSubmitHandler}>
-				<label htmlFor='target'>
-					Target:
-					<select
-						autoComplete='off'
-						required
-						name='target'
-						id='target'
-						value={target !== null ? target.id : ''}
-						onChange={targetChangeHandler}>
-						<option value=''>Choose one</option>
-						{props.children}
-					</select>
-				</label>
-				<label htmlFor='differ'>
-					differ:
-					<select
-						autoComplete='off'
-						required
-						name='differ'
-						id='differ'
-						value={differ !== null ? differ.id : ''}
-						onChange={differChangeHandler}>
-						<option value=''>Choose one</option>
-						{props.children}
-					</select>
-				</label>
-				<fieldset style={{ display: 'flex', flexDirection: 'column' }}>
-					<legend>What do you want to do to the target?</legend>
-					{
-						Object.entries(CLIENT_DIFF_TYPES).map((pair) => {
-							return (
-								<label htmlFor={pair[0]} key={pair[0]}>
-									<input
-										type='radio'
-										name='actionType'
-										id={pair[0]}
-										value={pair[0]}
-										defaultChecked={pair[0] === 'adu'}
-										onChange={radioHandler} />
-									{pair[1]}
-								</label>
-							)
-						})
-					}
-				</fieldset>
-				<button
-					disabled={userLoading || specificLoading || loading}
-					type='submit'>Change it!</button>
-			</form>
-			<section>
-				<h3>Output</h3>
-				<section>
-					{
-						success !== null && (<>
-							<h4>Success{
-								error === null
-									|| (success !== null && success.reasons.length > 0) ?
-									'!' : '?'
-							}</h4>
-							<p>
-								{
-									error !== null && error
-								}
-								{
-									success === null ? '' : success.reasons.length > 0 ?
-										'Partial success' :
-										'Total success'
-								}
-							</p>
-							{
-								success !== null
-								&& success.reasons.length > 0
-								&& (
-									<figure>
-										<figcaption>Reasons</figcaption>
-										<ul>
-											{
-												success.reasons.map(
-													(reason, index) =>
-														<li key={`reason-${index}`}>{reason}</li>)
-											}
-										</ul>
-									</figure>
-								)
-							}
-						</>)
-					}
-				</section>
+		<>
+			<form onSubmit={formHandler} className={local.form}>
+				<div className={local.stageControls}>
+					<button
+						onClick={() => setStage(Math.max(stage - 1, 0))}
+						disabled={stage === 0}
+						type='button'
+						className={global.emptyButton}><FaAngleLeft /></button>
+					<div className={local.progressBar}>
+						{dummy.map((value, index) => {
+							let classer = progClasser(value).join(' ');
+							if (index === stage) classer += ` ${local.current}`;
+							return <button
+								key={`${index}-progress`}
+								className={classer}
+								type='button'
+								onClick={() => setStage(index)}>
+								{index === 0 ? 'Target' : index === 1 ? 'Differ' : 'Result'}</button>
+						})}
+					</div>
+					<button onClick={() => setStage(Math.min(stage + 1, 2))}
+						disabled={stage === 2}
+						type='button'
+						className={global.emptyButton}><FaAngleRight /></button>
+				</div>
+				{
+					stage === 0 ? (
+						<label htmlFor='target' className={local.label}>
+							Choose Target playlist:
+							<select
+								autoComplete='off'
+								required
+								id='target'
+								value={target !== '' ? target.id : ''}
+								onChange={targetChangeHandler}
+								className={local.select}>
+								{props.children}
+							</select>
+						</label>
+					)
+						: stage === 1 ? (<>
+							<label htmlFor='differ' className={local.label}>
+								Choose Differ playlist:
+								<select
+									autoComplete='off'
+									required
+									id='differ'
+									value={differ !== '' ? differ.id : ''}
+									onChange={differChangeHandler}
+									className={local.select}>
+									{props.children}
+								</select>
+							</label>
 
-			</section>
-			<section>
-				<h3>Preview</h3>
-				<p>
-					{type !== null && CLIENT_DIFF_TYPES[type]}
-				</p>
-				{
-					/*
-						Really jank conditional rendering
-					*/
-					target !== null && (
-						<section>
-							<h4>Target</h4>
-							{
-								(
-									userMap?.has(target.id)
-									&& (<PlaylistSingle playlist={userMap.get(target.id)} />)
-								)
-								|| (
-									specificMap?.has(target.id)
-									&& (<PlaylistSingle playlist={specificMap.get(target.id)} />)
-								)
-							}
-						</section>
-					)
-				}
-				{
-					differ !== null && (
-						<section>
-							<h4>Differ</h4>
-							{
-								(
-									userMap?.has(differ.id)
-									&& (<PlaylistSingle playlist={userMap.get(differ.id)} />)
-								)
-								|| (specificMap?.has(differ.id)
-									&& (<PlaylistSingle playlist={specificMap.get(differ.id)} />)
-								)
-							}
-						</section>
-					)
-				}
-			</section>
-		</section >
+						</>)
+							: (<>
+								<label htmlFor='actionType' className={local.label}>
+									The result will contain:
+									<select
+										autoComplete='off'
+										required
+										id='actionType'
+										value={type}
+										onChange={radioHandler}
+										className={local.select}>
+										<option value={''}>Choose one...</option>
+										{
+											Object.entries(CLIENT_DIFF_TYPES).map(pair => {
+												return (
+													<option value={pair[0]} key={pair[0]}>{pair[1]}</option>
+												);
+											})
+										}
+									</select>
+								</label>
+								<label htmlFor='name' className={local.label}>
+									New playlist name (optional):
+									<input
+										id='name'
+										name='name'
+										type='text'
+										autoComplete='off'
+										maxLength={30} />
+								</label>
+								<label htmlFor='desc' className={local.label}>
+									New playlist description (optional);
+									<textarea
+										id='desc'
+										name='desc'
+										autoComplete='off'
+										maxLength={120} />
+								</label>
+								<p className={local.caveat}><FaExclamationCircle /> This tool will never directly change a playlist. It will compare the two selected playlists and create a new one from that comparison.</p>
+								<button
+									disabled={userLoading
+										|| specificLoading
+										|| loading
+										|| target === ''
+										|| differ === ''
+										|| type === ''}
+									type='submit'
+									className={global.emptyButton}>Create a new playlist!</button>
+							</>)}
+				<div className={local.previewContainer}>
+					{
+						stage === 0 ? (
+							<div className={target === '' ? local.emptyItem : local.warningDiv}>
+								{target === '' ? <p>nothing here...</p>
+									: (<>
+										<ListItem playlist={target} />
+										{target.tracks > 500
+											&& <p className={local.warning}>
+												<FaExclamationCircle />Target {lengthComplaint}
+											</p>}
+										<button
+											type='button'
+											onClick={() => setStage(stage + 1)}
+											className={global.emptyButton}>Next</button>
+									</>)}
+							</div>
+						) : stage === 1 ? (
+							<div className={differ === '' ? local.emptyItem : local.warningDiv}>
+								{differ === '' ? <p>nothing here...</p>
+									: (<>
+										<ListItem playlist={differ} />
+										{differ.tracks > 500
+											&& <p className={local.warning}>
+												<FaExclamationCircle />Differ {lengthComplaint}
+											</p>}
+										<button
+											type='button'
+											onClick={() => setStage(stage + 1)}
+											className={global.emptyButton}>Next</button>
+									</>)}
+							</div>
+						) : (
+							<>
+								<div className={local.warningDiv}>
+									{
+										(target !== '' && target.tracks > 500)
+										&& <p className={local.warning}>
+											<FaExclamationCircle />Target {lengthComplaint}
+										</p>
+									}
+									{
+										(differ !== '' && differ.tracks > 500)
+										&& <p className={local.warning}>
+											<FaExclamationCircle />Differ {lengthComplaint}
+										</p>
+									}
+								</div>
+							</>)
+					}
+				</div>
+			</form>
+		</>
 	);
 };

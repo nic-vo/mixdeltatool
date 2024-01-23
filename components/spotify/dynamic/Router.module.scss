@@ -1,0 +1,62 @@
+@use '@styles/globals.module.scss' as g;
+
+.heading {
+	margin-top: 5svh;
+	display: flex;
+	justify-content: center;
+}
+
+$routerBorderWidth: 2px;
+
+@mixin sliderButton {
+	cursor: pointer;
+	background-color: transparent;
+	color: #444;
+	padding: 0.2em;
+}
+
+.button {
+	@include sliderButton;
+	display: flex;
+	align-items: center;
+	border: $routerBorderWidth solid g.$teal;
+	font-size: 2rem;
+	font-weight: bold;
+	line-height: normal;
+}
+
+@media (min-aspect-ratio: 1) {
+	.button {
+		font-size: 3rem;
+	}
+}
+
+.button:hover,
+.button:focus,
+.button:active {
+	background-color: g.$white;
+	color: g.$black;
+}
+
+.rightButton {
+	border-top-right-radius: g.$rounded;
+	border-bottom-right-radius: g.$rounded;
+	border-left-width: calc(0.5*$routerBorderWidth);
+	border-left-width: 0;
+	margin-right: 0.2em;
+}
+
+.leftButton {
+	border-top-left-radius: g.$rounded;
+	border-bottom-left-radius: g.$rounded;
+	border-right-width: calc(0.5*$routerBorderWidth);
+	border-right-width: 0;
+}
+
+.active,
+.active:focus,
+.active:hover,
+.active:active {
+	background-color: g.$teal;
+	color: g.$white;
+}

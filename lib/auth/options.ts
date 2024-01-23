@@ -2,20 +2,18 @@ import type { NextAuthOptions } from 'next-auth';
 
 import SpotifyProvider from 'next-auth/providers/spotify';
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter';
-import clientPromise from '@lib/database/client';
+import clientPromise from '@lib/database/mongoose/client';
 import { signInUpdater } from './accessKey';
 import { SPOT_LOGIN_WINDOW } from '@consts/spotify';
 
 const SPOTIFY_SCOPES = [
 	'user-read-email',
-	'user-read-currently-playing',
-	'user-read-recently-played',
-	'user-top-read',
 	'user-library-read',
 	'playlist-read-private',
 	'playlist-read-collaborative',
 	'playlist-modify-public',
-	'playlist-modify-private'
+	'playlist-modify-private',
+	'ugc-image-upload'
 ];
 const nParams = new URLSearchParams();
 nParams.append('scope', SPOTIFY_SCOPES.join(' '));
@@ -26,7 +24,7 @@ export const authOptions: NextAuthOptions = {
 		SpotifyProvider({
 			clientId: process.env.SPOTIFY_ID!,
 			clientSecret: process.env.SPOTIFY_SECRET!,
-			authorization: SPOT_URL
+			authorization: SPOT_URL,
 		})
 	],
 	session: {

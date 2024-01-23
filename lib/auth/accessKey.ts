@@ -15,15 +15,15 @@ export const signInUpdater = async (account: AccountType) => {
 			updateAccount.access_token = account.access_token;
 			updateAccount.expires_at = account.expires_at;
 			await updateAccount.save();
-		};
+		}
 	} catch {
 		// The only errors should be at network level hopefully;
 		// Assumes Account model is correct
 		// + next-auth adapters don't change their schema suddenly
 		throw 'Network error'
-	};
+	}
 	return null;
-};
+}
 
 export const routeKeyRetriever = async (id: string) => {
 	// This function assumes that my signin callback works
@@ -32,9 +32,8 @@ export const routeKeyRetriever = async (id: string) => {
 	let token = null;
 	try {
 		await mongoosePromise();
-		const query = await Account.findOne({
-			userId: id
-		}).where('provider')
+		const query = await Account.findOne({ userId: id })
+			.where('provider')
 			.equals('spotify')
 			.select(['access_token', 'expires_at'])
 			.exec();
@@ -47,6 +46,6 @@ export const routeKeyRetriever = async (id: string) => {
 		// Assumes Account model is correct
 		// + next-auth adapters don't change their schema suddenly
 		throw 'Network error'
-	};
+	}
 	return token;
-};
+}

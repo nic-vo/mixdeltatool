@@ -34,21 +34,23 @@ export interface SpotAlbumObject extends BasicSpotObj {
 	type: 'album'
 }
 
-export interface SpotTrackObject { track: Pick<BasicSpotObj, 'uri'> }
+export interface SpotPlaylistTrackObject {
+	track: Pick<BasicSpotObj, 'uri'>,
+	is_local: boolean
+}
 
 export interface SpotUser extends BasicSpotObj {
 	display_name: string | null
 }
 
-export interface SpotArtistObject
-	extends Omit<SpotUser, 'display_name'> {
+export interface SpotArtistObject extends BasicSpotObj {
 	name: string,
 }
 
 export interface SpotImageObject {
 	url: string,
-	height: number,
-	width: number
+	height?: number | null,
+	width?: number | null
 }
 
 export interface BasicSpotApiResponse {
@@ -62,8 +64,12 @@ export interface SpotUserPlaylistsResponse
 }
 
 export interface MyPlaylistObject
-	extends Pick<SpotPlaylistObject, 'id' | 'name' | 'owner'> {
-	image: SpotImageObject,
+	extends Pick<SpotPlaylistObject, 'id' | 'name'> {
+	owner: {
+		name: string,
+		id: string
+	}[],
+	image?: SpotImageObject,
 	tracks: number,
 	type: 'album' | 'playlist'
 }
@@ -90,8 +96,8 @@ export type ActionType = 'adu' | 'odu' | 'otu' | 'bu' | 'stu'
 
 export interface createDiffPlaylistApiRequest extends NextApiRequest {
 	body: {
-		target: { id: string, type: 'album' | 'playlist' },
-		differ: { id: string, type: 'album' | 'playlist' },
+		target: MyPlaylistObject,
+		differ: MyPlaylistObject,
 		type: 'adu' | 'odu' | 'otu' | 'bu' | 'stu'
 	}
 }
@@ -104,46 +110,30 @@ export interface createDiffPlaylistApiRequest extends NextApiRequest {
 	'stu' === 'keep only similarities'
 */
 
-export interface UserContextSignature {
-	userPlaylists: MyPlaylistObject[] | null,
-	userCurrentPage: number | null,
-	userError: string | null,
-	userLoading: boolean,
-	clearUserPlaylistsHandler: () => null,
-	getUserPlaylistsHandler: () => Promise<null>,
-	updateUserPlaylistsHandler: (playlist: MyPlaylistObject) => null
-};
-
-export interface SpecificContextSignature {
-	specificPlaylists: MyPlaylistObject[] | null,
-	specificError: string | null,
-	specificLoading: boolean,
-	getSpecificPlaylistHandler: (params:
-		{ id: string, type: string }
-	) => Promise<null>,
-	clearSpecificPlaylistsHandler: () => null,
+export interface SpotPlaylistTracksResponse extends BasicSpotApiResponse {
+	total: number,
+	items: SpotPlaylistTrackObject[]
 }
 
-export type ProviderState = MyPlaylistObject[] | null;
-
-export interface SpotTracksResponse extends BasicSpotApiResponse {
-	next: string,
+export interface SpotAlbumTracksResponse extends BasicSpotApiResponse {
 	total: number,
-	items: SpotTrackObject[]
+	items: {
+		uri: string
+	}[]
 }
 
 export interface differInternalPlaylistPromise {
-	partial: boolean,
 	total: number,
-	items: string[],
-	apiNull: boolean
+	completed: number,
+	items: Set<string>,
+}
+
+export interface differRouteResponse {
+	part: string[],
+	playlist: MyPlaylistObject
 }
 
 export interface differInternalAddPromise {
-	partial: boolean,
-	total: number
-}
-
-export interface successState {
-	reasons: string[]
+	total: number,
+	completed: number
 }

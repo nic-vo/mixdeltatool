@@ -1,0 +1,89 @@
+@mixin animationdeets {
+	animation-duration: 2s;
+	animation-timing-function: ease-out;
+	animation-iteration-count: infinite;
+	animation-fill-mode: both;
+}
+
+.left {
+	animation-name: leftfadein;
+	@include animationdeets;
+}
+
+.middle {
+	animation-name: middlefadein;
+	@include animationdeets;
+}
+
+.right {
+	animation-name: rightfadein;
+	@include animationdeets;
+}
+
+@keyframes leftfadein {
+	0% {
+		opacity: 0;
+		transform: translate(-10%, -10%);
+	}
+
+	10% {
+		opacity: 1;
+		transform: translate(0, 0);
+	}
+
+	90% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+	}
+}
+
+@keyframes middlefadein {
+	0% {
+		opacity: 0;
+	}
+
+	10% {
+		opacity: 0;
+		transform: translateY(10%);
+	}
+
+	20% {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	90% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+	}
+}
+
+@keyframes rightfadein {
+	0% {
+		opacity: 0;
+	}
+
+	5% {
+		opacity: 0;
+		transform: translate(10%, -10%);
+	}
+
+	15% {
+		opacity: 1;
+		transform: translate(0, 0);
+	}
+
+	90% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+	}
+}

@@ -1,44 +1,32 @@
 import { useContext } from 'react';
 import { UserPlaylistContext } from '../../contexts/UserPlaylistProvider';
+import { SmallStatus } from '@components/misc';
+import { FaDownload } from 'react-icons/fa';
 
-export default function UserAdder(props: { children: React.ReactNode }) {
+import local from './UserAdder.module.scss';
+import global from '@styles/globals.module.scss';
 
-	console.log('***USER ADDER RENDER***')
-
+export default function UserAdder() {
 	// Basically dump most of the context here because it requires every bit
 	const {
 		userCurrentPage,
 		userLoading,
 		userError,
-		getUserPlaylistsHandler,
-		clearUserPlaylistsHandler
+		getUserPlaylistsHandler
 	} = useContext(UserPlaylistContext);
 
+	const buttonClasser = `${global.emptyButton} ${local.button}${userCurrentPage === null ?
+		` ${local.done}` : ''}`
+
 	return (
-		<section>
-			<h3>Browse your playlists</h3>
-			<section>
-				<button
-					onClick={getUserPlaylistsHandler}
-					disabled={userLoading || userCurrentPage === null}>
-					Get your playlists</button>
-				<button
-					onClick={clearUserPlaylistsHandler}
-					disabled={userLoading}>
-					Clear your playlists</button>
-				<p>Next page {userCurrentPage !== null ? userCurrentPage : 'end'}</p>
-				<p>User {userLoading ? 'loading' : 'idle'}</p>
-				<p>{userError !== null && userError}</p>
-			</section>
-			{props.children}
+		<>
 			<button
 				onClick={getUserPlaylistsHandler}
-				disabled={userLoading || userCurrentPage === null}>
-				Get your playlists</button>
-			<button
-				onClick={clearUserPlaylistsHandler}
-				disabled={userLoading}>
-				Clear your playlists</button>
-		</section>
+				disabled={userLoading || userCurrentPage === null}
+				className={buttonClasser}>
+				<FaDownload /> {userCurrentPage === null ? 'No more!' : 'Retrieve'}
+			</button>
+			<SmallStatus error={userError} loading={userLoading} />
+		</ >
 	);
 };

@@ -38,6 +38,12 @@
 			],
 			"@consts/*": [
 				"./consts/*"
+			],
+			"@styles/*": [
+				"./styles/*"
+			],
+			"@hooks/*": [
+				"./hooks/*"
 			]
 		}
 	},

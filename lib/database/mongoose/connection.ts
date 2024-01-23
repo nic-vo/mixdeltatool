@@ -5,17 +5,17 @@ if (!process.env.MONGODB_URI) {
 };
 
 // Init a variable from an existing global variable
-let cached = global.mongoose
+let cached = global.mongoose;
 
 // If that global doesn't actually exist, create a base object
 // with null properties to be added later
 if (!cached) {
-	cached = global.mongoose = { conn: null, promise: null }
+	cached = global.mongoose = { conn: null, promise: null };
 }
 
 async function mongoosePromise() {
 	if (cached.conn !== null) {
-		return cached.conn
+		return cached.conn;
 	}
 
 	if (cached.promise === null) {
@@ -35,6 +35,6 @@ async function mongoosePromise() {
 		cached.promise = null
 	};
 	return cached.conn;
-};
+}
 
 export default mongoosePromise;

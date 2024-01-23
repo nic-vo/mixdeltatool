@@ -1,12 +1,21 @@
 import { routeKeyRetriever } from '@lib/auth/accessKey';
 import { getServerSession } from 'next-auth';
-import { createEmptyPlaylist, outputAdder, playlistGetter, userGetter } from '@lib/spotify/differPromises';
+import {
+	createEmptyPlaylist,
+	outputAdder,
+	playlistGetter,
+	updateDescription,
+} from '@lib/spotify/differPromises';
 import { diffBodyParser } from '@lib/spotify/validators';
+import { printTime } from '@lib/misc';
+import { checkAndUpdateEntry } from '@lib/database/redis/ratelimiting';
+import { sanitize } from 'dompurify';
 
 import {
+	AUTH_WINDOW,
+	GLOBAL_EXECUTION_WINDOW,
 	SERVER_DIFF_TYPES,
-	SPOT_LOGIN_WINDOW,
-	SPOT_URL_BASE
+	SPOT_LOGIN_WINDOW
 } from '@consts/spotify';
 import { authOptions } from '@lib/auth/options';
 
@@ -18,39 +27,64 @@ import {
 } from '@components/spotify/types';
 import {
 	AuthError,
+	CustomError,
 	FetchError,
-	ForbiddenError,
 	MalformedError,
 	RateError,
 	ReqMethodError,
 	UnprocessableError
-} from '@lib/spotify/errors';
+} from '@lib/errors';
+
+const RATE_LIMIT_PREFIX = 'CDP';
+const RATE_LIMIT_ROLLING_LIMIT = 5;
+const RATE_LIMIT_DECAY_SECONDS = 30;
 
 export default async function handler(
 	req: createDiffPlaylistApiRequest, res: NextApiResponse
 ) {
-	const globalTimeoutMS = Date.now() + 9000;
+	const start = Date.now();
+	let nextStep;
+
+	// return res.status(400).json({message: 'Testing diff message'});
+	const globalTimeoutMS = Date.now() + GLOBAL_EXECUTION_WINDOW;
 	const authTimeout = setTimeout(() => {
 		return res.status(504).json({ message: 'Server timed out' })
-	}, 3000);
+	}, AUTH_WINDOW);
 	const globalTimeout = setTimeout(() => {
 		if (newPlaylist !== undefined)
 			return res.status(200).json({ part, playlist: newPlaylist });
 		return res.status(504).json({ message: 'Server timed out' })
-	}, 9000);
+	}, GLOBAL_EXECUTION_WINDOW);
+
 	let newPlaylist: MyPlaylistObject;
 	// Because of imeouts, allow partial flag and reasons
-	let part = { reasons: [] as string[] };
+	let part = [] as string[];
 	try {
 		// Validate req method
 		if (req.method !== 'POST') throw new ReqMethodError('POST');
+
+		if (!req.headers['x-forwarded-for'])
+			throw new CustomError(500, 'Internal Error');
+		const rateLimitCheckSeconds = await checkAndUpdateEntry({
+			ip: req.headers['x-forwarded-for'] as string,
+			prefix: RATE_LIMIT_PREFIX,
+			rollingLimit: RATE_LIMIT_ROLLING_LIMIT,
+			rollingDecaySeconds: RATE_LIMIT_DECAY_SECONDS
+		});
+
+		if (rateLimitCheckSeconds !== null)
+			throw new RateError(rateLimitCheckSeconds);
+
+		nextStep = printTime('Rate limit passed:', start);
 		// Validate body and body values
-		let target, differ, actionType;
+		let target, differ, actionType, newName, newDesc;
 		try {
 			const parsed = diffBodyParser.parse(req.body);
 			target = parsed.target;
 			differ = parsed.differ;
 			actionType = parsed.type;
+			newName = parsed.newName;
+			newDesc = parsed.newDesc;
 		} catch (e: any) {
 			const error = e as ZodError;
 			const map = new Map();
@@ -65,11 +99,15 @@ export default async function handler(
 			|| actionType === undefined)
 			throw new MalformedError();
 
+		let session;
 		// Check next-auth session
-		const session = await getServerSession(req, res, authOptions);
+		try {
+			session = await getServerSession(req, res, authOptions);
+		} catch {
+			throw new FetchError('Server error; try again');
+		}
 		// If no session, send 401 and client-side should redirect
-		if (session === null || session === undefined)
-			throw new AuthError();
+		if (session === null || session === undefined) throw new AuthError();
 
 		// Access token should never expire if there is a session
 		// Custom access token retriever outside of next-auth flow
@@ -88,23 +126,36 @@ export default async function handler(
 		const { expiresAt, accessToken } = token;
 		if ((expiresAt === undefined || expiresAt === null)
 			|| (accessToken === undefined || accessToken === null)
-			|| Date.now() - expiresAt < 3600 - SPOT_LOGIN_WINDOW)
+			|| (Date.now() - expiresAt) < (3600 - SPOT_LOGIN_WINDOW))
 			throw new AuthError();
 
-		// Get user and create playlist
-		const userId = await userGetter({ accessToken, globalTimeoutMS });
-		newPlaylist = await createEmptyPlaylist({
-			accessToken,
-			actionType,
-			userId,
-			target,
-			differ,
-			globalTimeoutMS
-		});
+		nextStep = printTime('Auth finished:', nextStep);
 
-		let targetDetails, differDetails;
+		const targetTemp = target.owner.length;
+		const differTemp = differ.owner.length;
+
+		const baseDescStr = newDesc !== null ?
+			sanitize(newDesc) : SERVER_DIFF_TYPES({
+				actionType, target:
+				{
+					name: target.name,
+					owner: target.owner.reduce((str, current, index) => {
+						let newstr = str + `${current.name}${index < targetTemp - 1 ? ', ' : ''}`;
+						return newstr;
+					}, '')
+				}, differ: {
+					name: differ.name,
+					owner: differ.owner.reduce((str, current, index) => {
+						let newstr = str + `${current.name}${index < differTemp - 1 ? ', ' : ''}`;
+						return newstr;
+					}, '')
+				}
+			});
+
+		newName = newName === null ? null : sanitize(newName);
+
 		// Each one has 5 second timeout
-		const results = await Promise.all([
+		const [targetDetails, differDetails, emptyPlaylist] = await Promise.all([
 			playlistGetter({
 				accessToken,
 				type: target.type,
@@ -116,90 +167,132 @@ export default async function handler(
 				type: differ.type,
 				id: differ.id,
 				globalTimeoutMS
+			}),
+			createEmptyPlaylist({
+				accessToken,
+				baseDescStr,
+				globalTimeoutMS,
+				newName
 			})
 		]);
-		if (results[0].apiNull === true)
-			part = {
-				reasons: [
-					...part.reasons,
-					'The Spotify API returned empty info for some tracks for the target'
-				]
-			};
-		if (results[1].apiNull === true)
-			part = {
-				reasons: [
-					...part.reasons,
-					'The Spotify API returned empty info for some tracks for the differ'
-				]
-			};
-		if (results[0].partial === true)
-			part = { reasons: [...part.reasons, 'target get was incomplete'] };
-		if (results[1].partial === true)
-			part = { reasons: [...part.reasons, 'differ get was incomplete'] };
-		targetDetails = results[0];
-		differDetails = results[1];
+		if (targetDetails.completed !== targetDetails.total) {
+			const { completed, total } = targetDetails;
+			part.push(`Spotify returned only ${completed}/${total} tracks for the target.`);
+		}
+		if (differDetails.completed !== differDetails.total) {
+			const { completed, total } = differDetails;
+			part.push(`Spotify returned only ${completed}/${total} tracks for the differ.`);
+		}
+		newPlaylist = emptyPlaylist;
 
-		// Five sets: two originals, one for similarities, both uniques
-		const targetOriginal = new Set(targetDetails.items);
-		const differOriginal = new Set(differDetails.items);
+		nextStep = printTime('Playlists fetched and empty created:', nextStep);
 
-		// Determine which diff needs to happen
-		// New set based on diff type from the other maps
-		let diffResult: Set<string>;
+		let result: Set<string> = new Set();
+		let tu: number;
+		let shared: number;
+		let du: number;
 		switch (actionType) {
 			case 'adu':
 				// Add differ uniques to target
-				diffResult = new Set(targetDetails.items.concat(differDetails.items));
+				du = differDetails.items.size;
+				result = targetDetails.items;
+				for (const uri of differDetails.items) {
+					if (result.has(uri)) du--;
+					result.add(uri);
+				}
+				part.push(`${du} tracks from the differ were added to the target.`);
 				break;
 			case 'odu':
 				// Only differ uniques
-				diffResult = new Set();
-				for (const uri of differOriginal)
-					if (targetOriginal.has(uri) === false)
-						diffResult.add(uri);
+				du = 0;
+				for (const uri of differDetails.items)
+					if (targetDetails.items.has(uri) === false) {
+						result.add(uri);
+						du++
+					}
+				part.push(`The target was replaced by ${du} unique tracks from the differ.`);
 				break;
 			case 'otu':
 				// Only target uniques
-				diffResult = new Set();
-				for (const uri of targetOriginal)
-					if (differOriginal.has(uri) === false)
-						diffResult.add(uri);
+				tu = 0;
+				for (const uri of targetDetails.items)
+					if (differDetails.items.has(uri) === false) {
+						result.add(uri);
+						tu++
+					}
+				part.push(
+					`${targetDetails.items.size - tu} shared tracks were removed from the target;`
+					+ ` ${tu} tracks remain.`);
 				break;
 			case 'bu':
-				// Both uniques
-				diffResult = new Set();
-				for (const uri of targetOriginal)
-					if (differOriginal.has(uri) === false) diffResult.add(uri);
-				for (const uri of differOriginal)
-					if (targetOriginal.has(uri) === false) diffResult.add(uri);
+				shared = 0;
+				for (const uri of targetDetails.items) {
+					if (differDetails.items.has(uri)) {
+						targetDetails.items.delete(uri);
+						differDetails.items.delete(uri);
+						shared++;
+					} else {
+						result.add(uri);
+					}
+				}
+				for (const uri of differDetails.items)
+					result.add(uri)
+				part.push(
+					`The target had ${targetDetails.items.size} unique tracks. `
+					+ `The differ had ${differDetails.items.size} unique tracks. `
+					+ `${shared} shared tracks were removed.`
+				)
 				break;
 			case 'stu':
 				// Subtract target uniques
-				diffResult = new Set();
-				for (const uri of targetOriginal)
-					if (differOriginal.has(uri)) diffResult.add(uri);
+				for (const uri of targetDetails.items)
+					if (differDetails.items.has(uri)) {
+						targetDetails.items.delete(uri);
+						differDetails.items.delete(uri);
+						result.add(uri);
+					}
+				part.push(
+					`The target had ${targetDetails.items.size} unique tracks. `
+					+ `The differ had ${differDetails.items.size} unique tracks. `
+					+ `The target now contains ${result.size} shared tracks.`
+				)
 				break;
 		};
 
-		const newPlaylistAddResult = await outputAdder({
+		nextStep = printTime('Diff operation complete:', nextStep);
+
+		const addedToPlaylist = await outputAdder({
 			accessToken,
 			id: newPlaylist.id,
-			items: diffResult,
+			items: result,
 			globalTimeoutMS
 		});
-		if (newPlaylistAddResult.partial === true)
-			part = {
-				reasons: [
-					...part.reasons,
-					'New playlist only has a partial result of the diffing operation'
-				]
-			};
-		newPlaylist.tracks = newPlaylistAddResult.total;
+		if (addedToPlaylist.completed % addedToPlaylist.total !== 0) {
+			const { completed, total } = addedToPlaylist;
+			part.push(`New playlist has ${completed}/${total} tracks from the comparison.`);
+		}
 
+		nextStep = printTime(
+			`${addedToPlaylist.completed}/${addedToPlaylist.total} tracks added: `,
+			nextStep);
+
+		newPlaylist.tracks = addedToPlaylist.total;
+		const updatedDescription = await updateDescription({
+			accessToken,
+			globalTimeoutMS,
+			baseDescStr,
+			id: newPlaylist.id,
+			reasons: part
+		})
+		if (updatedDescription !== null) part.push(updatedDescription);
 		clearTimeout(globalTimeout);
+		printTime('Completed:', start);
 		return res.status(201).json({ part, playlist: newPlaylist });
 	} catch (e: any) {
-		return res.status(e.status || 500)
-			.json({ message: e.message || 'Unknown error' });
+		clearTimeout(authTimeout);
+		clearTimeout(globalTimeout);
+		if (e.status === 429) res.setHeader('Retry-After', e.retryTime);
+		return res.status(e.status ? e.status : 500)
+			.json({ message: e.message ? e.message : 'Unknown error' });
 	};
 };
