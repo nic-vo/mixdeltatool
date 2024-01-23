@@ -14,7 +14,6 @@ export default async function handler(
 	try {
 		await mongoosePromise();
 		const now = new Date(Date.now() - (1000 * 60 * 60));
-		console.log(now.getTime())
 		const deleted = await Session.deleteMany(
 			{ expires: { $lt: now } }
 		).exec();

@@ -1,7 +1,7 @@
 import { getServerSession } from 'next-auth';
 
 import { authOptions } from '@lib/auth/options';
-import { AuthError } from '@lib/spotify/errors';
+import { AuthError } from '@lib/errors';
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import { sessionDeleter, userDeleter } from '@lib/auth/accountDeletion';
