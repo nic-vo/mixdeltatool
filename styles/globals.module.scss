@@ -6,22 +6,43 @@
 
 $white: #EDEDED;
 $black: #121218;
+$orange: #F79824;
+$tanorange: #FFC482;
+$teal: #0CBABA;
+$pinkred: #D56062;
+$grayed: #666;
+$transparentBlack: rgba(12, 12, 18, 0.7);
 $rounded: 10px;
 $easeLength: 0.25s;
-$buttonPadding: 0.5rem;
+$buttonPadding: 0.6em;
+$buttonBorder: 2px;
 
 .emptyButton {
+	display: flex;
+	justify-content: center;
 	cursor: pointer;
 	padding: $buttonPadding;
-	border: 2px solid $white;
+	border: $buttonBorder solid $white;
 	border-radius: $rounded;
-	background-color: transparent;
+	background-color: $transparentBlack;
 	color: $white;
+	align-items: center;
+
+	* {
+		color: inherit;
+	}
 }
 
-.emptyButton:hover,
-.emptyButton:focus,
-.emptyButton:active {
+.emptyButton:is([disabled]) {
+	opacity: 0.2;
+}
+
+.emptyButton:hover:not([disabled]),
+.emptyButton:focus:not([disabled]) {
 	color: $black;
 	background-color: $white;
+
+	* {
+		color: $black;
+	}
 }
