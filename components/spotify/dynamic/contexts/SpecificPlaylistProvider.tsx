@@ -1,6 +1,13 @@
-import { createContext, useState, useEffect } from 'react';
+import {
+	createContext,
+	useState,
+	useEffect,
+	useContext,
+	useCallback
+} from 'react';
 import { signIn } from 'next-auth/react';
 import { sanitize } from 'dompurify';
+import { GlobalLoadingContext } from './GlobalLoadingProvider';
 
 import type { MyPlaylistObject } from '../../types';
 
@@ -18,6 +25,8 @@ type SpecificContextSignature = typeof SpecificContextInit;
 
 const SpecificPlaylistContext = createContext<SpecificContextSignature>(SpecificContextInit);
 
+const SSKEYDATA = 'SPEC_PLAYLISTS';
+
 function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 	// TODO: This can be modified to remove unwanted playlists
 	const [playlists, setPlaylists] = useState<MyPlaylistObject[]>([]);
@@ -26,15 +35,17 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
 
+	const { gLoading, updateGLoading } = useContext(GlobalLoadingContext);
+
 	useEffect(() => {
 		// If not first load, set sessionStorage to new playlist object
 		if (first === false) {
-			sessionStorage.setItem('SPEC_PLAYLISTS', JSON.stringify(playlists));
+			sessionStorage.setItem(SSKEYDATA, JSON.stringify(playlists));
 			return;
 		}
 
 		// If first load, set playlist to sessionStorage
-		const storageData = sessionStorage.getItem('SPEC_PLAYLISTS');
+		const storageData = sessionStorage.getItem(SSKEYDATA);
 		// If sessionStorage is empty, no big deal
 		if (storageData === null) {
 			setFirst(false);
@@ -70,19 +81,24 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 		setFirst(false);
 	}, [playlists]);
 
-	const clearSpecificPlaylistsHandler = () => {
-		setPlaylists([]);
-		setError(null);
+	const clearSpecificPlaylistsHandler = useCallback(() => {
+		setPlaylists(() => []);
+		setError(() => null);
 		return null;
-	}
+	}, []);
 
 	// For use with input element
 	const getSpecificPlaylistHandler = async (
 		params: {
 			type: string, id: string
 		}) => {
+		if (gLoading) {
+			setError(`Something's busy. Please wait...`);
+			return null;
+		}
 		setError(null);
 		setLoading(true);
+		updateGLoading(true);
 		try {
 			const { id, type } = params;
 			if (type !== 'album' && type !== 'playlist')
@@ -119,7 +135,7 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 		<SpecificPlaylistContext.Provider value={
 			{
 				specificPlaylists: playlists,
-				specificLoading: loading,
+				specificLoading: loading || gLoading,
 				specificError: error,
 				getSpecificPlaylistHandler,
 				clearSpecificPlaylistsHandler
