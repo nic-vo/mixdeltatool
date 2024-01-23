@@ -176,6 +176,7 @@ const playlistGetter = async (args: {
 	id: string,
 	globalTimeoutMS: number
 }): Promise<differInternalPlaylistPromise> => {
+	const start = Date.now();
 	const { accessToken, type, id, globalTimeoutMS } = args;
 	const localLimit = 2200;
 	const localTimeoutMS = globalTimeoutMS - localLimit;
@@ -203,7 +204,7 @@ const playlistGetter = async (args: {
 			let completed = 0;
 			let total = 0;
 			// Init loop with initNext
-			let next = initNext;
+			let next: string | null = initNext;
 			// One retry because for some reason on
 			// random playlists, the fetch instantly throws
 			try {
@@ -229,7 +230,7 @@ const playlistGetter = async (args: {
 						if ((Date.now() + wait) > localTimeoutMS) {
 							// Break early from rate limit if data exists
 							if (set.size > 0) break;
-							throw new RateError();
+							throw new RateError(5);
 						}
 						// Await retry if within timeout time
 						await new Promise(async r => setTimeout(r, wait));
@@ -254,35 +255,45 @@ const playlistGetter = async (args: {
 							'from Spotify');
 					// Add this iteration to set
 					// Set next to either new url or null
-					const jsoned = await response.json() as SpotTracksResponse;
-					for (const item of jsoned.items) {
-						// Filter for existing and local files;
-						// Local files have really weird URIs;
-						// Sometimes spotify returns null for a weird non-existing track
-						// And this whole thing throws
-						if (item === null
-							|| item.track === null
-							|| item.track.uri === null
-							|| /local/.test(item.track.uri) === true
-							|| set.has(item.track.uri) === true) {
-							continue;
+					let jsoned;
+					if (type === 'playlist') {
+						jsoned = await response.json() as SpotPlaylistTracksResponse;
+						for (const item of jsoned.items) {
+							// Filter for existing and local files;
+							// Local files have really weird URIs;
+							// Sometimes spotify returns null for a weird non-existing track
+							// And this whole thing throws
+							if (item === null
+								|| item.track === null
+								|| item.track.uri === null
+								|| item.is_local
+								|| /:local:/.test(item.track.uri)
+								|| set.has(item.track.uri) === true) continue;
+							// Show that some tracks returned null for some reason
+							// Don't increment completed
+							set.add(item.track.uri);
+							completed += 1;
 						}
-						// Show that some tracks returned null for some reason
-						// Don't increment completed
-						set.add(item.track.uri);
-						completed += 1;
+					} else {
+						jsoned = await response.json() as SpotAlbumTracksResponse;
+						for (const item of jsoned.items) {
+							if (!item.uri) continue;
+							set.add(item.uri);
+							completed += 1;
+						}
 					}
 					next = jsoned.next;
 					total = total === 0 ? jsoned.total : total;
 				}
 			} catch (e: any) {
+				printTime(`ERROR - ${id} - ${completed}/${total} fetched in:`, start);
 				return rej(e);
 			}
-
+			printTime(`${id} - ${completed}/${total} fetched in:`, start);
 			return res({
 				total,
 				completed,
-				items: Array.from(set) as string[]
+				items: set
 			});
 		})]);
 }
