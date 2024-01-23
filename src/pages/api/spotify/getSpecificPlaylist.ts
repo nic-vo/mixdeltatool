@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth';
 import { routeKeyRetriever } from '@lib/auth/accessKey';
 import { specificQueryParser } from '@lib/spotify/validators';
 import { specificPlaylistGetter } from '@lib/spotify/getterPromises';
+import { checkAndUpdateEntry } from '@lib/database/redis/ratelimiting';
 
 import { authOptions } from '@lib/auth/options';
 import { SPOT_LOGIN_WINDOW } from '@consts/spotify';
@@ -9,18 +10,25 @@ import { SPOT_LOGIN_WINDOW } from '@consts/spotify';
 import { getSpecificPlaylistApiRequest } from '@components/spotify/types';
 import {
 	AuthError,
+	CustomError,
 	FetchError,
 	MalformedError,
+	RateError,
 	ReqMethodError
-} from '@lib/spotify/errors';
+} from '@lib/errors';
 import { NextApiResponse } from 'next';
 
 // The assumption for this route is that every sign-on refreshes access token
 // Session never updates, and only exists until access token expiry
 
+const RATE_LIMIT_PREFIX = 'GSP';
+const RATE_LIMIT_ROLLING_LIMIT = 10;
+const RATE_LIMIT_DECAY_SECONDS = 5;
+
 export default async function handler(
 	req: getSpecificPlaylistApiRequest, res: NextApiResponse
 ) {
+	// return res.status(404).json({message: `Testing a proper error message. ${Date.now()}`});
 	const globalTimeoutMS = Date.now() + 9000;
 	const globalTimeout = setTimeout(() => {
 		return res.status(504).json({ message: 'Server timed out' });
@@ -34,6 +42,18 @@ export default async function handler(
 	try {
 		// Validate req method
 		if (req.method !== 'GET') throw new ReqMethodError('GET');
+
+		if (!req.headers['x-forwarded-for'])
+			throw new CustomError(500, 'Internal Error');
+		const rateLimitCheckSeconds = await checkAndUpdateEntry({
+			ip: req.headers['x-forwarded-for'] as string,
+			prefix: RATE_LIMIT_PREFIX,
+			rollingLimit: RATE_LIMIT_ROLLING_LIMIT,
+			rollingDecaySeconds: RATE_LIMIT_DECAY_SECONDS
+		});
+
+		if (rateLimitCheckSeconds !== null)
+			throw new RateError(rateLimitCheckSeconds);
 
 		// Validate query parameters
 		let id, type;
@@ -91,6 +111,7 @@ export default async function handler(
 	} catch (e: any) {
 		clearTimeout(authTimeout);
 		clearTimeout(globalTimeout);
+		if (e.status === 429) res.setHeader('Retry-After', e.retryTime);
 		return res.status(e.status ? e.status : 500)
 			.json({ message: e.message ? e.message : 'Unknown error' });
 	}
