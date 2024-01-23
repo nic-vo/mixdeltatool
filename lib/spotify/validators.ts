@@ -39,7 +39,9 @@ const playlistIdTypeParser = z.object({
 const diffBodyParser = z.object({
 	target: playlistIdTypeParser,
 	differ: playlistIdTypeParser,
-	type: z.enum(['adu', 'odu', 'otu', 'bu', 'stu'])
+	type: z.enum(['adu', 'odu', 'otu', 'bu', 'stu']),
+	newName: z.nullable(z.string().max(150)),
+	newDesc: z.nullable(z.string().max(600))
 }).strict();
 
 const basicSpotAPIResponseParser = z.object({
