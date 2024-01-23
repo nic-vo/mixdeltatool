@@ -42,3 +42,37 @@ const AccountModel = model('account',
 	{ overwriteModels: true }
 );
 export const Account = (mongoose.models['account'] as typeof AccountModel) || AccountModel;
+
+const globalStatusPointerSchema = new Schema({
+	current: SchemaTypes.ObjectId
+});
+const GlobalStatusPointerModel = model('globalStatusPointer',
+	globalStatusPointerSchema,
+	'globalStatusPointers',
+	{ overwriteModels: true }
+);
+export const GlobalStatusPointer = (mongoose.models['globalStatusPointer'] as typeof GlobalStatusPointerModel) || GlobalStatusPointerModel;
+
+const globalStatusSchema = new Schema({
+	active: SchemaTypes.Number,
+	status: SchemaTypes.String,
+	statusType: SchemaTypes.String
+});
+const GlobalStatusModel = model('globalStatus',
+	globalStatusSchema,
+	'globalStatuses',
+	{ overwriteModels: true }
+);
+export const GlobalStatus = (mongoose.models['globalStatus'] as typeof GlobalStatusModel) || GlobalStatusModel;
+
+const contactMessageSchema = new Schema({
+	ip: SchemaTypes.String,
+	name: SchemaTypes.String,
+	message: SchemaTypes.String,
+});
+const ContactMessageModel = model('contactMessage',
+	contactMessageSchema,
+	'contactMessages',
+	{ overwriteModels: true }
+);
+export const ContactMessage = (mongoose.models['contactMessage'] as typeof ContactMessageModel) || ContactMessageModel;
