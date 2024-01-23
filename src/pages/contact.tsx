@@ -63,6 +63,7 @@ const Contact = () => {
 							type='text'
 							required={true}
 							pattern="^(\w|d\|-|'| ){3,30}$"
+							autoComplete='off'
 							minLength={3}
 							maxLength={30}
 						/>
