@@ -5,7 +5,18 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 # Changelog
 (the commit history sucks because this started out as an experiment)
 
-## 0.13.0
+## 0.14.0
+  - Privacy Policy
+    - Update contact info
+    - Escape HTML entities
+    - Use consts
+    - Add IP address stipulation
+  - Home
+    - Add good copy
+    - Add global status indicator
+    - Add minor styling
+
+### 0.13.0
   -  Header
     - Improve button styling / responsiveness
     - Fix focus / blur issues
