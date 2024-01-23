@@ -24,22 +24,23 @@ import {
 
 const createEmptyPlaylist = async (args: {
 	accessToken: string,
-	userId: string,
-	actionType: ActionType,
 	baseDescStr: string,
-	globalTimeoutMS: number
+	globalTimeoutMS: number,
+	newName: string | null
 }): Promise<MyPlaylistObject> => {
-	const { accessToken,
-		userId,
-		actionType,
+	const {
+		accessToken,
 		globalTimeoutMS,
-		baseDescStr } = args;
+		baseDescStr,
+		newName } = args;
+	const start = Date.now();
 	const localLimit = 2200;
 	const localTimeoutMS = globalTimeoutMS - 2200;
-	const url = SPOT_URL_BASE.concat('users/', userId, '/playlists');
-	const headers = new Headers();
-	headers.append('Authorization', `Bearer ${accessToken}`);
-	headers.append('Content-Type', 'application/json');
+	const imgPath = path.join(
+		process.cwd(),
+		'consts',
+		'mdl.jpg');
+	const imgString = readFileSync(imgPath).toString('base64');
 
 	return Promise.race([
 		localTimeout<MyPlaylistObject>(globalTimeoutMS, localLimit),
@@ -68,8 +69,9 @@ const createEmptyPlaylist = async (args: {
 							headers,
 							method: 'POST',
 							body: JSON.stringify({
-								name: `SuperUser ${actionType} ${Math.floor(Date.now() / 1000)}`,
-								description: baseDescStr
+								name: `${APP_NAME} - ${newName !== null ? newName : genUId(4)}`,
+								description: baseDescStr,
+								public: false
 							})
 						});
 					} catch {
@@ -82,7 +84,7 @@ const createEmptyPlaylist = async (args: {
 					if (response.status === 429) {
 						const header = response.headers.get('Retry-After');
 						const wait = header !== null ? parseInt(header) * 1000 : 1000;
-						if (Date.now() + wait >= localTimeoutMS) throw new RateError();
+						if (Date.now() + wait >= localTimeoutMS) throw new RateError(5);
 						await new Promise(r => setTimeout(r, wait));
 						continue;
 					}
@@ -108,12 +110,59 @@ const createEmptyPlaylist = async (args: {
 					const parsed = spotPlaylistObjectParser.parse(jsoned);
 					returner = {
 						...parsed,
+						owner: [{ ...parsed.owner, name: parsed.owner.display_name || 'Spotify User' }],
 						image: parsed.images[0],
 						tracks: 0
 					};
 				} catch {
 					throw new FetchError('There was an error creating a new playlist');
 				}
+				let putStart = Date.now();
+				// PUT Logo
+				const putUrl = SPOT_URL_BASE.concat('playlists/', returner.id, '/images');
+				const putHeaders = new Headers();
+				putHeaders.append('Authorization', `Bearer ${accessToken}`);
+				putHeaders.append('Content-Type', 'image/jpeg');
+				try {
+					let response;
+					let networkRetry = true;
+					let thumbSilentFail = false;
+					while (true) {
+						try {
+							response = await Promise.race([fetch(putUrl, {
+								headers: putHeaders,
+								method: 'PUT',
+								body: imgString
+							}),
+							new Promise<Response>((_, r) => setTimeout(() => {
+								thumbSilentFail = true;
+								return r();
+							}, 3000))
+							]);
+						} catch {
+							if (thumbSilentFail) break;
+							if (networkRetry === false)
+								throw new FetchError('There was an error creating a new playlist');
+							networkRetry = false;
+							continue;
+						}
+						networkRetry = true;
+						if (response.status === 429) {
+							const header = response.headers.get('Retry-After');
+							const wait = header !== null ? parseInt(header) * 1000 : 1000;
+							if (Date.now() + wait >= localTimeoutMS) throw new RateError(5);
+							await new Promise(r => setTimeout(r, wait));
+							continue;
+						}
+						break;
+					}
+					if (!response || !response.ok) throw new Error();
+					printTime('Thumb uploaded:', putStart);
+				} catch {
+					printTime('Thumb skipped:', putStart);
+				}
+				returner.image = { url: '/mdl.jpg' }
+				printTime('Created empty playlist and uploaded thumb:', start);
 				return res(returner);
 			} catch (e: any) {
 				return rej(e);
