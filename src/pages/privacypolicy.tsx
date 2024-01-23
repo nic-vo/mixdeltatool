@@ -96,9 +96,9 @@ const PrivacyPolicy = () => {
 						<li>
 							<h3>Contact Information</h3>
 							<p>
-								Users can contact us with inquiries regarding their information at [Your Contact Email].
+								Users can contact us with inquiries regarding their information via either our <a href='/contact' target='_blank'>contact form</a> or emailing <a href='mailto:mixdeltatool@gmail.com' target='_blank'>mixdeltatool@gmail.com</a>.
 							</p>
-						</li>hCaptcha
+						</li>
 						<li>
 							<h3>Use of Cookies</h3>
 							<p>
