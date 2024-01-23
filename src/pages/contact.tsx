@@ -24,7 +24,6 @@ const Contact = () => {
 			let toReplace = Object.fromEntries(data.entries());
 			toReplace.name = sanitize(toReplace.name as string);
 			toReplace.message = sanitize(toReplace.message as string);
-			console.log(toReplace);
 			const raw = await fetch('/api/contact', {
 				method: 'POST',
 				body: JSON.stringify(toReplace)

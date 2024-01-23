@@ -13,13 +13,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 		const ip = req.headers['x-forwarded-for'] as string;
 		if (!ip) throw new CustomError(500, 'Internal error');
 
-		console.log(req.body);
 		let body;
 
 		try {
 			body = contactBodyParser.parse(JSON.parse(req.body));
 		} catch (e: any) {
-			console.log(e);
 			throw new MalformedError();
 		}
 
