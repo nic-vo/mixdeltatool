@@ -1,7 +1,8 @@
 import { useContext, useRef, useState } from 'react';
 import { SpecificPlaylistContext } from '../../contexts/SpecificPlaylistProvider';
+import { SmallStatus } from '@components/misc';
 
-import local from '../PlaylistAdder.module.scss';
+import local from './SpecificAdder.module.scss';
 import global from '@styles/globals.module.scss';
 
 /*
@@ -13,7 +14,7 @@ Has to adapt the playlist context's specificPlaylistHandler to a <form>
 
 */
 
-export default function SpecificAdder(props: { children: React.ReactNode }) {
+export default function SpecificAdder() {
 	const [href, setHref] = useState<string | ''>('');
 	// Ref for non-stateful input
 	const fieldRef = useRef<HTMLInputElement | null>(null);
@@ -22,8 +23,7 @@ export default function SpecificAdder(props: { children: React.ReactNode }) {
 	const {
 		specificLoading,
 		specificError,
-		getSpecificPlaylistHandler,
-		clearSpecificPlaylistsHandler
+		getSpecificPlaylistHandler
 	} = useContext(SpecificPlaylistContext);
 
 	const specificPlaylistFormHandler = async (e: React.SyntheticEvent) => {
@@ -53,30 +53,27 @@ export default function SpecificAdder(props: { children: React.ReactNode }) {
 
 	return (
 		<>
-			<section className={local.innerContainer}>
-				<form
-					name='getSpecificPlaylist'
-					onSubmit={specificPlaylistFormHandler}>
-					<input
-						disabled={specificLoading}
-						type='text'
-						autoComplete='off'
-						pattern='^(https:\/\/\w+.spotify.com\/playlist\/[A-Za-z0-9]{22}\?si=.*)|(https:\/\/\w+.spotify.com\/album\/[A-Za-z0-9]{22}\?si=.*)$'
-						required
-						value={href}
-						onChange={hrefChangeHandler}
-						ref={fieldRef} />
-					<button
-						type='submit'
-						disabled={specificLoading}
-						className={global.emptyButton}>Get playlist</button>
-				</form>
-				<button onClick={clearSpecificPlaylistsHandler}
-					className={global.emptyButton}>Clear specific playlists</button>
-				<p>specific {specificLoading ? 'loading' : 'idle'}</p>
-				<p>{specificError !== null && specificError}</p>
-			</section>
-			{props.children}
+			<form
+				name='getSpecificPlaylist'
+				onSubmit={specificPlaylistFormHandler}
+				className={local.form}>
+				<input
+					disabled={specificLoading}
+					type='text'
+					autoComplete='off'
+					pattern='^(https:\/\/\w+.spotify.com\/playlist\/[A-Za-z0-9]{22}\?si=.*)|(https:\/\/\w+.spotify.com\/album\/[A-Za-z0-9]{22}\?si=.*)$'
+					required
+					placeholder='Playlist/album link here...'
+					value={href}
+					onChange={hrefChangeHandler}
+					ref={fieldRef}
+					className={local.textInput} />
+				<button
+					type='submit'
+					disabled={specificLoading}
+					className={global.emptyButton}>Add</button>
+			</form>
+			<SmallStatus error={specificError} loading={specificLoading} />
 		</>
 	);
 };
