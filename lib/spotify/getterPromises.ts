@@ -5,7 +5,7 @@ import {
 	FetchError,
 	ForbiddenError,
 	RateError
-} from './errors';
+} from '../errors';
 
 import { localTimeout } from './commonPromises';
 import {
@@ -64,7 +64,7 @@ const userPlaylistGetter = async (args: {
 						// Retry based on Retry-After header in sec, otherwise 2s wait
 						const wait = header !== null ? parseInt(header) * 1000 : 2000;
 						// Throw rate error if wait would pass the timeout time
-						if ((Date.now() + wait) >= globalTimeoutMS) throw new RateError();
+						if ((Date.now() + wait) >= globalTimeoutMS) throw new RateError(10);
 						// Await retry if within timeout time
 						await new Promise(async r => setTimeout(r, wait));
 						// Continue for while loop
@@ -102,6 +102,7 @@ const userPlaylistGetter = async (args: {
 						const { images, tracks } = item;
 						return {
 							...item,
+							owner: [{ ...item.owner, name: item.owner.display_name }],
 							image: images[0],
 							tracks: tracks.total,
 						};
@@ -145,7 +146,7 @@ const specificPlaylistGetter = async (args: {
 						// Retry based on Retry-After header in sec, otherwise 2s wait
 						const wait = header !== null ? parseInt(header) * 1000 : 2000;
 						// Throw rate error if wait would pass the timeout time
-						if ((Date.now() + wait) >= globalTimeoutMS) throw new RateError();
+						if ((Date.now() + wait) >= globalTimeoutMS) throw new RateError(10);
 						// Await retry if within timeout time
 						await new Promise(async r => setTimeout(r, wait));
 						// Continue for while loop
@@ -165,7 +166,7 @@ const specificPlaylistGetter = async (args: {
 						case 404:
 							throw new CustomError(404, 'That Spotify ID does not exist');
 						default:
-							throw new FetchError('There was an error reaching Spotify');
+							throw new FetchError('Verify that link is valid');
 					}
 				}
 
@@ -178,10 +179,10 @@ const specificPlaylistGetter = async (args: {
 						returner = {
 							...parsed,
 							image: parsed.images[0],
-							owner: {
-								...parsed.artists[0],
-								display_name: parsed.artists.map(a => a.name).join(', '),
-							},
+							owner: parsed.artists.map(artist => {
+								const { name, id } = artist;
+								return { name, id }
+							}),
 							tracks: parsed.total_tracks,
 						};
 					} else if (jsoned.type === 'playlist') {
@@ -190,9 +191,10 @@ const specificPlaylistGetter = async (args: {
 							...parsed,
 							image: parsed.images[0],
 							tracks: parsed.tracks.total,
+							owner: [{ ...parsed.owner, name: parsed.owner.display_name ||'Spotify User' }]
 						};
 					} else throw new Error();
-				} catch {
+				} catch (e: any) {
 					throw new CustomError(404, 'That was not a valid playlist');
 				}
 				return res(returner);
