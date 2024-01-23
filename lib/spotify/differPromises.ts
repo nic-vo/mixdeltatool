@@ -333,63 +333,71 @@ const outputAdder = (params: {
 			const total = uris.length;
 			let completed = 0;
 
-			for (const uriArr of fetches) {
-				// Arbitrary early break just in case time might go over
-				if (Date.now() + 220 > localTimeoutMS) break;
-				let response;
-				let networkRetry = true;
-				while (true) {
-					try {
-						response = await fetch(url,
-							{
-								headers,
-								method: 'POST',
-								body: JSON.stringify({ uris: uriArr })
+			try {
+				for (const uriArr of fetches) {
+					// Arbitrary early break just in case time might go over
+					if (Date.now() + 220 > localTimeoutMS) break;
+					let response;
+					let networkRetry = true;
+					while (true) {
+						while (true) {
+							try {
+								response = await fetch(url,
+									{
+										headers,
+										method: 'POST',
+										body: JSON.stringify({ uris: uriArr })
+									}
+								);
+							} catch {
+								if (networkRetry === false)
+									throw new FetchError('There was an error adding tracks to the'
+										+ 'new playlist');
+								networkRetry = false;
+								continue;
 							}
-						);
-					} catch {
-						if (networkRetry === false)
-							throw new FetchError('There was an error adding tracks to the'
-								+ 'new playlist');
-						networkRetry = false;
-						continue;
+							break;
+						}
+						networkRetry = true;
+						if (response.status === 429) {
+							const header = response.headers.get('Retry-After');
+							const wait = header !== null ? parseInt(header) * 1000 : 2000;
+							// Throw rate error if wait would pass the timeout time
+							if ((Date.now() + wait) > localTimeoutMS) {
+								// Break early from rate limit if data exists
+								if (completed > 0) break;
+								throw new RateError(5);
+							}
+							// Await retry if within timeout time
+							await new Promise(async r => setTimeout(r, wait));
+							continue;
+						}
+						break;
 					}
-					break;
-				}
-				networkRetry = true;
-				if (response.status === 429) {
-					const header = response.headers.get('Retry-After');
-					const wait = header !== null ? parseInt(header) * 1000 : 2000;
-					// Throw rate error if wait would pass the timeout time
-					if ((Date.now() + wait) > localTimeoutMS) {
-						// Break early from rate limit if data exists
-						if (completed > 0) break;
-						throw new RateError();
+					if (response.ok === false) {
+						// This is if somehow after all this, Spotify detects something wrong
+						switch (response.status) {
+							case 401:
+								throw new AuthError();
+							case 403:
+								throw new ForbiddenError(`For some reason, you can't access the `
+									+ `playlist`);
+							default:
+								throw new FetchError('There was an error populating the playlist');
+						}
 					}
-					// Await retry if within timeout time
-					await new Promise(async r => setTimeout(r, wait));
-					continue;
+					if (!response)
+						throw new FetchError('There was an error getting a response ' +
+							'from Spotify');
+					// Add new number to completed, either a hundred or the remainder
+					if (iterations <= hundreds) completed += 100;
+					else if (remain > 0) completed += remain;
+					iterations += 1;
 				}
-				if (response.ok === false) {
-					// This is if somehow after all this, Spotify detects something wrong
-					switch (response.status) {
-						case 401:
-							throw new AuthError();
-						case 403:
-							throw new ForbiddenError(`For some reason, you can't access the `
-								+ `playlist`);
-						default:
-							throw new FetchError('There was an error populating the playlist');
-					}
-				}
-				if (!response)
-					throw new FetchError('There was an error getting a response ' +
-						'from Spotify');
-				// Add new number to completed, either a hundred or the remainder
-				if (iterations <= hundreds) completed += 100;
-				else if (remain > 0) completed += remain;
-				iterations += 1;
+			} catch (e: any) {
+				rej(e);
 			}
+
 			return res({
 				total,
 				completed
