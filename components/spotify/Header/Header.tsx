@@ -21,25 +21,28 @@ const Hidden = dynamic(import('./HiddenContent'),
 
 const Content = () => {
 	const { data, status } = useSession();
-
 	return (
 		<>
-			<section className={look.info}>
-				{status !== 'authenticated' && <button onClick={() => signIn()}>Sign in</button>}
-				{
-					data !== undefined && data !== null && data.user.image ?
-						<img
-							src={data.user.image}
-							alt='profile picture'
-							loading='lazy' />
-						:
-						<div>Image here</div>
-				}
-				{
-					data !== undefined && data !== null && data.user.name ?
-						<p>{data.user.name}</p>
-						:
-						<div>Name here</div>
+			<section className={local.info}>
+				{status !== 'authenticated' ?
+					<button
+						id='header-signin'
+						className={global.emptyButton}
+						onClick={() => signIn()}>Sign in</button>
+					: (<>
+						<div style={{ width: '8svh', height: '8svh' }}>
+							<ImageLoader url={data.user.image}
+								alt={'Profile picture'} />
+						</div>
+						<p>
+							{
+								data.user.name ? data.user.name
+									: data.user.email ? data.user.email
+										: data.user.id
+							}
+						</p>
+					</>
+					)
 				}
 			</section>
 			{status === 'authenticated' ? <Hidden /> : <FaHourglassHalf />}
@@ -52,20 +55,47 @@ const Toggler = (props: {
 }) => {
 	const [toggle, setToggle] = useState(false);
 	const classer = toggle === true ?
-		`${look.header} ${look.active}` : look.header;
+		`${local.header} ${local.active}` : local.header;
+
+	const onFocusHandler = (e: React.FocusEvent) => {
+		if (e.target.id === 'toggler') return null;
+		setToggle(true);
+	}
+
+	const onBlurHandler = (e: React.FocusEvent) => {
+		if (
+			(e.target.id !== 'toggler' || (
+				e.relatedTarget !== null && (
+					e.relatedTarget.id === 'header-signin'
+					|| e.relatedTarget.id === 'delete-account'
+				)
+			))
+			&&
+			(e.target.id !== 'home'
+				|| (e.relatedTarget !== null
+					&& e.relatedTarget.id === 'privacy-policy'))) return null;
+		setToggle(false);
+	}
 
 	return (
-		<header className={classer} onFocus={() => setToggle(true)}>
+		<header
+			className={classer}
+			onFocus={onFocusHandler}
+			onBlur={onBlurHandler}>
 			<button
+				id='toggler'
 				onClick={() => setToggle(!toggle)}
-				onFocus={() => setToggle(true)}
-				className={look.toggler}><FaBars /></button>
-			<div className={look.returner}
+				className={local.toggler}><FaBars /></button>
+			<div className={local.returner}
 				onClick={() => setToggle(false)} />
 			{props.children}
-			<section className={look.innerContainer}>
-				<a href='/privacypolicy' className={look.button}>Privacy Policy</a>
-				<a href='/' className={look.button} onBlur={() => setToggle(false)}><FaHome /></a>
+			<section className={local.innerContainer}>
+				<a
+					id='home'
+					href='/'
+					className={local.flatButton}>
+					<LogoToAnimate /> Back to home
+				</a>
 			</section>
 		</header>
 	);
