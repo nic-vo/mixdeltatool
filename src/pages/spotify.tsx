@@ -18,23 +18,23 @@ export default function Spotify(props: {
 				<meta name='description' content={MAIN_DESC} />
 			</Head>
 
-			<Header />
-			<main style={{
-				position: 'relative',
-				display: 'flex',
-				flexDirection: 'column',
-				alignItems: 'center',
-				gap: '2svh',
-				width: '80svw',
-				height: '100svh',
-				margin: 'auto',
-				zIndex: 1,
-			}}>
-				<SpotEUA />
-				<AuthProvider>
+			<AuthProvider>
+				<Header />
+				<main style={{
+					position: 'relative',
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'center',
+					gap: '2svh',
+					width: '80svw',
+					height: '100svh',
+					margin: 'auto',
+					zIndex: 1,
+				}}>
+					<SpotEUA />
 					<SpotifyFrame {...props} />
-				</AuthProvider>
-			</main>
+				</main>
+			</AuthProvider>
 			<Background />
 		</>
 	);
