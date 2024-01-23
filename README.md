@@ -5,6 +5,22 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 # Changelog
 (the commit history sucks because this started out as an experiment)
 
+## 0.15.0
+  - API Routes
+    - Modify a few promises
+    - Simplify parsers so that unnecessary keys get stripped
+    - createDiffPlaylist
+      - Allow user to customize name
+      - Upload logo
+      - Allow for slight variation based on object type when getting from Spotify API
+  - Contexts
+    - Add global loading state to relevant contexts
+  - Turn larger components in the Adder tree to layouts
+    - Separation between controls interacting with contexts and playlist display
+  - Differ Form
+    - Make the form multi-stage
+    - Add interactive progress bar
+
 ## 0.14.0
   - Privacy Policy
     - Update contact info
