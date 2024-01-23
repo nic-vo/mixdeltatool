@@ -5,7 +5,12 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 # Changelog
 (the commit history sucks because this started out as an experiment)
 
-## 0.16.0
+## 0.17.0
+  - Add animated logo variation
+  - Make differ disclaimer more apparent
+  - Add contact info to relevant area in privacy policy
+
+### 0.16.0
   - API Routes
     - Add rate limiting
     - createDiffPlaylist
