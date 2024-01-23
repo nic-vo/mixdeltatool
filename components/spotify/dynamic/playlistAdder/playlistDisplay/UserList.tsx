@@ -9,8 +9,6 @@ export default function UserList() {
 
 	let memo = useMemo(() => userPlaylists, [userPlaylists.length]);
 
-	console.log('user render')
-
 	if (memo.length === 0)
 		return (
 			<p style={{

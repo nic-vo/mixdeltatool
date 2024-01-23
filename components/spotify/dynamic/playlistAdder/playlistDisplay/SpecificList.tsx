@@ -7,9 +7,7 @@ import { ListItem } from '@components/misc';
 export default function SpecificList() {
 	const { specificPlaylists } = useContext(SpecificPlaylistContext);
 
-	let memo = useMemo(() => specificPlaylists, [specificPlaylists.length])
-
-	console.log('specific render');
+	let memo = useMemo(() => specificPlaylists, [specificPlaylists.length]);
 
 	if (memo.length === 0)
 		return (
