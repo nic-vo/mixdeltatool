@@ -1,7 +1,14 @@
 import { MyUserAPIRouteResponse } from '@components/spotify/types';
-import { createContext, useState, useEffect } from 'react';
+import {
+	createContext,
+	useState,
+	useEffect,
+	useContext,
+	useCallback
+} from 'react';
 import { signIn } from 'next-auth/react';
 import { sanitize } from 'dompurify';
+import { GlobalLoadingContext } from './GlobalLoadingProvider';
 
 import { MyPlaylistObject } from '../../types';
 
@@ -19,6 +26,9 @@ type UserContextSignature = typeof UserContextInit;
 
 const UserPlaylistContext = createContext<UserContextSignature>(UserContextInit);
 
+const SSKEYDATA = 'USER_PLAYLISTS';
+const SSPKEYDATA = 'USER_PLAYLISTS_PAGE';
+
 function UserPlaylistProvider(props: { children: React.ReactNode }) {
 	// This will only ever be added to
 	const [playlists, setPlaylists] = useState<MyPlaylistObject[]>([]);
@@ -28,8 +38,16 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
 
+	const { gLoading, updateGLoading } = useContext(GlobalLoadingContext);
+
 	const getUserPlaylistsHandler = async () => {
+		if (gLoading) {
+			setError(`Something's busy. Please wait...`);
+			return null;
+		}
+		updateGLoading(true);
 		setLoading(true);
+		setError(null);
 		try {
 			// If either 50th page of results or no next, cancel
 			if (page === null) throw { message: 'No more' };
@@ -69,25 +87,30 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 			setError(e.message || 'Unknown error');
 		}
 		setLoading(false);
+		updateGLoading(false);
 		return null;
 	}
 
 	useEffect(() => {
 		// If not first load, set sessionStorage to new playlist object
 		if (first === false) {
-			sessionStorage.setItem('USER_PLAYLISTS', JSON.stringify(playlists));
+			sessionStorage.setItem(SSKEYDATA, JSON.stringify(playlists));
+			sessionStorage.setItem(SSPKEYDATA, page === null ? 'null' : page.toString());
 			return;
 		}
 
 		// If first load, set playlist to sessionStorage
-		const storageData = sessionStorage.getItem('USER_PLAYLISTS');
+		const storageData = sessionStorage.getItem(SSKEYDATA);
+		const pageStorageData = sessionStorage.getItem(SSPKEYDATA);
 		// If sessionStorage is empty, no big deal
-		if (storageData === null) {
+		if (storageData === null || pageStorageData === null) {
 			setFirst(false);
 			return;
 		};
 
 		try {
+			const sessionPage = pageStorageData === 'null' ? null
+				: parseInt(pageStorageData) >= 50 ? null : parseInt(pageStorageData);
 			const sessionPlaylists = JSON.parse(storageData) as MyPlaylistObject[];
 			// Map over playlists to sanitize their name and image.url if defined
 			const sanitizedPlaylists = sessionPlaylists.map(playlist => {
@@ -108,6 +131,7 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 					}
 				};
 			});
+			setPage(sessionPage);
 			setPlaylists(sanitizedPlaylists);
 		} catch {
 			// Silent catch in case of weird non-parseable JSON
@@ -115,12 +139,12 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 		setFirst(false);
 	}, [playlists]);
 
-	const clearUserPlaylistsHandler = () => {
-		setPlaylists([]);
-		setError(null);
+	const clearUserPlaylistsHandler = useCallback(() => {
+		setPlaylists(() => []);
+		setError(() => null);
 		setPage(0);
 		return null;
-	}
+	}, []);
 
 	const updateUserPlaylistsHandler = (playlist: MyPlaylistObject) => {
 		// Gets called after a successful diff, I think
@@ -140,7 +164,7 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 			{
 				userPlaylists: playlists,
 				userCurrentPage: page,
-				userLoading: loading,
+				userLoading: loading || gLoading,
 				userError: error,
 				getUserPlaylistsHandler,
 				updateUserPlaylistsHandler,
