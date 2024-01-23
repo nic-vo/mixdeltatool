@@ -1,22 +1,23 @@
-@use '@styles/globals.module.scss' as global;
+@use '@styles/globals.module.scss' as g;
 
 .header {
 	position: fixed;
-	height: 100svh;
-	@include global.flexCenter;
+	height: 100vh;
+	@include g.flexCenter;
 	flex-direction: column;
 	justify-content: space-between;
-	background-color: #AAA;
-	padding: 2svw;
+	background-color: g.$black;
 	translate: -100%;
-	transition: all global.$easeLength;
+	transition: all g.$easeLength;
 	transition-timing-function: ease;
 	z-index: 2;
-	gap: 4svh;
+	gap: 4vh;
+	min-width: 8svw;
+	font-size: 1rem;
 }
 
 .active {
-	translate: 0;
+	translate: 0%;
 }
 
 .toggler {
@@ -25,26 +26,25 @@
 	right: 0;
 	display: flex;
 	align-items: center;
-	border: 4px solid global.$white;
-	border-radius: global.$rounded;
+	border: 2px solid g.$white;
+	border-radius: g.$rounded;
 	background-color: rgba(10, 10, 10, 0.7);
 	padding: 1rem;
-	transform: translateX(calc(100% + 2svw));
-	color: global.$white;
+	transform: translateX(calc(100% + 2vh)) translateY(2vh);
+	color: g.$white;
 	z-index: 2;
 
 	* {
-		color: global.$white;
+		color: g.$white;
 	}
 }
 
 .toggler:hover,
-.toggler:focus,
-.toggler:active {
-	background-color: global.$white;
+.toggler:focus {
+	background-color: g.$white;
 
 	* {
-		color: global.$black;
+		color: g.$black;
 	}
 }
 
@@ -53,8 +53,8 @@
 	position: absolute;
 	right: 0;
 	top: 0;
-	translate: 100%;
-	height: 100svh;
+	translate: calc(100%);
+	height: 100vh;
 	width: 100svw;
 	background-color: transparent;
 	backdrop-filter: brightness(0.5);
@@ -64,7 +64,7 @@
 .active .returner {
 	display: block;
 	animation-name: returnerfadein;
-	animation-duration: global.$easeLength;
+	animation-duration: g.$easeLength;
 	animation-timing-function: ease;
 	animation-fill-mode: both;
 }
@@ -84,31 +84,79 @@
 	padding: 4rem;
 
 	* {
-		color: global.$black;
+		color: g.$black;
 	}
 }
 
 .hidden {
-	@include global.flexCenter;
+	@include g.flexCenter;
 	height: 100%;
+	width: 100%;
 	flex-grow: 1;
 	flex-direction: column;
 	justify-content: flex-start;
-	gap: 1rem;
 }
 
 .innerContainer {
-	@include global.flexCenter;
+	@include g.flexCenter;
+	width: 100%;
 	flex-direction: column;
-	gap: 1rem;
+	margin-bottom: 2vh;
 }
 
 .info {
-	@include global.flexCenter;
+	@include g.flexCenter;
 	flex-direction: column;
-	gap: 2svw;
+	gap: 2vh;
+	width: 100%;
+	min-height: 15vh;
+	padding: 2vh 0;
+	margin-top: 2vh;
 }
 
-.button {
-	padding: 1rem;
+.flatButton {
+	cursor: pointer;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 1em;
+	border: none;
+	padding: 1em;
+	border-top: 2px solid #666;
+	background-color: inherit;
+	color: inherit;
+	transition: color 0.25s, background-color 0.25s;
+	text-wrap: nowrap;
+	white-space: nowrap;
+
+
+	* {
+		color: inherit;
+		transition: color 0.25s;
+	}
+
+	svg {
+		flex-shrink: 1;
+	}
+
+	:not(svg) {
+		text-wrap: nowrap;
+		white-space: nowrap;
+	}
+}
+
+.flatButton:hover,
+.flatButton:focus {
+	color: g.$black;
+	background-color: g.$white;
+
+	img {
+		color: g.$white;
+	}
+}
+
+.homeLogo {
+	max-width: 64px;
+	height: auto;
 }
