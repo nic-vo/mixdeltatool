@@ -5,7 +5,13 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 # Changelog
 (the commit history sucks because this started out as an experiment)
 
-## 0.11.0
+## 0.12.0
+  - Simplify some consts
+  - Add global `canvas` background and FPS limit it
+  - Modify Spotify OAuth scopes
+  - Clarify EUA language and add links
+
+### 0.11.0
   - Separate playlist lists from parent
   - Separate differ styling from adder's styling entirely
 
@@ -51,7 +57,7 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
   - Sanitize certain data
   - Cleanup route flow and error handling
 
-### 0.3.0 ???
+### 0.3.0
   - Implement timeout functionality for all routes
 
 ### 0.2.0
