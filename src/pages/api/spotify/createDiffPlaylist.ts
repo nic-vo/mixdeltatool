@@ -187,54 +187,95 @@ export default async function handler(
 
 		nextStep = printTime('Playlists fetched and empty created:', nextStep);
 
-		// Determine which diff needs to happen
-		// New set based on diff type from the other maps
-		let diffResult: Set<string>;
+		let result: Set<string> = new Set();
+		let tu: number;
+		let shared: number;
+		let du: number;
 		switch (actionType) {
 			case 'adu':
 				// Add differ uniques to target
-				diffResult = new Set(targetDetails.items.concat(differDetails.items));
+				du = differDetails.items.size;
+				result = targetDetails.items;
+				for (const uri of differDetails.items) {
+					if (result.has(uri)) du--;
+					result.add(uri);
+				}
+				part.push(`${du} tracks from the differ were added to the target.`);
 				break;
 			case 'odu':
 				// Only differ uniques
-				diffResult = new Set();
-				for (const uri of differOriginal)
-					if (targetOriginal.has(uri) === false)
-						diffResult.add(uri);
+				du = 0;
+				for (const uri of differDetails.items)
+					if (targetDetails.items.has(uri) === false) {
+						result.add(uri);
+						du++
+					}
+				part.push(`The target was replaced by ${du} unique tracks from the differ.`);
 				break;
 			case 'otu':
 				// Only target uniques
-				diffResult = new Set();
-				for (const uri of targetOriginal)
-					if (differOriginal.has(uri) === false)
-						diffResult.add(uri);
+				tu = 0;
+				for (const uri of targetDetails.items)
+					if (differDetails.items.has(uri) === false) {
+						result.add(uri);
+						tu++
+					}
+				part.push(
+					`${targetDetails.items.size - tu} shared tracks were removed from the target;`
+					+ ` ${tu} tracks remain.`);
 				break;
 			case 'bu':
-				// Both uniques
-				diffResult = new Set();
-				for (const uri of targetOriginal)
-					if (differOriginal.has(uri) === false) diffResult.add(uri);
-				for (const uri of differOriginal)
-					if (targetOriginal.has(uri) === false) diffResult.add(uri);
+				shared = 0;
+				for (const uri of targetDetails.items) {
+					if (differDetails.items.has(uri)) {
+						targetDetails.items.delete(uri);
+						differDetails.items.delete(uri);
+						shared++;
+					} else {
+						result.add(uri);
+					}
+				}
+				for (const uri of differDetails.items)
+					result.add(uri)
+				part.push(
+					`The target had ${targetDetails.items.size} unique tracks. `
+					+ `The differ had ${differDetails.items.size} unique tracks. `
+					+ `${shared} shared tracks were deleted.`
+				)
 				break;
 			case 'stu':
 				// Subtract target uniques
-				diffResult = new Set();
-				for (const uri of targetOriginal)
-					if (differOriginal.has(uri)) diffResult.add(uri);
+				for (const uri of targetDetails.items)
+					if (differDetails.items.has(uri)) {
+						targetDetails.items.delete(uri);
+						differDetails.items.delete(uri);
+						result.add(uri);
+					}
+				part.push(
+					`The target had ${targetDetails.items.size} unique tracks. `
+					+ `The differ had ${differDetails.items.size} unique tracks. `
+					+ `The target now contains ${result.size} shared tracks.`
+				)
 				break;
 		};
+
+		nextStep = printTime('Diff operation complete:', nextStep);
 
 		const addedToPlaylist = await outputAdder({
 			accessToken,
 			id: newPlaylist.id,
-			items: diffResult,
+			items: result,
 			globalTimeoutMS
 		});
 		if (addedToPlaylist.completed % addedToPlaylist.total !== 0) {
 			const { completed, total } = addedToPlaylist;
 			part.push(`New playlist has ${completed}/${total} tracks from the comparison.`);
 		}
+
+		nextStep = printTime(
+			`${addedToPlaylist.completed}/${addedToPlaylist.total} tracks added: `,
+			nextStep);
+
 		newPlaylist.tracks = addedToPlaylist.total;
 		const updatedDescription = await updateDescription({
 			accessToken,
