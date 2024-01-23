@@ -1,4 +1,4 @@
-import { Loading } from '@components/misc';
+import { LoadingForDynamic } from '@components/misc';
 import dynamic from 'next/dynamic';
 
 const PlaylistDiffer = dynamic(import('./PlaylistDiffer'), {
@@ -6,7 +6,7 @@ const PlaylistDiffer = dynamic(import('./PlaylistDiffer'), {
 		error?: Error | null,
 		pastDelay?: boolean,
 		timedOut?: boolean
-	}) => <Loading
+	}) => <LoadingForDynamic
 			error={props.error}
 			pastDelay={props.pastDelay}
 			timedOut={props.timedOut} />,
