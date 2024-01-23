@@ -8,33 +8,34 @@ export default function PlaylistOptions() {
 	const memoized = useMemo(() => {
 		return (
 			<>
-				<option value=''>Choose one</option>
-				<optgroup label='Your Playlists'>
-					{
-						userPlaylists !== null &&
-						userPlaylists.map((playlist) => {
+				<option value=''>Choose one...</option>
+				{
+					specificPlaylists.length > 0 &&
+					<optgroup label='Specific Playlists'>
+						{specificPlaylists.map((playlist) => {
 							const { id, name, owner, tracks } = playlist;
 							return (
 								<option value={id} key={id}>
-									{name} | {owner.display_name} | {tracks} tracks
+									{name} / {owner.map((user, index) => `${user.name}${index < owner.length - 1 ? ',' : ''}`)} / {tracks} tracks
 								</option>
 							)
-						})
-					}
-				</optgroup>
-				<optgroup label='Specific Playlists'>
-					{
-						specificPlaylists !== null &&
-						specificPlaylists.map((playlist) => {
-							const { id, name, owner, tracks } = playlist;
-							return (
-								<option value={id} key={id}>
-									{name} | {owner.display_name} | {tracks} tracks
-								</option>
-							)
-						})
-					}
-				</optgroup>
+						})}
+					</optgroup>
+				}
+				{
+					userPlaylists.length > 0 &&
+					<optgroup label='Your Playlists'>
+						{
+							userPlaylists.map((playlist) => {
+								const { id, name, owner, tracks } = playlist;
+								return (
+									<option value={id} key={id}>
+										{name} / {owner.map((user, index) => `${user.name}${index < owner.length - 1 ? ',' : ''}`)} / {tracks} tracks
+									</option>
+								)
+							})}
+					</optgroup>
+				}
 			</>
 		)
 	}, [userPlaylists, specificPlaylists]);
