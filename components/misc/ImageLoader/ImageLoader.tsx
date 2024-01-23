@@ -15,7 +15,6 @@ const ImageLoader = (props: { url?: string | null | undefined, alt?: string }) =
 	}
 
 	const errorHandler = () => {
-		console.log('art error')
 		setError(true);
 	}
 
