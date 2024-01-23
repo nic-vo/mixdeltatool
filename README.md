@@ -5,7 +5,21 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 # Changelog
 (the commit history sucks because this started out as an experiment)
 
-## 0.12.0
+## 0.13.0
+  -  Header
+    - Improve button styling / responsiveness
+    - Fix focus / blur issues
+  - Global
+    - Styling adjustments for `body`
+    - Some default styling for text elements
+    - Add global color palette
+    - Add global button `\[disabled\]` styling + more
+  - Make Spotify page more of a layout
+  - MongoDB
+    - Change mongoose schemas to the correct types to fix linting
+    - Add models for global status and contact form
+
+### 0.12.0
   - Simplify some consts
   - Add global `canvas` background and FPS limit it
   - Modify Spotify OAuth scopes
