@@ -1,4 +1,4 @@
-import { Loading } from '@components/misc';
+import { LoadingForDynamic } from '@components/misc';
 import dynamic from 'next/dynamic';
 
 const SpotifyMain = dynamic(() => import('./SpotifyMain'), {
@@ -6,7 +6,7 @@ const SpotifyMain = dynamic(() => import('./SpotifyMain'), {
 		error?: Error | null,
 		pastDelay?: boolean,
 		timedOut?: boolean
-	}) => <Loading
+	}) => <LoadingForDynamic
 			error={props.error}
 			pastDelay={props.pastDelay}
 			timedOut={props.timedOut} />,
