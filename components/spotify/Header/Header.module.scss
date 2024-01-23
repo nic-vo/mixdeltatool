@@ -126,18 +126,16 @@
 	border-top: 2px solid #666;
 	background-color: inherit;
 	color: inherit;
-	transition: color 0.25s, background-color 0.25s;
+	transition: color g.$easeLength, background-color g.$easeLength;
 	text-wrap: nowrap;
 	white-space: nowrap;
 
-
-	* {
-		color: inherit;
-		transition: color 0.25s;
-	}
-
 	svg {
-		flex-shrink: 1;
+		color: inherit;
+		* {
+			color: inherit;
+			transition: color 0.1s;
+		}
 	}
 
 	:not(svg) {
