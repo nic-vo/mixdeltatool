@@ -240,7 +240,7 @@ export default async function handler(
 				part.push(
 					`The target had ${targetDetails.items.size} unique tracks. `
 					+ `The differ had ${differDetails.items.size} unique tracks. `
-					+ `${shared} shared tracks were deleted.`
+					+ `${shared} shared tracks were removed.`
 				)
 				break;
 			case 'stu':
