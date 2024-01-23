@@ -1,11 +1,10 @@
-import { ObjectId } from 'mongodb';
-import mongoose, { Schema, model } from 'mongoose';
+import mongoose, { Schema, model, SchemaTypes } from 'mongoose';
 
 const userSchema = new Schema({
-	name: String,
-	email: String,
-	image: String,
-	emailVerified: Number
+	name: SchemaTypes.String,
+	email: SchemaTypes.String,
+	image: SchemaTypes.String,
+	emailVerified: SchemaTypes.Number
 });
 const UserModel = model('user',
 	userSchema,
@@ -15,11 +14,10 @@ const UserModel = model('user',
 export const User = (mongoose.models['user'] as typeof UserModel) || UserModel;
 
 const sessionSchema = new Schema({
-	sessionToken: String,
-	expires: Date,
-	userId: ObjectId
+	sessionToken: SchemaTypes.String,
+	expires: SchemaTypes.Date,
+	userId: SchemaTypes.ObjectId
 });
-
 const SessionModel = model('session',
 	sessionSchema,
 	'sessions',
@@ -28,17 +26,16 @@ const SessionModel = model('session',
 export const Session = (mongoose.models['session'] as typeof SessionModel) || SessionModel;
 
 const accountSchema = new Schema({
-	provider: String,
-	providerAccountId: String,
-	type: String,
-	access_token: String,
-	token_type: String,
-	expires_at: Number,
-	refresh_token: String,
-	scope: String,
-	userId: ObjectId
+	provider: SchemaTypes.String,
+	providerAccountId: SchemaTypes.String,
+	type: SchemaTypes.String,
+	access_token: SchemaTypes.String,
+	token_type: SchemaTypes.String,
+	expires_at: SchemaTypes.Number,
+	refresh_token: SchemaTypes.String,
+	scope: SchemaTypes.String,
+	userId: SchemaTypes.ObjectId
 });
-
 const AccountModel = model('account',
 	accountSchema,
 	'accounts',
