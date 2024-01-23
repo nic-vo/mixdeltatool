@@ -201,3 +201,20 @@
 		min-height: 20ch;
 	}
 }
+
+.caveat {
+	display: flex;
+	align-items: center;
+	gap: 0.5em;
+	border-radius: g.$rounded;
+	padding: 0.5em;
+	background-color: g.$whiteorange;
+	color: g.$black;
+
+	svg {
+		flex-shrink: 0;
+		* {
+			color: g.$pinkred
+		}
+	}
+}

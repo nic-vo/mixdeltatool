@@ -135,6 +135,7 @@ export default function DifferForm(props: {
 										autoComplete='off'
 										maxLength={120} />
 								</label>
+								<p className={local.caveat}><FaExclamationCircle /> This tool will never directly change a playlist. It will compare the two selected playlists and create a new one from that comparison.</p>
 								<button
 									disabled={userLoading
 										|| specificLoading
@@ -192,9 +193,7 @@ export default function DifferForm(props: {
 											<FaExclamationCircle />Differ {lengthComplaint}
 										</p>
 									}
-									<p><FaExclamationCircle /> This tool will never change a playlist. It will compare two playlists and create a new one from that comparison.</p>
 								</div>
-
 							</>)
 					}
 				</div>
