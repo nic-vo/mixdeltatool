@@ -5,7 +5,13 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 # Changelog
 (the commit history sucks because this started out as an experiment)
 
-## 0.15.0
+## 0.16.0
+  - API Routes
+    - Add rate limiting
+    - createDiffPlaylist
+      - Clarify return messages
+
+### 0.15.0
   - API Routes
     - Modify a few promises
     - Simplify parsers so that unnecessary keys get stripped
