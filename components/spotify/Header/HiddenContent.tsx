@@ -1,18 +1,19 @@
 import { signOut } from 'next-auth/react';
+import DeleteDialog from './deleteDialog/DeleteDialog';
 
-import look from './Header.module.scss';
-import DeleteDialog from './DeleteDialog';
+import local from './Header.module.scss';
+import { FaPowerOff } from 'react-icons/fa';
 
 const HiddenContent = () => {
 	return (
-		<section className={look.hidden}>
+		<>
 			<DeleteDialog />
 			<button
 				onClick={() => signOut()}
-				className={look.button}>
-				Sign out
+				className={local.flatButton}>
+				<FaPowerOff /> Sign out
 			</button>
-		</section>
+		</>
 	);
 }
 
