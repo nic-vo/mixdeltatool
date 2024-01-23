@@ -77,12 +77,14 @@ export default async function handler(
 
 		nextStep = printTime('Rate limit passed:', start);
 		// Validate body and body values
-		let target, differ, actionType;
+		let target, differ, actionType, newName, newDesc;
 		try {
 			const parsed = diffBodyParser.parse(req.body);
 			target = parsed.target;
 			differ = parsed.differ;
 			actionType = parsed.type;
+			newName = parsed.newName;
+			newDesc = parsed.newDesc;
 		} catch (e: any) {
 			const error = e as ZodError;
 			const map = new Map();
@@ -127,19 +129,33 @@ export default async function handler(
 			|| (Date.now() - expiresAt) < (3600 - SPOT_LOGIN_WINDOW))
 			throw new AuthError();
 
-		// Get user and create playlist
-		const userId = await userGetter({ accessToken, globalTimeoutMS });
-		const baseDescStr = SERVER_DIFF_TYPES[actionType]({ target, differ });
-		newPlaylist = await createEmptyPlaylist({
-			accessToken,
-			actionType,
-			userId,
-			baseDescStr,
-			globalTimeoutMS
-		});
+		nextStep = printTime('Auth finished:', nextStep);
+
+		const targetTemp = target.owner.length;
+		const differTemp = differ.owner.length;
+
+		const baseDescStr = newDesc !== null ?
+			sanitize(newDesc) : SERVER_DIFF_TYPES({
+				actionType, target:
+				{
+					name: target.name,
+					owner: target.owner.reduce((str, current, index) => {
+						let newstr = str + `${current.name}${index < targetTemp - 1 ? ', ' : ''}`;
+						return newstr;
+					}, '')
+				}, differ: {
+					name: differ.name,
+					owner: differ.owner.reduce((str, current, index) => {
+						let newstr = str + `${current.name}${index < differTemp - 1 ? ', ' : ''}`;
+						return newstr;
+					}, '')
+				}
+			});
+
+		newName = newName === null ? null : sanitize(newName);
 
 		// Each one has 5 second timeout
-		const [targetDetails, differDetails] = await Promise.all([
+		const [targetDetails, differDetails, emptyPlaylist] = await Promise.all([
 			playlistGetter({
 				accessToken,
 				type: target.type,
@@ -151,19 +167,25 @@ export default async function handler(
 				type: differ.type,
 				id: differ.id,
 				globalTimeoutMS
+			}),
+			createEmptyPlaylist({
+				accessToken,
+				baseDescStr,
+				globalTimeoutMS,
+				newName
 			})
 		]);
-		if (targetDetails.completed % targetDetails.total !== 0) {
+		if (targetDetails.completed !== targetDetails.total) {
 			const { completed, total } = targetDetails;
-			part.push(`Spotify returned ${completed}/${total} tracks for the target.`);
+			part.push(`Spotify returned only ${completed}/${total} tracks for the target.`);
 		}
-		if (differDetails.completed % differDetails.total !== 0) {
+		if (differDetails.completed !== differDetails.total) {
 			const { completed, total } = differDetails;
-			part.push(`Spotify returned ${completed}/${total} tracks for the differ.`);
+			part.push(`Spotify returned only ${completed}/${total} tracks for the differ.`);
 		}
-		// Five sets: two originals, one for similarities, both uniques
-		const targetOriginal = new Set(targetDetails.items);
-		const differOriginal = new Set(differDetails.items);
+		newPlaylist = emptyPlaylist;
+
+		nextStep = printTime('Playlists fetched and empty created:', nextStep);
 
 		// Determine which diff needs to happen
 		// New set based on diff type from the other maps
