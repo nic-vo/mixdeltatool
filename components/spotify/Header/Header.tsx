@@ -1,10 +1,12 @@
-import { useState } from 'react';
-import { FaBars, FaHome, FaHourglassHalf } from 'react-icons/fa';
-
-import look from './Header.module.scss';
-import { signIn, useSession } from 'next-auth/react';
 import dynamic from 'next/dynamic';
-import { Loading } from '@components/misc';
+import { useState } from 'react';
+import { signIn, useSession } from 'next-auth/react';
+import { LogoToAnimate, LoadingForDynamic } from '@components/misc';
+import { FaBars, FaHourglassHalf } from 'react-icons/fa';
+import ImageLoader from '@components/misc/ImageLoader/ImageLoader';
+
+import local from './Header.module.scss';
+import global from '@styles/globals.module.scss';
 
 const Hidden = dynamic(import('./HiddenContent'),
 	{
@@ -13,7 +15,7 @@ const Hidden = dynamic(import('./HiddenContent'),
 			error?: Error | null,
 			pastDelay?: boolean,
 			timedOut?: boolean
-		}) => <Loading
+		}) => <LoadingForDynamic
 				error={props.error}
 				pastDelay={props.pastDelay}
 				timedOut={props.timedOut} />
@@ -45,7 +47,9 @@ const Content = () => {
 					)
 				}
 			</section>
-			{status === 'authenticated' ? <Hidden /> : <FaHourglassHalf />}
+			<section className={local.hidden}>
+				{status === 'authenticated' ? <Hidden /> : <FaHourglassHalf />}
+			</section>
 		</>
 	);
 }
