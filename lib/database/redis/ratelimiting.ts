@@ -72,7 +72,6 @@ const checkAndUpdateEntry = async (params: {
 			printTime('Awaited new rate limit:', start);
 		}
 	} catch (e: any) {
-		console.log(e)
 		throw new CustomError(500, 'Internal error');
 	}
 	return returner;

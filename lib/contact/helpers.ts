@@ -32,9 +32,6 @@ export const hCaptchaPromise = async (token: string): Promise<null> => {
 		}
 		if (response === undefined) return rej(new CustomError(500, 'Internal error.'));
 		const jsoned = await response.json();
-		console.log(jsoned);
-
-		console.log('captcha success', jsoned.success);
 		if (!jsoned.success) return rej(new MalformedError());
 		return res(null);
 	});
