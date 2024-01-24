@@ -5,7 +5,10 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 # Changelog
 (the commit history sucks because this started out as an experiment)
 
-## 0.18.0
+## 0.19.0
+  - Switch routers to buttons just in case of accessibility
+
+### 0.18.0
   - Disable specific ESLint stuff
   - Fix privacy policy copy
 

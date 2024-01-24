@@ -16,16 +16,14 @@ const SpotifyRouter = () => {
 
 	return (
 		<>
-			<h1 className={local.heading}>
-				<a
-					href='#'
+			<div className={local.router}>
+				<button
 					onClick={() => setOnAdder(true)}
-					className={leftClasser}>Add.</a>
-				<a
-					href='#'
+					className={leftClasser}>Add.</button>
+				<button
 					onClick={() => setOnAdder(false)}
-					className={rightClasser}>Diff.</a>
-			</h1>
+					className={rightClasser}>Diff.</button>
+			</div>
 			{onAdder ? <PlaylistAdder /> : <PlaylistDiffer />}
 		</>
 	);

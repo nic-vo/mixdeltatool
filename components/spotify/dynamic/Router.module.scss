@@ -1,6 +1,6 @@
 @use '@styles/globals.module.scss' as g;
 
-.heading {
+.router {
 	margin-top: 5svh;
 	display: flex;
 	justify-content: center;
@@ -43,7 +43,6 @@ $routerBorderWidth: 2px;
 	border-bottom-right-radius: g.$rounded;
 	border-left-width: calc(0.5*$routerBorderWidth);
 	border-left-width: 0;
-	margin-right: 0.2em;
 }
 
 .leftButton {
