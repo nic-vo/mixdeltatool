@@ -17,7 +17,7 @@ export default async function handler(
 	if (obfus !== process.env.NEXT_PUBLIC_GLOBAL_STATUS_UPDATE_ROUTE)
 		return res.status(404).json({ message: 'Route not found' });
 	if (req.headers.authorization === undefined)
-		return res.status(404).json({ message: 'Thing was undefined' });
+		return res.status(404).json(JSON.stringify(req.headers));
 	if (req.headers.authorization !== process.env.NEXT_PUBLIC_GLOBAL_STATUS_UPDATE_SECRET)
 		return res.status(404).json({ message: 'Thing not found' });
 
