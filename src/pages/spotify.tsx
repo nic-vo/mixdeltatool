@@ -42,8 +42,5 @@ export default function Spotify(props: {
 
 export async function getStaticProps() {
 	const globalStatus = await GlobalStatusUpdater();
-	return {
-		props: { ...globalStatus },
-		revalidate: 300
-	};
+	return { props: { ...globalStatus } };
 }
