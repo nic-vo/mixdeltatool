@@ -17,7 +17,7 @@ export default async function handler(
 	if (obfus !== process.env.NEXT_PUBLIC_GLOBAL_STATUS_UPDATE_ROUTE)
 		return res.status(404).json({ message: 'Not found' });
 
-	const { status, statusType, token } = JSON.parse(req.body);
+	const { status, statusType, token } = req.body;
 	if (!token || token !== process.env.NEXT_PUBLIC_GLOBAL_STATUS_UPDATE_SECRET)
 		return res.status(404).json({ message: 'Not found' });
 	if (!status || !statusType)
