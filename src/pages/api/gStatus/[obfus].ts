@@ -43,6 +43,12 @@ export default async function handler(
 		} catch {
 			throw new FetchError('There was an error creating a new status');
 		}
+
+		try {
+			await Promise.all([res.revalidate('/'), res.revalidate('/spotify')]);
+		} catch {
+			throw new CustomError(500, 'There was an error pushing status to the page');
+		}
 	} catch (e: any) {
 		return res.status(e.status || 500)
 			.json({ message: e.message || 'Unknown error' });
