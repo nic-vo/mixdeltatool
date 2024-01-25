@@ -16,6 +16,9 @@ export default async function handler(
 		return res.status(404).json({ message: 'Method not found' });
 	if (obfus !== process.env.NEXT_PUBLIC_GLOBAL_STATUS_UPDATE_ROUTE)
 		return res.status(404).json({ message: 'Route not found' });
+	if (req.headers.authorization === undefined
+		|| process.env.NEXT_PUBLIC_GLOBAL_STATUS_UDPATE_SECRET === undefined)
+		return res.status(404).json({ message: 'Thing was undefined' });
 	if (req.headers.authorization !== process.env.NEXT_PUBLIC_GLOBAL_STATUS_UPDATE_SECRET)
 		return res.status(404).json({ message: 'Thing not found' });
 
