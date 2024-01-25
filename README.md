@@ -5,7 +5,14 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 # Changelog
 (the commit history sucks because this started out as an experiment)
 
-## 0.19.0
+## 0.20.1
+  - Move homepage revalidation to correct location
+
+### 0.20.0
+  - Simplify route names
+  - Reduce rate limiting boilerplate
+
+### 0.19.0
   - Switch routers to buttons just in case of accessibility
 
 ### 0.18.0

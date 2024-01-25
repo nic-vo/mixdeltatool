@@ -43,12 +43,6 @@ export default async function handler(
 		} catch {
 			throw new FetchError('There was an error creating a new status');
 		}
-
-		try {
-			await res.revalidate('/')
-		} catch {
-			throw new CustomError(500, 'There was an error pushing status to the page');
-		}
 	} catch (e: any) {
 		return res.status(e.status || 500)
 			.json({ message: e.message || 'Unknown error' });

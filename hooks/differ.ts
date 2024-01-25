@@ -112,7 +112,7 @@ const useDifferForm = () => {
 		const newDesc = typeof (rawDesc) === 'string' && rawDesc !== '' ? sanitize(rawDesc.toString()) : null;
 
 		try {
-			const raw = await fetch('/api/spotify/createDiffPlaylist', {
+			const raw = await fetch('/api/spotify/create', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'

@@ -4,17 +4,31 @@ import {
 	hCaptchaPromise
 } from '@lib/contact/helpers';
 import { contactBodyParser } from '@lib/contact/validators';
+import { checkAndUpdateEntry } from '@lib/database/redis/ratelimiting';
 
-import { CustomError, ForbiddenError, MalformedError } from '@lib/errors';
+import { CustomError, ForbiddenError, MalformedError, RateError } from '@lib/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
+
+const RATE_LIMIT_PREFIX = 'SCF';
+const RATE_LIMIT_ROLLING_LIMIT = 5;
+const RATE_LIMIT_DECAY_SECONDS = 30;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 	try {
-		const ip = req.headers['x-forwarded-for'] as string;
-		if (!ip) throw new CustomError(500, 'Internal error');
+		const forHeader = req.headers['x-forwarded-for'];
+		if (!forHeader)
+			throw new CustomError(500, 'Internal Error');
+		const ip = Array.isArray(forHeader) ? forHeader[0] : forHeader;
+		const rateLimit = await checkAndUpdateEntry({
+			ip,
+			prefix: RATE_LIMIT_PREFIX,
+			rollingLimit: RATE_LIMIT_ROLLING_LIMIT,
+			rollingDecaySeconds: RATE_LIMIT_DECAY_SECONDS
+		});
+		if (rateLimit !== null)
+			throw new RateError(rateLimit);
 
 		let body;
-
 		try {
 			body = contactBodyParser.parse(JSON.parse(req.body));
 		} catch (e: any) {

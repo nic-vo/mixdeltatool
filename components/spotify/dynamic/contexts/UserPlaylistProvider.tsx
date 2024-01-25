@@ -51,7 +51,7 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 		try {
 			// If either 50th page of results or no next, cancel
 			if (page === null) throw { message: 'No more' };
-			const raw = await fetch(`/api/spotify/getUserPlaylists?page=${page}`);
+			const raw = await fetch(`/api/spotify/getUser?page=${page}`);
 			if (raw.status === 401) signIn();
 			if (raw.ok === false) {
 				const jsoned = await raw.json();
