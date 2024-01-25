@@ -46,7 +46,7 @@ export default async function handler(
 
 	try {
 		if (req.method !== 'GET') throw new ReqMethodError('GET');
-
+		console.log(req.socket.remoteAddress);
 		if (!req.headers['x-forwarded-for'])
 			throw new CustomError(500, 'Internal Error');
 		const rateLimitCheckSeconds = await checkAndUpdateEntry({
