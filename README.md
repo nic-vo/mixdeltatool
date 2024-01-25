@@ -3,9 +3,11 @@ Welcome! For now this is a Spotify-only tool and it'll probably remain that way 
 This will essentially be a glorified playlist cleanup / diffing / combining tool.
 
 # Changelog
-(the commit history sucks because this started out as an experiment)
 
-## 0.20.1
+## 0.20.2
+  - Address CORS issues with page revalidation
+
+### 0.20.1
   - Move homepage revalidation to correct location
 
 ### 0.20.0
