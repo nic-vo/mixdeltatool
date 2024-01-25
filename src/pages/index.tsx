@@ -41,5 +41,8 @@ export default function Home(props: {
 
 export async function getStaticProps() {
 	const globalStatus = await GlobalStatusUpdater();
-	return { props: { ...globalStatus } };
+	return {
+		props: { ...globalStatus },
+		revalidate: 300
+	};
 }
