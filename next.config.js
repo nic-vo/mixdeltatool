@@ -11,7 +11,7 @@ const nextConfig = {
 					{ key: 'Access-Control-Allow-Credentials', value: 'true' },
 					{ key: 'Access-Control-Allow-Origin', value: '*' },
 					{ key: 'Access-Control-Allow-Methods', value: 'OPTIONS,POST' },
-					{ key: 'Access-Control-Allow-Headers', value: 'Accept, Accept-Version, Content-Length, Content-Type, Date, Authorization, Accept-Encoding' },
+					{ key: 'Access-Control-Allow-Headers', value: 'Accept, Accept-Version, Content-Length, Content-Type, Date, Accept-Encoding' },
 				]
 			}
 		]
