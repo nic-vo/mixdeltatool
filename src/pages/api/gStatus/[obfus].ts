@@ -13,11 +13,11 @@ export default async function handler(
 	if (req.method === 'OPTIONS')
 		return res.status(200).end();
 	if (req.method !== 'POST')
-		return res.status(404).json({ message: 'Not found' });
+		return res.status(404).json({ message: 'Method not found' });
 	if (obfus !== process.env.NEXT_PUBLIC_GLOBAL_STATUS_UPDATE_ROUTE)
 		return res.status(404).json({ message: 'Route not found' });
 	if (req.headers.authorization !== process.env.NEXT_PUBLIC_GLOBAL_STATUS_UPDATE_SECRET)
-		return res.status(404).json({ message: 'Not found' });
+		return res.status(404).json({ message: 'Thing not found' });
 
 	const { status, statusType } = JSON.parse(req.body);
 	if (!status || !statusType)
