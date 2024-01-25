@@ -10,6 +10,8 @@ export default async function handler(
 	res: NextApiResponse
 ) {
 	const { obfus } = req.query;
+	if (req.method === 'OPTIONS')
+		return res.status(200).end();
 	if (req.method !== 'POST')
 		return res.status(404).json({ message: 'Not found' });
 	if (obfus !== process.env.NEXT_PUBLIC_GLOBAL_STATUS_UPDATE_ROUTE)
