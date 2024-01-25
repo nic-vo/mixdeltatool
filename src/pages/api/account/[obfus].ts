@@ -1,11 +1,15 @@
 import { getServerSession } from 'next-auth';
-
-import { authOptions } from '@lib/auth/options';
-import { AuthError } from '@lib/errors';
-
-import { NextApiRequest, NextApiResponse } from 'next';
 import { sessionDeleter, userDeleter } from '@lib/auth/accountDeletion';
+import { authOptions } from '@lib/auth/options';
+import { checkAndUpdateEntry } from '@lib/database/redis/ratelimiting';
+
+import { AuthError, CustomError, RateError } from '@lib/errors';
+import { NextApiRequest, NextApiResponse } from 'next';
 import { AUTH_WINDOW, GLOBAL_EXECUTION_WINDOW } from '@consts/spotify';
+
+const RATE_LIMIT_PREFIX = 'DUA';
+const RATE_LIMIT_ROLLING_LIMIT = 10;
+const RATE_LIMIT_DECAY_SECONDS = 10;
 
 export default async function handler(
 	req: NextApiRequest,
@@ -26,11 +30,24 @@ export default async function handler(
 		return res.status(504).json({ message: 'Server timed out' });
 	}, AUTH_WINDOW);
 
-	let session;
+	let session, ratelimit;
 	try {
-		session = await getServerSession(req, res, authOptions);
-		clearTimeout(authTimeout);
+		const forHeader = req.headers['x-forwarded-for'];
+		const ip = Array.isArray(forHeader) ? forHeader[0] : forHeader;
+		if (!ip)
+			throw new CustomError(500, 'Internal Error');
+		[session, ratelimit] = await Promise.all([
+			getServerSession(req, res, authOptions),
+			checkAndUpdateEntry({
+				ip,
+				prefix: RATE_LIMIT_PREFIX,
+				rollingDecaySeconds: RATE_LIMIT_DECAY_SECONDS,
+				rollingLimit: RATE_LIMIT_ROLLING_LIMIT
+			})
+		]);
+		if (ratelimit !== null) throw new RateError(ratelimit);
 		if (session === null || session === undefined) throw new AuthError();
+		clearTimeout(authTimeout);
 		await userDeleter(session.user.id);
 		clearTimeout(globalTimeout)
 		res.status(200).json({ message: 'Success' });
@@ -38,6 +55,7 @@ export default async function handler(
 	} catch (e: any) {
 		clearTimeout(authTimeout);
 		clearTimeout(globalTimeout);
+		if (e.status === 429) res.setHeader('Retry-After', e.retryTime);
 		return res.status(e.status ? e.status : 500)
 			.json({ message: e.message ? e.message : 'Unknown error' });
 	}

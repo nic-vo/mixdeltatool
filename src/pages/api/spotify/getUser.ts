@@ -46,18 +46,19 @@ export default async function handler(
 
 	try {
 		if (req.method !== 'GET') throw new ReqMethodError('GET');
-		console.log(req.socket.remoteAddress);
-		if (!req.headers['x-forwarded-for'])
+		const forHeader = req.headers['x-forwarded-for'];
+		if (!forHeader)
 			throw new CustomError(500, 'Internal Error');
-		const rateLimitCheckSeconds = await checkAndUpdateEntry({
-			ip: req.headers['x-forwarded-for'] as string,
+		const ip = Array.isArray(forHeader) ? forHeader[0] : forHeader;
+		const rateLimit = await checkAndUpdateEntry({
+			ip,
 			prefix: RATE_LIMIT_PREFIX,
 			rollingLimit: RATE_LIMIT_ROLLING_LIMIT,
 			rollingDecaySeconds: RATE_LIMIT_DECAY_SECONDS
 		});
 
-		if (rateLimitCheckSeconds !== null)
-			throw new RateError(rateLimitCheckSeconds);
+		if (rateLimit !== null)
+			throw new RateError(rateLimit);
 		// Validate req method
 		// Initialize page var and validate query parameters
 
