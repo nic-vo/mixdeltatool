@@ -4,7 +4,10 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 
 # Changelog
 
-## 0.20.2
+## 0.20.3
+  - Fix serverside sanitization issue
+
+### 0.20.2
   - Address CORS issues with page revalidation
 
 ### 0.20.1
