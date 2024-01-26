@@ -2,7 +2,6 @@ import { useContext, useEffect, useState } from 'react';
 import { UserPlaylistContext } from '@components/spotify/dynamic/contexts/UserPlaylistProvider';
 import { SpecificPlaylistContext } from '@components/spotify/dynamic/contexts/SpecificPlaylistProvider';
 import { signIn } from 'next-auth/react';
-import { sanitize } from 'dompurify';
 
 import { ActionType, MyPlaylistObject, differRouteResponse } from '@components/spotify/types';
 import { CLIENT_DIFF_TYPES } from '@consts/spotify';
@@ -107,9 +106,9 @@ const useDifferForm = () => {
 		setError(null);
 		const form = new FormData(e.target as HTMLFormElement);
 		let rawName = form.get('name');
-		const newName = typeof (rawName) === 'string' && rawName !== '' ? sanitize(rawName) : null;
+		const newName = typeof (rawName) === 'string' && rawName !== '' ? rawName : null;
 		let rawDesc = form.get('desc');
-		const newDesc = typeof (rawDesc) === 'string' && rawDesc !== '' ? sanitize(rawDesc.toString()) : null;
+		const newDesc = typeof (rawDesc) === 'string' && rawDesc !== '' ? rawDesc : null;
 
 		try {
 			const raw = await fetch('/api/spotify/create', {

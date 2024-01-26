@@ -1,6 +1,6 @@
 {
   "name": "superuser-actions",
-  "version": "0.20.2",
+  "version": "0.20.3",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "@next-auth/mongodb-adapter": "^1",
-    "@upstash/redis": "^1.28.1",
-    "dompurify": "^3",
+    "@upstash/redis": "^1",
+    "isomorphic-dompurify": "^2",
     "mongodb": "^5",
     "mongoose": "^8",
     "next": "^13",
@@ -24,7 +24,6 @@
     "zod": "^3"
   },
   "devDependencies": {
-    "@types/dompurify": "^3",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
