@@ -10,8 +10,11 @@ export default function LoadingForDynamic(props: {
 		|| pastDelay === true
 		|| timedOut === true) return <h1>Please refresh page.</h1>;
 	return (
-		<div style={{height:'20svh', maxWidth: '50%'}}>
-			<h1 style={{ alignSelf: 'center' }}>
+		<div style={{ maxWidth: '50%', margin: 'auto' }}>
+			<h1 style={{
+				alignSelf: 'center',
+				textAlign: 'center'
+			}}>
 				<ImageLoadingLogo /> Loading...
 			</h1>
 		</div>
