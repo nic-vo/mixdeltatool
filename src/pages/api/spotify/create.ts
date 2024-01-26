@@ -9,7 +9,7 @@ import {
 import { diffBodyParser } from '@lib/spotify/validators';
 import { printTime } from '@lib/misc';
 import { checkAndUpdateEntry } from '@lib/database/redis/ratelimiting';
-import { sanitize } from 'dompurify';
+import { sanitize } from 'isomorphic-dompurify';
 
 import {
 	AUTH_WINDOW,
