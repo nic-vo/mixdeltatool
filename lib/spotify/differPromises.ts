@@ -1,4 +1,4 @@
-import { APP_NAME, SPOT_URL_BASE } from '@consts/spotify';
+import { SPOT_URL_BASE } from '@consts/spotify';
 import { localTimeout, userGetter } from './commonPromises';
 import { spotPlaylistObjectParser } from './validators';
 import { printTime } from '@lib/misc';
@@ -69,7 +69,7 @@ const createEmptyPlaylist = async (args: {
 							headers,
 							method: 'POST',
 							body: JSON.stringify({
-								name: `${APP_NAME} - ${newName !== null ? newName : genUId(4)}`,
+								name: `MixDelta - ${newName !== null ? newName : genUId(4)}`,
 								description: baseDescStr,
 								public: false
 							})

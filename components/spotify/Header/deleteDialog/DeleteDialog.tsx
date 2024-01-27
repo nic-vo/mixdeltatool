@@ -50,7 +50,7 @@ const DeleteDialog = () => {
 			{
 				toggle && (
 					<dialog ref={modalRef} className={local.dialog}>
-						<p>This form will delete only your account and session data from {APP_NAME}. It won&apos;t affect any playlists you&apos;ve already created with the tool. After using this tool, visit <a href='https://accounts.spotify.com' target='_blank' style={{ textDecoration: 'underline' }}>accounts.spotify.com</a> to disconnect {APP_NAME} from your Spotify account.</p>
+						<p>This form will delete only your account and session data from MixDelta. It won&apos;t affect any playlists you&apos;ve already created with the tool. After using this tool, visit <a href='https://accounts.spotify.com' target='_blank' style={{ textDecoration: 'underline' }}>accounts.spotify.com</a> to disconnect MixDelta from your Spotify account.</p>
 						<form
 							onSubmit={submitHandler}
 							className={form.form}

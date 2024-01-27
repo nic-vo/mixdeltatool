@@ -37,7 +37,7 @@ export default function SpotifyFrame(props: {
 				style={{minWidth: '24ch', gap: '0.5em'}}>
 				<img
 					src={MixDeltaLogo.src}
-					alt='Click on this MixDelta logo to return to the homepage'
+					alt='Click to return to the homepage'
 					style={{
 						maxHeight: '64px',
 					}} />

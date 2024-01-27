@@ -5,8 +5,6 @@ import {
 	useRef
 } from 'react';
 
-import { APP_NAME } from '@consts/spotify';
-
 import local from './SpotEUA.module.scss';
 import global from '@styles/globals.module.scss';
 
@@ -55,11 +53,11 @@ const SpotEUA = (props: {
 	if (accepted !== true) return (
 		<dialog ref={dialogRef} className={local.dialog}>
 			<form onSubmit={formSubmit} className={local.form}>
-				<h2 className={local.h2}>{APP_NAME} End User Agreement</h2>
+				<h2 className={local.h2}>MixDelta End User Agreement</h2>
 				<div className={local.textContainer}>
-					<p>Last updated: {UPDATED}</p>
+					<p>Effective: January 26, 2024</p>
 					<p>
-						This End User Agreement (&quot;Agreement&quot;) is entered into between you (&quot;User&quot; or &quot;you&quot;) and the developer (&quot;Developer&quot;) of the web app &quot;{APP_NAME}&quot; (&quot;Application&quot; or &quot;App&quot;). This Agreement governs your use of the App and any related services provided by the Developer.
+						This End User Agreement (&quot;Agreement&quot;) is entered into between you (&quot;User&quot; or &quot;you&quot;) and the developer (&quot;Developer&quot;) of the web app &quot;MixDelta&quot; (&quot;Application&quot; or &quot;App&quot;). This Agreement governs your use of the App and any related services provided by the Developer.
 					</p>
 					<ol className={local.list}>
 						<li>
@@ -182,7 +180,7 @@ const SpotEUA = (props: {
 										<li>
 											<h4>Modification of Content</h4>
 											<p>
-												The User acknowledges that the Developer reserves the right to modify, suspend, or discontinue {APP_NAME}, and shall not be liable for any modification, suspension, or discontinuation of the App.
+												The User acknowledges that the Developer reserves the right to modify, suspend, or discontinue MixDelta, and shall not be liable for any modification, suspension, or discontinuation of the App.
 											</p>
 										</li>
 										<li>
@@ -228,7 +226,7 @@ const SpotEUA = (props: {
 									<p>Any breach of this Agreement by the User.</p>
 								</li>
 								<li>
-									<h4>Misuse of {APP_NAME}</h4>
+									<h4>Misuse of MixDelta</h4>
 									<p>
 										Any misuse or abuse of the App by the User that results in harm, damages, or legal consequences.
 									</p>
@@ -259,7 +257,7 @@ const SpotEUA = (props: {
 						</li>
 					</ol>
 				</div>
-				<p className={local.ppLink}>{APP_NAME}&apos;s <a href='/privacypolicy'>privacy policy.</a></p>
+				<p className={local.ppLink}>MixDelta&apos;s <a href='/privacypolicy'>privacy policy.</a></p>
 				<label htmlFor='check'>
 					<input type='checkbox' name='check' id='check' required />
 					I have read, understood, and agreed to these terms and conditions as well as the terms and conditions set forth by the privacy policy.

@@ -3,8 +3,6 @@ import { GlobalStatusUpdater } from '@lib/misc';
 import Head from 'next/head';
 import { FaArrowCircleRight } from 'react-icons/fa';
 
-import { APP_NAME, MAIN_DESC, MAIN_TITLE } from '@consts/spotify';
-
 import local from '@styles/Home.module.scss';
 import global from '@styles/globals.module.scss';
 
@@ -16,12 +14,12 @@ export default function Home(props: {
 	return (
 		<>
 			<Head>
-				<title>{MAIN_TITLE}</title>
-				<meta name='description' content={MAIN_DESC} />
+				<title>Compare Spotify playlists and make bulk changes | MixDelta</title>
+				<meta name='description' content='A tool for Spotify users to compare playlists and edit them based on the comparisons.' />
 			</Head>
 
 			<main className={local.main}>
-				<h1 className={local.heading}>Welcome to the {APP_NAME} tool for Spotify!</h1>
+				<h1 className={local.heading}>Welcome to the MixDelta tool for Spotify!</h1>
 				<a href='/spotify' className={global.emptyButton.concat(' ', local.toolLink)}>To the tool! <FaArrowCircleRight /></a>
 				<ServiceStatus {...props} />
 				<section className={local.description}>

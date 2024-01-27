@@ -48,9 +48,6 @@ export function SERVER_DIFF_TYPES(params: {
 };
 
 export const SPOT_URL_BASE = 'https://api.spotify.com/v1/';
-export const APP_NAME = 'MixDelta';
-export const MAIN_TITLE = `Compare Spotify playlists and make bulk changes | ${APP_NAME}`;
-export const MAIN_DESC = 'A tool for Spotify users to compare playlists and edit them based on the comparisons.';
 
 export {
 	MixDeltaLogo,

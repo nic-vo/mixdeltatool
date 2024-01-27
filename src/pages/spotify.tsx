@@ -14,8 +14,8 @@ export default function Spotify(props: {
 	return (
 		<>
 			<Head>
-				<title>{MAIN_TITLE}</title>
-				<meta name='description' content={MAIN_DESC} />
+				<title>Compare Spotify playlists and make bulk changes | MixDelta</title>
+				<meta name='description' content='A tool for Spotify users to compare playlists and edit them based on the comparisons.' />
 			</Head>
 
 			<AuthProvider>
