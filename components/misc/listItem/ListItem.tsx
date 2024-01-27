@@ -10,12 +10,12 @@ const ListItem = (props: { playlist: MyPlaylistObject }) => {
 
 	return (
 		<div className={local.item}>
-			<h3 className={local.name}>
+			<p className={local.name}>
 				<a
 					href={`https://open.spotify.com/playlist/${id}`}
 					target='_blank'
 					className={local.link}>{name} <FaExternalLinkAlt /></a>
-			</h3>
+			</p>
 			<div className={local.thumb}>
 				<ImageLoader url={image ? image.url : null} alt={`${name}'s album art`} />
 			</div>
