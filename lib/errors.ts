@@ -50,7 +50,7 @@ class RateError extends Error {
 	constructor(retryTime: number) {
 		super();
 		this.status = 429;
-		this.message = `Servers under load. Try again in a few minutes`;
+		this.message = `Busy. Try again in a few minutes`;
 		this.retryTime = retryTime;
 	}
 }
