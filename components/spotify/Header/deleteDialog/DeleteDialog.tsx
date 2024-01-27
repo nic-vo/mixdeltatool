@@ -5,7 +5,6 @@ import local from './DeleteDialog.module.scss';
 import form from '@components/spotify/dynamic/playlistDiffer/differForm/DifferForm.module.scss'
 import parent from '../Header.module.scss';
 import global from '@styles/globals.module.scss';
-import { APP_NAME } from '@consts/spotify';
 import { FaExclamationTriangle } from 'react-icons/fa';
 
 const DeleteDialog = () => {
@@ -23,7 +22,7 @@ const DeleteDialog = () => {
 	const submitHandler = async (e: React.FormEvent) => {
 		e.preventDefault();
 		const data = new FormData(e.target as HTMLFormElement);
-		if (data.get('confirmation') !== APP_NAME.toLowerCase()) {
+		if (data.get('confirmation') !== 'mixdelta') {
 			setError('Try again');
 			return null;
 		}
@@ -57,7 +56,7 @@ const DeleteDialog = () => {
 							style={{ margin: '1rem auto' }}>
 							<label htmlFor='confirmation' className={form.label}>
 								To proceed with deletion,
-								type &quot;{APP_NAME.toLowerCase()}&quot; and press confirm.
+								type &quot;mixdelta&quot; and press confirm.
 								<input
 									name='confirmation'
 									id='confirmation'
@@ -65,7 +64,7 @@ const DeleteDialog = () => {
 									required
 									autoComplete='off'
 									disabled={loading || success === true}
-									pattern={APP_NAME.toLowerCase()} />
+									pattern='mixdelta' />
 							</label>
 							<button
 								type='button'
