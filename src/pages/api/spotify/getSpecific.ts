@@ -42,19 +42,26 @@ export default async function handler(
 	try {
 		// Validate req method
 		if (req.method !== 'GET') throw new ReqMethodError('GET');
-		const forHeader = req.headers['x-forwarded-for'];
-		if (!forHeader)
-			throw new CustomError(500, 'Internal Error');
-		const ip = Array.isArray(forHeader) ? forHeader[0] : forHeader;
-		const rateLimit = await checkAndUpdateEntry({
-			ip,
-			prefix: RATE_LIMIT_PREFIX,
-			rollingLimit: RATE_LIMIT_ROLLING_LIMIT,
-			rollingDecaySeconds: RATE_LIMIT_DECAY_SECONDS
-		});
 
-		if (rateLimit !== null)
-			throw new RateError(rateLimit);
+		/*
+			***
+			Hopefully this is a low-impact route that doesn't require rate-limiting;
+			if it does, will uncomment
+			***
+		*/
+
+		// const forHeader = req.headers['x-forwarded-for'];
+		// if (!forHeader)
+		// 	throw new CustomError(500, 'Internal Error');
+		// const ip = Array.isArray(forHeader) ? forHeader[0] : forHeader;
+		// const rateLimit = await checkAndUpdateEntry({
+		// 	ip,
+		// 	prefix: RATE_LIMIT_PREFIX,
+		// 	rollingLimit: RATE_LIMIT_ROLLING_LIMIT,
+		// 	rollingDecaySeconds: RATE_LIMIT_DECAY_SECONDS
+		// });
+		// if (rateLimit !== null)
+		// 	throw new RateError(rateLimit);
 
 		// Validate query parameters
 		let id, type;
