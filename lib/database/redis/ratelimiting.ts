@@ -4,12 +4,20 @@ import { printTime } from '@lib/misc';
 
 const createEntry = async (params: {
 	prefix: string,
-	ip: string
+	ip: string,
+	rollingLimit: number,
+	rollingDecaySeconds: number
 }) => {
-	const { prefix, ip } = params;
+	const {
+		prefix,
+		ip,
+		rollingLimit,
+		rollingDecaySeconds
+	} = params;
 	try {
 		await redisClient.set(`${prefix}-${ip}`,
 			`1 ${Math.ceil(Date.now() / 1000)}`,
+			{ ex: (rollingLimit * rollingDecaySeconds * 5) }
 		);
 	} catch {
 		throw new CustomError(500, 'Create error');
@@ -53,7 +61,12 @@ const checkAndUpdateEntry = async (params: {
 		const current = await redisClient.get(`${prefix}-${ip}`) as string | null;
 		printTime('First rate limit get:', start);
 		if (current === null) {
-			await createEntry({ prefix, ip });
+			await createEntry({
+				prefix,
+				ip,
+				rollingDecaySeconds,
+				rollingLimit
+			});
 			printTime('Created new rate limit:', start);
 			return returner;
 		} else {
@@ -67,7 +80,8 @@ const checkAndUpdateEntry = async (params: {
 			}
 			await redisClient.set(`${prefix}-${ip}`, `${newHistory} ${now}`,
 				{
-					ex: (newHistory * rollingDecaySeconds) + rollingDecaySeconds
+					ex: (newHistory * rollingDecaySeconds)
+						+ (2 * rollingDecaySeconds * rollingLimit)
 				});
 			printTime('Awaited new rate limit:', start);
 		}

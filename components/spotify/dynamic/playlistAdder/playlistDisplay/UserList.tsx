@@ -22,8 +22,8 @@ export default function UserList() {
 	return (
 		<ul className={local.list}>
 			{memo.map(playlist => (
-				<li>
-					<ListItem key={playlist.id} playlist={playlist} />
+				<li key={playlist.id} >
+					<ListItem playlist={playlist} />
 				</li>
 			)
 			)}

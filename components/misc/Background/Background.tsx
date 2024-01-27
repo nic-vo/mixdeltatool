@@ -21,7 +21,7 @@ const Background = () => {
 		init: FieldsInitValues[]
 	}) => {
 		const { ctx, startTime, init } = args;
-		ctx.globalCompositeOperation = 'screen';
+		ctx.globalCompositeOperation = 'hard-light';
 		for (const square of init) {
 			const frameTime = Date.now();
 			const { posX, predrawY, hue, size, period, totalY } = square;

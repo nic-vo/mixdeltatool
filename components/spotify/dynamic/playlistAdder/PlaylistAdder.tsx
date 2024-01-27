@@ -25,16 +25,18 @@ export default function PlaylistAdder() {
 
 	return (
 		<section className={local.container}>
-			<h1 className={local.heading}>Retrieve playlists:</h1>
+			<h1 className={local.heading}>Which playlists?</h1>
 			<div className={local.router}>
 				<button
 					tabIndex={0}
 					onClick={() => setOnUser(false)}
-					className={leftClasser}>Specific</button>
+					className={leftClasser}>Specific{!onUser && ' playlists'}</button>
 				<button
 					tabIndex={0}
 					onClick={() => setOnUser(true)}
-					className={rightClasser}>Yours</button>
+					className={rightClasser}>
+					Your{!onUser && 's'}{onUser && ' playlists'}
+				</button>
 			</div>
 			<div className={local.controls}>
 				{onUser ? <UserAdder /> : <SpecificAdder />}

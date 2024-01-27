@@ -22,7 +22,11 @@ export default function SpecificList() {
 
 	return (
 		<ul className={local.list}>
-			{memo.map(playlist => <ListItem key={playlist.id} playlist={playlist} />)}
+			{memo.map(playlist => (
+				<li key={playlist.id} >
+					<ListItem playlist={playlist} />
+				</li>
+			))}
 		</ul>
 	);
 }

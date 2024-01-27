@@ -35,6 +35,7 @@ $buttonBorder: 2px;
 }
 
 .emptyButton:is([disabled]) {
+	cursor: not-allowed;
 	opacity: 0.2;
 }
 

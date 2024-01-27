@@ -128,6 +128,7 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 			setError(e.message || 'Unknown error');
 		}
 		setLoading(false);
+		updateGLoading(false);
 		return null;
 	}
 

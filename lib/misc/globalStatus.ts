@@ -3,6 +3,8 @@ import mongoosePromise, {
 	GlobalStatusPointer
 } from '@lib/database/mongoose';
 
+import { NextApiRequest } from 'next';
+
 export default async function getGlobalStatus() {
 	let status = 'There may be an issue with our servers; please stand by.';
 	let statusType = 'concern';
@@ -50,4 +52,15 @@ export default async function getGlobalStatus() {
 		}
 	}
 	return { status, statusType, active };
+}
+
+export function CORSGet(req: NextApiRequest) {
+	if (process.env.IS_DEV === 'YES'
+		&& req.headers.origin) {
+		return req.headers.origin;
+	}
+	if (!req.headers.origin
+		|| req.headers.origin !== process.env.SAFE_ORIGIN)
+		return 'https://mixdeltatool.vercel.app';
+	return req.headers.origin;
 }

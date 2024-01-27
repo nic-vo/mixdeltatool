@@ -71,7 +71,7 @@ export default function DifferForm(props: {
 				{
 					stage === 0 ? (
 						<label htmlFor='target' className={local.label}>
-							Choose Target playlist:
+							Choose the Target playlist:
 							<select
 								autoComplete='off'
 								required
@@ -85,7 +85,7 @@ export default function DifferForm(props: {
 					)
 						: stage === 1 ? (<>
 							<label htmlFor='differ' className={local.label}>
-								Choose Differ playlist:
+								Choose the Differ playlist:
 								<select
 									autoComplete='off'
 									required
@@ -128,13 +128,17 @@ export default function DifferForm(props: {
 										maxLength={30} />
 								</label>
 								<label htmlFor='desc' className={local.label}>
-									New playlist description (optional);
+									New playlist description (optional):
 									<textarea
 										id='desc'
 										name='desc'
 										autoComplete='off'
 										maxLength={120} />
 								</label>
+								{/* <label htmlFor='keepimg'>
+									Keep original playlist thumbnail?
+									<input type='checkbox' id='keepimg' name='keepimg' />
+								</label> */}
 								<p className={local.caveat}><FaExclamationCircle /> This tool will never directly change a playlist. It will compare the two selected playlists and create a new one from that comparison.</p>
 								<button
 									disabled={userLoading
