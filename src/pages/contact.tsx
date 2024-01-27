@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Head from 'next/head';
 import Script from 'next/script';
 import { FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa';
-import { sanitize } from 'dompurify';
+import { sanitize } from 'isomorphic-dompurify';
 
 import local from '@styles/contact.module.scss';
 import form from '@components/spotify/dynamic/playlistDiffer/differForm/DifferForm.module.scss';
