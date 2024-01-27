@@ -2,7 +2,6 @@ import AuthProvider from '@components/auth/provider';
 import { SpotEUA } from '@components/legal';
 import { Background } from '@components/misc';
 import { Header, SpotifyFrame } from '@components/spotify';
-import { MAIN_DESC, MAIN_TITLE } from '@consts/spotify';
 import { GlobalStatusUpdater } from '@lib/misc';
 import Head from 'next/head';
 
