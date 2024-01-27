@@ -71,7 +71,7 @@ export default function DifferForm(props: {
 				{
 					stage === 0 ? (
 						<label htmlFor='target' className={local.label}>
-							Choose Target playlist:
+							Choose the Target playlist:
 							<select
 								autoComplete='off'
 								required
@@ -85,7 +85,7 @@ export default function DifferForm(props: {
 					)
 						: stage === 1 ? (<>
 							<label htmlFor='differ' className={local.label}>
-								Choose Differ playlist:
+								Choose the Differ playlist:
 								<select
 									autoComplete='off'
 									required
