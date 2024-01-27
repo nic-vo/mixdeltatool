@@ -7,7 +7,7 @@ import {
 	useCallback
 } from 'react';
 import { signIn } from 'next-auth/react';
-import { sanitize } from 'dompurify';
+import { sanitize } from 'isomorphic-dompurify';
 import { GlobalLoadingContext } from './GlobalLoadingProvider';
 
 import { MyPlaylistObject } from '../../types';

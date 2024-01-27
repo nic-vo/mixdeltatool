@@ -4,7 +4,11 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 
 # Changelog
 
-## 0.22.1
+## 0.22.2
+  - Fix incorrect imports for sanitization
+  - Add dev stuff for bundle analysis
+
+### 0.22.1
   - Add _document to fix a small SEO issue
   - Reduce the size on some copy
 
