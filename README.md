@@ -4,7 +4,11 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 
 # Changelog
 
-## 0.22.0
+## 0.22.1
+  - Add _document to fix a small SEO issue
+  - Reduce the size on some copy
+
+### 0.22.0
   - Add terms page
   - Attempt to reduce bundle size
 
