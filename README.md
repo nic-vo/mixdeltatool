@@ -4,7 +4,15 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 
 # Changelog
 
-## 0.21.0
+## 0.22.1
+  - Add _document to fix a small SEO issue
+  - Reduce the size on some copy
+
+### 0.22.0
+  - Add terms page
+  - Attempt to reduce bundle size
+
+### 0.21.0
   - Narrow CORS scope dramatically
   - Fix issues with adder heading
   - Fix various copy issues

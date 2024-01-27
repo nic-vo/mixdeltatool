@@ -2,7 +2,6 @@ import AuthProvider from '@components/auth/provider';
 import { SpotEUA } from '@components/legal';
 import { Background } from '@components/misc';
 import { Header, SpotifyFrame } from '@components/spotify';
-import { MAIN_DESC, MAIN_TITLE } from '@consts/spotify';
 import { GlobalStatusUpdater } from '@lib/misc';
 import Head from 'next/head';
 
@@ -14,8 +13,8 @@ export default function Spotify(props: {
 	return (
 		<>
 			<Head>
-				<title>{MAIN_TITLE}</title>
-				<meta name='description' content={MAIN_DESC} />
+				<title>Compare Spotify playlists and make bulk changes | MixDelta</title>
+				<meta name='description' content='A tool for Spotify users to compare playlists and edit them based on the comparisons.' />
 			</Head>
 
 			<AuthProvider>

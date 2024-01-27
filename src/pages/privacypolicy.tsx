@@ -1,17 +1,14 @@
-import { APP_NAME } from '@consts/spotify';
 import Head from 'next/head';
 import { FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa';
 
 import look from '@styles/privacy.module.scss';
 
-const LAST_UPDATED = new Date();
-
 const PrivacyPolicy = () => {
 	return (
 		<>
 			<Head>
-				<title>{`Privacy Policy | ${APP_NAME}`}</title>
-				<meta name='description' content={`The privacy policy for ${APP_NAME}`} />
+				<title>Privacy Policy | MixDelta</title>
+				<meta name='description' content='The privacy policy for MixDelta' />
 			</Head>
 
 			<nav className={look.smallnav}>
@@ -19,12 +16,12 @@ const PrivacyPolicy = () => {
 				<a href='/spotify'>To the tool <FaAngleDoubleRight /></a>
 			</nav>
 			<main className={look.main}>
-				<h1 className={look.h1}>{APP_NAME} Privacy Policy</h1>
-				<p>Last updated: {LAST_UPDATED.toDateString()}</p>
+				<h1 className={look.h1}>MixDelta Privacy Policy</h1>
+				<p>Effective: January 26, 2024</p>
 				<section className={look.section}>
 					<h2>Introduction</h2>
 					<p>
-						Welcome to the {APP_NAME} for Spotify! This Privacy Policy outlines the information we collect, how we use it, and the choices you have concerning your data. By using {APP_NAME}, you agree to the terms of this Privacy Policy.
+						Welcome to the MixDelta for Spotify! This Privacy Policy outlines the information we collect, how we use it, and the choices you have concerning your data. By using MixDelta, you agree to the terms of this Privacy Policy.
 					</p>
 				</section>
 				<section className={look.section}>
@@ -32,7 +29,7 @@ const PrivacyPolicy = () => {
 					<section className={look.section}>
 						<h3>User Authentication and Authorization</h3>
 						<p>
-							{APP_NAME} uses Spotify&apos;s OAuth flow for user authentication and authorization. We collect and store the following information:
+							MixDelta uses Spotify&apos;s OAuth flow for user authentication and authorization. We collect and store the following information:
 						</p>
 						<ul className={look.list}>
 							<li>Spotify user ID</li>
@@ -43,12 +40,12 @@ const PrivacyPolicy = () => {
 					</section>
 					<section>
 						<h3>IP Address Usage</h3>
-						<p>{APP_NAME} collects and temporarily stores IP addresses for the purpose of rate limiting API requests. This is done to ensure fair usage and protect against misuse of our services. These IP addresses are not associated with users&apos; Spotify information in any way.</p>
+						<p>MixDelta collects and temporarily stores IP addresses for the purpose of rate limiting API requests. This is done to ensure fair usage and protect against misuse of our services. These IP addresses are not associated with users&apos; Spotify information in any way.</p>
 					</section>
 					<section className={look.section}>
 						<h3>Playlist Information</h3>
 						<p>
-							{APP_NAME} only accesses the following information about the User&apos;s Spotify library:
+							MixDelta only accesses the following information about the User&apos;s Spotify library:
 						</p>
 						<ul className={look.list}>
 							<li>Playlist names</li>
@@ -61,7 +58,7 @@ const PrivacyPolicy = () => {
 					<section className={look.section}>
 						<h3>User-Specified Playlists and Albums</h3>
 						<p>
-							For certain functionalities, {APP_NAME} may collect information about randomly specified playlists and albums chosen by the user.
+							For certain functionalities, MixDelta may collect information about randomly specified playlists and albums chosen by the user.
 						</p>
 					</section>
 				</section>
@@ -102,7 +99,7 @@ const PrivacyPolicy = () => {
 						<li>
 							<h3>Use of Cookies</h3>
 							<p>
-								We use cookies for user authentication. These cookies are the bare minimum for this app&apos;s primary functionality. By using {APP_NAME}, you agree to the use of cookies for this purpose.
+								We use cookies for user authentication. These cookies are the bare minimum for this app&apos;s primary functionality. By using MixDelta, you agree to the use of cookies for this purpose.
 							</p>
 						</li>
 						<li>
@@ -131,9 +128,9 @@ const PrivacyPolicy = () => {
 				</section>
 				<section className={look.section}>
 					<h2>Contact Us</h2>
-					<p>If you have any questions or concerns about this Privacy Policy or {APP_NAME}, please contact us at either at <a href='mailto:mixdeltatool@gmail.com' target='_blank'>mixdeltatool@gmail.com</a> or via our <a href='/contact' target='_blank'>contact form</a>.</p>
+					<p>If you have any questions or concerns about this Privacy Policy or MixDelta, please contact us at either at <a href='mailto:mixdeltatool@gmail.com' target='_blank'>mixdeltatool@gmail.com</a> or via our <a href='/contact' target='_blank'>contact form</a>.</p>
 				</section>
-				<p>Thank you for using {APP_NAME}!</p>
+				<p>Thank you for using MixDelta!</p>
 			</main>
 			<nav className={look.smallnav}>
 				<a href='/'><FaAngleDoubleLeft />Back home</a>
