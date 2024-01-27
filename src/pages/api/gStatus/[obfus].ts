@@ -2,6 +2,8 @@ import mongoosePromise, {
 	GlobalStatusPointer,
 	GlobalStatus
 } from '@lib/database/mongoose';
+import { CORSGet } from '@lib/misc/globalStatus';
+
 import { CustomError, FetchError } from '@lib/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 
@@ -10,8 +12,14 @@ export default async function handler(
 	res: NextApiResponse
 ) {
 	const { obfus } = req.query;
-	if (req.method === 'OPTIONS')
-		return res.status(200).end();
+
+	res.setHeader('Access-Control-Allow-Credentials', 'true');
+	res.setHeader('Access-Control-Allow-Origin', CORSGet(req));
+	res.setHeader('Access-Control-Allow-Methods', 'OPTIONS,POST');
+	res.setHeader('Access-Control-Allow-Headers',
+		'Accept, Accept-Version, Content-Length, Content-Type, Date, Accept-Encoding');
+
+	if (req.method === 'OPTIONS') return res.status(200).end();
 	if (req.method !== 'POST')
 		return res.status(404).json({ message: 'Wrong method' });
 	if (obfus !== process.env.NEXT_PUBLIC_GLOBAL_STATUS_UPDATE_ROUTE)
