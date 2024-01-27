@@ -4,7 +4,13 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 
 # Changelog
 
-## 0.20.3
+## 0.21.0
+  - Narrow CORS scope dramatically
+  - Fix issues with adder heading
+  - Fix various copy issues
+  - Fix global loading status bug
+
+### 0.20.3
   - Fix serverside sanitization issue
 
 ### 0.20.2
