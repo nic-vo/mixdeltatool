@@ -3,8 +3,6 @@ import { FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa';
 
 import look from '@styles/privacy.module.scss';
 
-const LAST_UPDATED = new Date();
-
 const PrivacyPolicy = () => {
 	return (
 		<>
@@ -19,7 +17,7 @@ const PrivacyPolicy = () => {
 			</nav>
 			<main className={look.main}>
 				<h1 className={look.h1}>MixDelta Privacy Policy</h1>
-				<p>Last updated: {LAST_UPDATED.toDateString()}</p>
+				<p>Effective: January 26, 2024</p>
 				<section className={look.section}>
 					<h2>Introduction</h2>
 					<p>
