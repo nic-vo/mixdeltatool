@@ -40,3 +40,8 @@ next-env.d.ts
 /src/pages/dev
 /lib/dev
 /src/pages/api/dev
+
+# yarn
+.pnp.cjs
+.pnp.loader.mjs
+.yarn
