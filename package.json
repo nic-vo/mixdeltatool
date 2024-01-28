@@ -1,6 +1,6 @@
 {
   "name": "superuser-actions",
-  "version": "0.22.2",
+  "version": "0.23.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -24,7 +24,7 @@
     "zod": "^3"
   },
   "devDependencies": {
-    "@next/bundle-analyzer": "^14.1.0",
+    "@next/bundle-analyzer": "^14",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
