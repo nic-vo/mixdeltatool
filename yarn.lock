@@ -2742,6 +2742,32 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mixdeltatool@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "mixdeltatool@workspace:."
+  dependencies:
+    "@next-auth/mongodb-adapter": "npm:^1"
+    "@next/bundle-analyzer": "npm:^14"
+    "@types/node": "npm:^20"
+    "@types/react": "npm:^18"
+    "@types/react-dom": "npm:^18"
+    "@upstash/redis": "npm:^1"
+    eslint: "npm:^8"
+    eslint-config-next: "npm:^13"
+    isomorphic-dompurify: "npm:^2"
+    mongodb: "npm:^5"
+    mongoose: "npm:^8"
+    next: "npm:^13"
+    next-auth: "npm:^4"
+    react: "npm:^18"
+    react-dom: "npm:^18"
+    react-icons: "npm:^4"
+    sass: "npm:^1"
+    typescript: "npm:^5"
+    zod: "npm:^3"
+  languageName: unknown
+  linkType: soft
+
 "mkdirp@npm:^1.0.3":
   version: 1.0.4
   resolution: "mkdirp@npm:1.0.4"
@@ -3928,32 +3954,6 @@ __metadata:
   checksum: 42655cdadfa5388f8a48bb282d6b450df7d7b8cf066ac37038bd0499d3c9f084815ebd9ff9dfa12a218fd4441338851db79603498d7557207009c1cf4d609835
   languageName: node
   linkType: hard
-
-"superuser-actions@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "superuser-actions@workspace:."
-  dependencies:
-    "@next-auth/mongodb-adapter": "npm:^1"
-    "@next/bundle-analyzer": "npm:^14"
-    "@types/node": "npm:^20"
-    "@types/react": "npm:^18"
-    "@types/react-dom": "npm:^18"
-    "@upstash/redis": "npm:^1"
-    eslint: "npm:^8"
-    eslint-config-next: "npm:^13"
-    isomorphic-dompurify: "npm:^2"
-    mongodb: "npm:^5"
-    mongoose: "npm:^8"
-    next: "npm:^13"
-    next-auth: "npm:^4"
-    react: "npm:^18"
-    react-dom: "npm:^18"
-    react-icons: "npm:^4"
-    sass: "npm:^1"
-    typescript: "npm:^5"
-    zod: "npm:^3"
-  languageName: unknown
-  linkType: soft
 
 "supports-color@npm:^7.1.0":
   version: 7.2.0
