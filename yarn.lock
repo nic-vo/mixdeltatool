@@ -128,7 +128,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@next/bundle-analyzer@npm:^14.1.0":
+"@next/bundle-analyzer@npm:^14":
   version: 14.1.0
   resolution: "@next/bundle-analyzer@npm:14.1.0"
   dependencies:
@@ -3934,7 +3934,7 @@ __metadata:
   resolution: "superuser-actions@workspace:."
   dependencies:
     "@next-auth/mongodb-adapter": "npm:^1"
-    "@next/bundle-analyzer": "npm:^14.1.0"
+    "@next/bundle-analyzer": "npm:^14"
     "@types/node": "npm:^20"
     "@types/react": "npm:^18"
     "@types/react-dom": "npm:^18"
