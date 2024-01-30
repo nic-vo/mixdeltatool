@@ -1,21 +1,27 @@
 import mongoosePromise, { Account } from '@lib/database/mongoose';
 import type { Account as AccountType } from 'next-auth';
 
+
 export const signInUpdater = async (account: AccountType) => {
 	// Update existing access_key
 	// This should only run if app has existing provider account
+	// + should ALWAYS run because I think next-auth abstracts away
+	// 'Account' document creation and linking to a user even on first sign-in
 	try {
+		// This shouldn't happen because next-auth should always hit
+		// The Spotify OAuth endpoint
+		if (!account.access_token
+			|| !account.expires_at) throw new Error();
 		await mongoosePromise();
-		const updateAccount = await Account.findOne(
-			{ providerAccountId: account.providerAccountId })
-			.where('provider')
-			.equals('spotify')
-			.exec();
-		if (updateAccount !== undefined && updateAccount !== null) {
-			updateAccount.access_token = account.access_token;
-			updateAccount.expires_at = account.expires_at;
-			await updateAccount.save();
-		}
+		// Use findOneAndUpdate because hopefully it's atomic on MongoDB's side
+		await Account.findOneAndUpdate(
+			{
+				providerAccountId: account.providerAccountId,
+				provider: 'spotify'
+			}, {
+			access_token: account.access_token,
+			expires_at: account.expires_at
+		}).exec();
 	} catch {
 		// The only errors should be at network level hopefully;
 		// Assumes Account model is correct
@@ -26,9 +32,8 @@ export const signInUpdater = async (account: AccountType) => {
 }
 
 export const routeKeyRetriever = async (id: string) => {
-	// This function assumes that my signin callback works
-	// And that on every signin,
-	// next-auth refreshes the user access token in the Account collection
+	// This function assumes that my signIn callback works
+	// on every signIn, refreshing the user's access token in the 'Account'
 	let token = null;
 	try {
 		await mongoosePromise();
@@ -37,10 +42,13 @@ export const routeKeyRetriever = async (id: string) => {
 			.equals('spotify')
 			.select(['access_token', 'expires_at'])
 			.exec();
-		if (query !== null) token = {
-			accessToken: query.access_token,
-			expiresAt: query.expires_at
-		};
+		// Should never equal null, assuming next-auth
+		// Does all its abstract stuff
+		if (query !== null)
+			token = {
+				accessToken: query.access_token,
+				expiresAt: query.expires_at
+			};
 	} catch {
 		// The only errors should be at network level hopefully;
 		// Assumes Account model is correct
