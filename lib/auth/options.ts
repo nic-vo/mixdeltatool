@@ -38,14 +38,16 @@ export const authOptions: NextAuthOptions = {
 		async signIn({ account }) {
 			// In this case, account param refers to
 			// New account info returned from Spotify upon successful auth from them
-			if (account === null || account === undefined) return '/retrylogin';
-			// This should return regardless of whether next-auth account exists
-			// Otherwise it's standard next-auth behavior
+			// ***CONTAINS NEW ACCESS_TOKEN***
+			// console.log('Account info from Spot:', account);
+			// console.log('Profile from spot? Or existing profile:', profile);
+			// Ideally, I don't think this'll ever be null
+			if (!account) return '/';
 			try {
 				await signInUpdater(account);
 			}
 			catch {
-				return '/retrylogin';
+				return '/';
 			};
 			return true;
 		},
