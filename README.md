@@ -4,7 +4,10 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 
 # Changelog
 
-## 0.23.1
+## 0.23.2
+  - Auth flow patch and bugfix
+
+### 0.23.1
   - Simplify login flow
 
 ### 0.23.0
