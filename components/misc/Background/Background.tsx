@@ -77,7 +77,7 @@ const Background = () => {
 			predraw={predraw}
 			initializer={drawInit}
 			draw={draw}
-			animated={false} />
+			animated={true} />
 	);
 }
 
