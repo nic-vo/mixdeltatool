@@ -83,7 +83,11 @@ const AccountModel = model('account',
 export const Account = (mongoose.models['account'] as typeof AccountModel) || AccountModel;
 
 const globalStatusPointerSchema = new Schema({
-	current: SchemaTypes.ObjectId
+	current: {
+		type: SchemaTypes.ObjectId,
+		required: true,
+		ref: 'globalStatus'
+	}
 });
 const GlobalStatusPointerModel = model('globalStatusPointer',
 	globalStatusPointerSchema,
@@ -93,9 +97,18 @@ const GlobalStatusPointerModel = model('globalStatusPointer',
 export const GlobalStatusPointer = (mongoose.models['globalStatusPointer'] as typeof GlobalStatusPointerModel) || GlobalStatusPointerModel;
 
 const globalStatusSchema = new Schema({
-	active: SchemaTypes.Number,
-	status: SchemaTypes.String,
-	statusType: SchemaTypes.String
+	active: {
+		type: SchemaTypes.Number,
+		required: true
+	},
+	status: {
+		type: SchemaTypes.String,
+		required: true
+	},
+	statusType: {
+		type: SchemaTypes.String,
+		required: true
+	}
 });
 const GlobalStatusModel = model('globalStatus',
 	globalStatusSchema,
@@ -105,9 +118,18 @@ const GlobalStatusModel = model('globalStatus',
 export const GlobalStatus = (mongoose.models['globalStatus'] as typeof GlobalStatusModel) || GlobalStatusModel;
 
 const contactMessageSchema = new Schema({
-	ip: SchemaTypes.String,
-	name: SchemaTypes.String,
-	message: SchemaTypes.String,
+	ip: {
+		type: SchemaTypes.String,
+		required: true
+	},
+	name: {
+		type: SchemaTypes.String,
+		required: true
+	},
+	message: {
+		type: SchemaTypes.String,
+		required: true
+	},
 });
 const ContactMessageModel = model('contactMessage',
 	contactMessageSchema,

@@ -19,7 +19,7 @@ export default async function getGlobalStatus() {
 		}
 	}
 	try {
-		let currentPointer = await GlobalStatusPointer.findOne();
+		let currentPointer = await GlobalStatusPointer.findOne().exec();
 		if (currentPointer === null) {
 			const newStatus = new GlobalStatus({
 				status,
