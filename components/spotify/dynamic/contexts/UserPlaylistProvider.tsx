@@ -52,7 +52,7 @@ function UserPlaylistProvider(props: { children: React.ReactNode }) {
 			// If either 50th page of results or no next, cancel
 			if (page === null) throw { message: 'No more' };
 			const raw = await fetch(`/api/spotify/getUser?page=${page}`);
-			if (raw.status === 401) signin('spotify');
+			if (raw.status === 401) signIn('spotify');
 			if (raw.ok === false) {
 				const jsoned = await raw.json();
 				// TODO: define a standard error interface (?)

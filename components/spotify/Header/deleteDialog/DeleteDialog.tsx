@@ -30,7 +30,7 @@ const DeleteDialog = () => {
 		setError(null);
 		try {
 			const res = await fetch(`/api/account/${process.env.NEXT_PUBLIC_ACCOUNT_ROUTE_OBFUS}`);
-			if (res.status === 401) signin('spotify');
+			if (res.status === 401) signIn('spotify');
 			else if (res.ok === false) {
 				const { message } = await res.json() as { message: string };
 				throw { message };

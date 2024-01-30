@@ -136,7 +136,7 @@ const useDifferForm = () => {
 					type: type
 				})
 			});
-			if (raw.status === 401) signin('spotify');
+			if (raw.status === 401) signIn('spotify');
 			if (raw.ok === false) {
 				const jsoned = await raw.json();
 				throw { message: jsoned.message };
