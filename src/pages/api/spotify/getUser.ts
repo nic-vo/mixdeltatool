@@ -2,6 +2,7 @@ import { pageQueryParser } from '@lib/spotify/validators';
 import { getServerSession } from 'next-auth';
 import { routeKeyRetriever } from '@lib/auth/accessKey'
 import { userPlaylistGetter } from '@lib/spotify/getterPromises';
+import { checkAndUpdateEntry } from '@lib/database/redis/ratelimiting';
 
 import { authOptions } from '@lib/auth/options';
 import {
@@ -20,7 +21,6 @@ import {
 
 import { getUserPlaylistsApiRequest } from '@components/spotify/types';
 import { NextApiResponse } from 'next';
-import { checkAndUpdateEntry } from '@lib/database/redis/ratelimiting';
 
 // The assumption for this route is that every sign-on refreshes access token
 // Session never updates, and only exists until access token expiry
@@ -39,6 +39,7 @@ export default async function handler(
 		return res.status(504).json({ message: 'Server timed out' });
 	}, GLOBAL_EXECUTION_WINDOW);
 
+	// If auth doesn't resolve in window, something's wrong anyway and cancel
 	const authTimeout = setTimeout(() => {
 		clearTimeout(globalTimeout);
 		return res.status(504).json({ message: 'Server timed out' });
