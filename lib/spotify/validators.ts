@@ -1,11 +1,6 @@
 import { SPOT_PLAYLIST_PAGE_LIMIT } from '@consts/spotify';
 import { z } from 'zod';
 
-const pageQueryParser = z.object({
-	page: z.coerce.number().int().gte(0).lte(SPOT_PLAYLIST_PAGE_LIMIT)
-}).strict();
-
-
 const idParamParser = z.string().length(22).regex(/^[A-Za-z0-9]{22}$/);
 const typeParamParser = z.enum(['playlist', 'album']);
 
@@ -79,7 +74,6 @@ const userPlaylistResponseParser = basicSpotAPIResponseParser.extend({
 });
 
 export {
-	pageQueryParser,
 	specificQueryParser,
 	playlistIdTypeParser,
 	diffBodyParser,
