@@ -1,13 +1,10 @@
 import { SPOT_URL_BASE } from '@consts/spotify';
 import {
-	AuthError,
-	CustomError,
 	FetchError,
-	ForbiddenError,
-	RateError
+	NotFoundError,
 } from '../errors';
 
-import { localTimeout } from './commonPromises';
+import { getOnePromise, localTimeout } from './commonPromises';
 import {
 	spotAlbumObjectParser,
 	spotPlaylistObjectParser,
@@ -34,6 +31,7 @@ const userPlaylistGetter = async (args: {
 	const { page, accessToken, globalTimeoutMS } = args;
 	// For pagination passed from user data
 	const offset = SPOT_PLAYLIST_ITER_INT * page;
+	const parentTimeoutMS = globalTimeoutMS - 100;
 
 	const headers = new Headers();
 	const params = new URLSearchParams({
@@ -44,48 +42,17 @@ const userPlaylistGetter = async (args: {
 	const url = `${SPOT_URL_BASE}me/playlists?${params.toString()}`;
 
 	return Promise.race([
-		localTimeout<MyUserAPIRouteResponse>(globalTimeoutMS, 100),
+		localTimeout<MyUserAPIRouteResponse>(parentTimeoutMS),
 		new Promise<MyUserAPIRouteResponse>(async (res, rej) => {
 			try {
-				let response;
-				let networkRetry = true;
-				while (true) {
-					try {
-						response = await fetch(url, { headers });
-					} catch {
-						if (networkRetry === false)
-							throw new FetchError('There was an error reaching Spotify');
-						networkRetry = false;
-						continue;
-					}
-					networkRetry = true;
-					if (response.status === 429) {
-						const header = response.headers.get('Retry-After');
-						// Retry based on Retry-After header in sec, otherwise 2s wait
-						const wait = header !== null ? parseInt(header) * 1000 : 2000;
-						// Throw rate error if wait would pass the timeout time
-						if ((Date.now() + wait) >= globalTimeoutMS) throw new RateError(10);
-						// Await retry if within timeout time
-						await new Promise(async r => setTimeout(r, wait));
-						// Continue for while loop
-						continue;
-					}
-					break;
-				}
-				if (!response)
-					throw new FetchError('There was an error reaching Spotify');
-				if (response.ok === false) {
-					// This is if somehow after all this, Spotify detects something wrong
-					switch (response.status) {
-						case 401:
-							throw new AuthError();
-						case 403:
-							throw new ForbiddenError(`Can't access your playlists`);
-						default:
-							throw new FetchError('There was an error reaching Spotify');
-					}
-				}
-
+				const request = fetch(url, { headers });
+				const response = await getOnePromise({
+					request, silentFail: false, parentTimeoutMS,
+					errorOverrides: [
+						{ status: 403, message: "Can't access your playlists." },
+						{ status: 404, message: "Can't find you, somehow." }
+					]
+				});
 				let items, next;
 				try {
 					const jsoned = await response.json();
@@ -121,55 +88,23 @@ const specificPlaylistGetter = async (args: {
 	globalTimeoutMS: number
 }): Promise<MyPlaylistObject> => {
 	const { accessToken, type, id, globalTimeoutMS } = args;
+	const parentTimeoutMS = globalTimeoutMS - 100
 	const headers = new Headers();
 	headers.append('Authorization', `Bearer ${accessToken}`);
 	const url = `${SPOT_URL_BASE}${type}s/${id}`;
 
 	return Promise.race([
-		localTimeout<MyPlaylistObject>(globalTimeoutMS, 100),
+		localTimeout<MyPlaylistObject>(parentTimeoutMS),
 		new Promise<MyPlaylistObject>(async (res, rej) => {
 			try {
-				let response;
-				let networkRetry = true;
-				while (true) {
-					try {
-						response = await fetch(url, { headers });
-					} catch {
-						if (networkRetry === false)
-							throw new FetchError('There was an error reaching Spotify');
-						networkRetry = false;
-						continue;
-					}
-					networkRetry = true;
-					if (response.status === 429) {
-						const header = response.headers.get('Retry-After');
-						// Retry based on Retry-After header in sec, otherwise 2s wait
-						const wait = header !== null ? parseInt(header) * 1000 : 2000;
-						// Throw rate error if wait would pass the timeout time
-						if ((Date.now() + wait) >= globalTimeoutMS) throw new RateError(10);
-						// Await retry if within timeout time
-						await new Promise(async r => setTimeout(r, wait));
-						// Continue for while loop
-						continue;
-					}
-					break;
-				}
-				if (!response)
-					throw new FetchError('There was an error reaching Spotify');
-				if (response.ok === false) {
-					// This is if somehow after all this, Spotify detects something wrong
-					switch (response.status) {
-						case 401:
-							throw new AuthError();
-						case 403:
-							throw new ForbiddenError(`Spotify forbids that playlist`);
-						case 404:
-							throw new CustomError(404, 'That Spotify ID does not exist');
-						default:
-							throw new FetchError('Verify that link is valid');
-					}
-				}
-
+				const request = fetch(url, { headers });
+				const response = await getOnePromise({
+					request, silentFail: false, parentTimeoutMS,
+					errorOverrides: [
+						{ status: 403, message: "Spotify forbids that playlist." },
+						{ status: 404, message: "Info is wrong / playlist doesn't exist." }
+					]
+				});
 				let returner: MyPlaylistObject;
 				try {
 					// User may submit a playlist or an album
@@ -191,11 +126,14 @@ const specificPlaylistGetter = async (args: {
 							...parsed,
 							image: parsed.images[0],
 							tracks: parsed.tracks.total,
-							owner: [{ ...parsed.owner, name: parsed.owner.display_name ||'Spotify User' }]
+							owner: [{
+								...parsed.owner,
+								name: parsed.owner.display_name || 'Spotify User'
+							}]
 						};
 					} else throw new Error();
-				} catch (e: any) {
-					throw new CustomError(404, 'That was not a valid playlist');
+				} catch {
+					throw new NotFoundError('That was not a valid playlist.');
 				}
 				return res(returner);
 			} catch (e: any) {
