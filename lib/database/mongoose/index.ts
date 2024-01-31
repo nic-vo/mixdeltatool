@@ -3,7 +3,11 @@ import {
 	Account,
 	Session
 } from './models';
-import { getGlobalStatusProps, setNewGlobalStatus } from './globalStatus';
+import {
+	getGlobalStatusProps,
+	setNewGlobalStatus,
+	CORSGet
+} from './globalStatus';
 import mongoosePromise from './connection';
 
 export default mongoosePromise;
@@ -13,5 +17,6 @@ export {
 	Account,
 	Session,
 	getGlobalStatusProps,
-	setNewGlobalStatus
+	setNewGlobalStatus,
+	CORSGet
 };
