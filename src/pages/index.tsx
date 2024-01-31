@@ -1,7 +1,7 @@
 import { Background, ServiceStatus } from '@components/misc';
-import { GlobalStatusUpdater } from '@lib/misc';
 import Head from 'next/head';
 import { FaArrowCircleRight } from 'react-icons/fa';
+import { getGlobalStatusProps } from '@lib/database/mongoose';
 
 import local from '@styles/Home.module.scss';
 import global from '@styles/globals.module.scss';
@@ -38,6 +38,6 @@ export default function Home(props: {
 }
 
 export async function getStaticProps() {
-	const globalStatus = await GlobalStatusUpdater();
+	const globalStatus = await getGlobalStatusProps();
 	return { props: { ...globalStatus } };
 }

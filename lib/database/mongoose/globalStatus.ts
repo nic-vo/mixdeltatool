@@ -1,11 +1,13 @@
-import mongoosePromise, {
+import { FetchError } from '@lib/errors';
+import mongoosePromise from './connection';
+import {
 	GlobalStatus,
 	GlobalStatusPointer
-} from '@lib/database/mongoose';
+} from './models';
 
 import { NextApiRequest } from 'next';
 
-export default async function getGlobalStatus() {
+export async function getGlobalStatusProps() {
 	let status = 'There may be an issue with our servers; please stand by.';
 	let statusType = 'concern';
 	let active = Date.now();
@@ -63,4 +65,32 @@ export function CORSGet(req: NextApiRequest) {
 		|| req.headers.origin !== process.env.SAFE_ORIGIN)
 		return 'https://mixdeltatool.vercel.app';
 	return req.headers.origin;
+}
+
+export async function setNewGlobalStatus(params:
+	{
+		status: string,
+		statusType: 'ok' | 'concern' | 'status'
+	}) {
+	const { status, statusType } = params;
+	try {
+		await mongoosePromise();
+	} catch {
+		throw new FetchError('There was an error connecting to MongoDB');
+	}
+	const newStatus = new GlobalStatus({
+		status, statusType, active: Date.now()
+	});
+	try {
+		let currentPointer = await GlobalStatusPointer.findOneAndUpdate(
+			{},
+			{ current: newStatus._id }).exec();
+		if (currentPointer === null) {
+			currentPointer = new GlobalStatusPointer({ current: newStatus._id });
+			await Promise.all([newStatus.save(), currentPointer.save()]);
+		}
+	} catch {
+		throw new FetchError('There was an error creating a new status');
+	}
+	return null;
 }

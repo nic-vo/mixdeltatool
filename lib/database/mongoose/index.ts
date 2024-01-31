@@ -1,10 +1,9 @@
 import {
 	User,
 	Account,
-	Session,
-	GlobalStatusPointer,
-	GlobalStatus
+	Session
 } from './models';
+import { getGlobalStatusProps, setNewGlobalStatus } from './globalStatus';
 import mongoosePromise from './connection';
 
 export default mongoosePromise;
@@ -13,6 +12,6 @@ export {
 	User,
 	Account,
 	Session,
-	GlobalStatusPointer,
-	GlobalStatus
+	getGlobalStatusProps,
+	setNewGlobalStatus
 };

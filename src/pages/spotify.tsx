@@ -2,7 +2,7 @@ import AuthProvider from '@components/auth/provider';
 import { SpotEUA } from '@components/legal';
 import { Background } from '@components/misc';
 import { Header, SpotifyFrame } from '@components/spotify';
-import { GlobalStatusUpdater } from '@lib/misc';
+import { getGlobalStatusProps } from '@lib/database/mongoose';
 import Head from 'next/head';
 
 export default function Spotify(props: {
@@ -40,6 +40,6 @@ export default function Spotify(props: {
 }
 
 export async function getStaticProps() {
-	const globalStatus = await GlobalStatusUpdater();
+	const globalStatus = await getGlobalStatusProps();
 	return { props: { ...globalStatus } };
 }
