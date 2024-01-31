@@ -1,5 +1,5 @@
 import { SPOT_URL_BASE } from '@consts/spotify';
-import { localTimeout, userGetter } from './commonPromises';
+import { getOnePromise, localTimeout, userGetter } from './commonPromises';
 import { spotPlaylistObjectParser } from './validators';
 import { printTime } from '@lib/misc';
 import { readFileSync } from 'fs';
@@ -34,8 +34,7 @@ const createEmptyPlaylist = async (args: {
 		baseDescStr,
 		newName } = args;
 	const start = Date.now();
-	const localLimit = 2200;
-	const localTimeoutMS = globalTimeoutMS - 2200;
+	const parentTimeoutMS = globalTimeoutMS - 2200;
 	const imgPath = path.join(
 		process.cwd(),
 		'consts',
@@ -43,9 +42,9 @@ const createEmptyPlaylist = async (args: {
 	const imgString = readFileSync(imgPath).toString('base64');
 
 	return Promise.race([
-		localTimeout<MyPlaylistObject>(globalTimeoutMS, localLimit),
+		localTimeout<MyPlaylistObject>(parentTimeoutMS),
 		new Promise<MyPlaylistObject>(async (res, rej) => {
-			let userId: string | undefined;
+			let userId: string;
 			try {
 				userId = await userGetter({ globalTimeoutMS, accessToken });
 			}
@@ -53,57 +52,26 @@ const createEmptyPlaylist = async (args: {
 				return rej(e)
 			}
 
-			if (userId === undefined)
-				return rej(new FetchError("For some reason you couldn't be found on Spotify."));
-
 			const url = SPOT_URL_BASE.concat('users/', userId, '/playlists');
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
 			headers.append('Content-Type', 'application/json');
 			try {
-				let response;
-				let networkRetry = true;
-				while (true) {
-					try {
-						response = await fetch(url, {
-							headers,
-							method: 'POST',
-							body: JSON.stringify({
-								name: `MixDelta - ${newName !== null ? newName : genUId(4)}`,
-								description: baseDescStr,
-								public: false
-							})
-						});
-					} catch {
-						if (networkRetry === false)
-							throw new FetchError('There was an error creating a new playlist');
-						networkRetry = false;
-						continue;
-					}
-					networkRetry = true;
-					if (response.status === 429) {
-						const header = response.headers.get('Retry-After');
-						const wait = header !== null ? parseInt(header) * 1000 : 1000;
-						if (Date.now() + wait >= localTimeoutMS) throw new RateError(5);
-						await new Promise(r => setTimeout(r, wait));
-						continue;
-					}
-					break;
-				}
-				if (!response)
-					throw new FetchError('There was an error reaching Spotify');
-				if (response.ok === false) {
-					// This is if somehow after all this, Spotify detects something wrong
-					switch (response.status) {
-						case 401:
-							throw new AuthError();
-						case 403:
-							throw new ForbiddenError(`For some reason you can't create a ` +
-								`playlist`);
-						default:
-							throw new FetchError('There was an error creating a new playlist');
-					}
-				}
+				const request = fetch(url, {
+					headers,
+					method: 'POST',
+					body: JSON.stringify({
+						name: `MixDelta - ${newName !== null ? newName : genUId(4)}`,
+						description: baseDescStr,
+						public: false
+					})
+				});
+				const response = await getOnePromise({
+					request, silentFail: false, parentTimeoutMS,
+					errorOverrides: [
+						{ status: 403, message: "For some reason you can't create a playlist." }
+					]
+				});
 				let returner: MyPlaylistObject;
 				try {
 					const jsoned = await response.json();
@@ -124,39 +92,15 @@ const createEmptyPlaylist = async (args: {
 				putHeaders.append('Authorization', `Bearer ${accessToken}`);
 				putHeaders.append('Content-Type', 'image/jpeg');
 				try {
-					let response;
-					let networkRetry = true;
-					let thumbSilentFail = false;
-					while (true) {
-						try {
-							response = await Promise.race([fetch(putUrl, {
-								headers: putHeaders,
-								method: 'PUT',
-								body: imgString
-							}),
-							new Promise<Response>((_, r) => setTimeout(() => {
-								thumbSilentFail = true;
-								return r();
-							}, 3000))
-							]);
-						} catch {
-							if (thumbSilentFail) break;
-							if (networkRetry === false)
-								throw new FetchError('There was an error creating a new playlist');
-							networkRetry = false;
-							continue;
-						}
-						networkRetry = true;
-						if (response.status === 429) {
-							const header = response.headers.get('Retry-After');
-							const wait = header !== null ? parseInt(header) * 1000 : 1000;
-							if (Date.now() + wait >= localTimeoutMS) throw new RateError(5);
-							await new Promise(r => setTimeout(r, wait));
-							continue;
-						}
-						break;
-					}
-					if (!response || !response.ok) throw new Error();
+					const request = fetch(putUrl, {
+						headers: putHeaders,
+						method: 'PUT',
+						body: imgString
+					});
+					const response = await getOnePromise({
+						request, silentFail: true, parentTimeoutMS
+					});
+					if (!response.ok) throw new Error();
 					printTime('Thumb uploaded:', putStart);
 				} catch {
 					printTime('Thumb skipped:', putStart);
@@ -179,10 +123,10 @@ const playlistGetter = async (args: {
 	const start = Date.now();
 	const { accessToken, type, id, globalTimeoutMS } = args;
 	const localLimit = 2200;
-	const localTimeoutMS = globalTimeoutMS - localLimit;
+	const parentTimeoutMS = globalTimeoutMS - 2200;
 
 	return Promise.race([
-		localTimeout<differInternalPlaylistPromise>(globalTimeoutMS, localLimit),
+		localTimeout<differInternalPlaylistPromise>(parentTimeoutMS),
 		new Promise<differInternalPlaylistPromise>(async (res, rej) => {
 			// Initial url for fetching
 			const base = SPOT_URL_BASE.concat(type, 's/', id, '/tracks?');
@@ -208,7 +152,7 @@ const playlistGetter = async (args: {
 			// One retry because for some reason on
 			// random playlists, the fetch instantly throws
 			try {
-				while (next !== null && (Date.now() + 500) < localTimeoutMS) {
+				while (next !== null && (Date.now() + 500) < parentTimeoutMS) {
 					let response;
 					let networkRetry = true;
 					while (true) {
@@ -227,7 +171,7 @@ const playlistGetter = async (args: {
 						const header = response.headers.get('Retry-After');
 						const wait = header !== null ? parseInt(header) * 1000 : 2000;
 						// Throw rate error if wait would pass the timeout time
-						if ((Date.now() + wait) > localTimeoutMS) {
+						if ((Date.now() + wait) > parentTimeoutMS) {
 							// Break early from rate limit if data exists
 							if (set.size > 0) break;
 							throw new RateError(5);
@@ -250,9 +194,6 @@ const playlistGetter = async (args: {
 								throw new FetchError('Spotify had an error');
 						}
 					}
-					if (!response)
-						throw new FetchError('There was an error getting a response ' +
-							'from Spotify');
 					// Add this iteration to set
 					// Set next to either new url or null
 					let jsoned;
@@ -305,12 +246,11 @@ const outputAdder = (params: {
 	globalTimeoutMS: number
 }) => {
 	const { accessToken, items, id, globalTimeoutMS } = params;
-	const localLimit = 200;
-	const localTimeoutMS = globalTimeoutMS - localLimit;
+	const parentTimeoutMS = globalTimeoutMS - 200;
 	const url = SPOT_URL_BASE.concat('playlists/', id, '/tracks');
 
 	return Promise.race<differInternalAddPromise>([
-		localTimeout<differInternalAddPromise>(globalTimeoutMS, localLimit),
+		localTimeout<differInternalAddPromise>(parentTimeoutMS),
 		new Promise<differInternalAddPromise>(async (res, rej) => {
 			// Batch the uris into 100s for successive fetch bodies
 			const uris = Array.from(items);
@@ -336,7 +276,7 @@ const outputAdder = (params: {
 			try {
 				for (const uriArr of fetches) {
 					// Arbitrary early break just in case time might go over
-					if (Date.now() + 220 > localTimeoutMS) break;
+					if (Date.now() + 220 > parentTimeoutMS) break;
 					let response;
 					let networkRetry = true;
 					while (true) {
@@ -363,7 +303,7 @@ const outputAdder = (params: {
 							const header = response.headers.get('Retry-After');
 							const wait = header !== null ? parseInt(header) * 1000 : 2000;
 							// Throw rate error if wait would pass the timeout time
-							if ((Date.now() + wait) > localTimeoutMS) {
+							if ((Date.now() + wait) > parentTimeoutMS) {
 								// Break early from rate limit if data exists
 								if (completed > 0) break;
 								throw new RateError(5);
@@ -419,46 +359,29 @@ const updateDescription = (params: {
 		reasons,
 		baseDescStr
 	} = params;
-	const localLimit = 200;
-	const localTimeoutMS = globalTimeoutMS - localLimit;
+	const parentTimeoutMS = globalTimeoutMS - 200;
 	const headers = new Headers();
 	headers.append('Authorization', `Bearer ${accessToken}`);
 	headers.append('Content-Type', 'application/json');
 	const failMsg = "Diff completed but couldn't update playlist description";
 
 	return new Promise<string | null>(async res => {
-		while (Date.now() + 220 < localTimeoutMS) {
-			try {
-				let response;
-				try {
-					response = await fetch(SPOT_URL_BASE.concat('playlists/', id), {
-						method: 'PUT',
-						headers,
-						body: JSON.stringify(
-							{ description: baseDescStr.concat(' ', reasons.join(' ')) }
-						)
-					})
-				} catch {
-					continue;
-				}
-
-				if (response.status === 429) {
-					const retryRaw = response.headers.get('Retry-After');
-					const retry = retryRaw !== null ? parseInt(retryRaw) * 1000 : 2000;
-					// Throw rate error if wait would pass the timeout time
-					if ((Date.now() + retry) < localTimeoutMS) {
-						// Await retry if within timeout time
-						await new Promise(async r => setTimeout(r, retry));
-						continue;
-					} else throw new Error();
-				}
-				if (response.ok === false) throw new Error();
-				return res(null);
-			} catch {
-				continue;
-			}
+		try {
+			const request = fetch(SPOT_URL_BASE.concat('playlists/', id), {
+				method: 'PUT',
+				headers,
+				body: JSON.stringify(
+					{ description: baseDescStr.concat(' ', reasons.join(' ')) }
+				)
+			});
+			const response = await getOnePromise({
+				request, silentFail: true, parentTimeoutMS
+			})
+			if (response.ok === false) throw new Error();
+			return res(null);
+		} catch {
+			return res(failMsg);
 		}
-		return res(failMsg);
 	});
 }
 
