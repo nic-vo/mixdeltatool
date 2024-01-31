@@ -17,7 +17,7 @@ Has to adapt the playlist context's specificPlaylistHandler to a <form>
 */
 
 export default function PlaylistAdder() {
-	const [onUser, setOnUser] = useState(true);
+	const [onUser, setOnUser] = useState(false);
 	const leftClasses = [local.button, local.leftButton, local.active];
 	const rightClasses = [local.button, local.rightButton, local.active];
 	const leftClasser = leftClasses.slice(0, !onUser ? 3 : 2).join(' ');
