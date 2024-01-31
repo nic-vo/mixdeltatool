@@ -9,17 +9,6 @@ class MalformedError extends Error {
 	}
 }
 
-class UnprocessableError extends Error {
-	status: number;
-	message: string;
-
-	constructor() {
-		super();
-		this.status = 422;
-		this.message = 'Check your information';
-	}
-}
-
 class AuthError extends Error {
 	status: number;
 	message: string;
@@ -31,14 +20,47 @@ class AuthError extends Error {
 	}
 }
 
-class TimeoutError extends Error {
+class ForbiddenError extends Error {
+	status: number;
+	message: string;
+
+	constructor(message?: string) {
+		super();
+		this.status = 403;
+		this.message = message? message: "You're not allowed to do that.";
+	}
+}
+
+class NotFoundError extends Error {
+	status: number;
+	message: string;
+
+	constructor(message?: string) {
+		super();
+		this.status = 404;
+		this.message = message? message: "Couldn't find that.";
+	}
+}
+
+class ReqMethodError extends Error {
+	status: number;
+	message: string;
+
+	constructor(reqType: string) {
+		super();
+		this.status = 405;
+		this.message = `${reqType} only`;
+	}
+}
+
+class UnprocessableError extends Error {
 	status: number;
 	message: string;
 
 	constructor() {
 		super();
-		this.status = 504;
-		this.message = 'Server timed out';
+		this.status = 422;
+		this.message = 'Check your information';
 	}
 }
 
@@ -59,32 +81,21 @@ class FetchError extends Error {
 	status: number;
 	message: string;
 
-	constructor(message: string) {
+	constructor(message?: string) {
 		super();
 		this.status = 502;
-		this.message = message;
+		this.message = message ? message : 'There was an error reaching spotify';
 	}
 }
 
-class ForbiddenError extends Error {
+class TimeoutError extends Error {
 	status: number;
 	message: string;
 
-	constructor(message: string) {
+	constructor() {
 		super();
-		this.status = 403;
-		this.message = message;
-	}
-}
-
-class ReqMethodError extends Error {
-	status: number;
-	message: string;
-
-	constructor(reqType: string) {
-		super();
-		this.status = 405;
-		this.message = `${reqType} only`;
+		this.status = 504;
+		this.message = 'Server timed out';
 	}
 }
 
@@ -102,11 +113,12 @@ class CustomError extends Error {
 export {
 	MalformedError,
 	AuthError,
-	RateError,
-	ReqMethodError,
-	CustomError,
 	ForbiddenError,
+	NotFoundError,
+	ReqMethodError,
+	UnprocessableError,
+	RateError,
 	FetchError,
 	TimeoutError,
-	UnprocessableError
+	CustomError,
 }
