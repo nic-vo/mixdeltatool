@@ -1,17 +1,14 @@
+import { pageQueryParser } from '@lib/spotify/validators';
 import { getServerSession } from 'next-auth';
 import { routeKeyRetriever } from '@lib/auth/accessKey'
 import { userPlaylistGetter } from '@lib/spotify/getterPromises';
-import { z } from 'zod';
-import { checkAndUpdateEntry } from '@lib/database/redis/ratelimiting';
 
 import { authOptions } from '@lib/auth/options';
 import {
 	AUTH_WINDOW,
 	GLOBAL_EXECUTION_WINDOW,
-	SPOT_LOGIN_WINDOW,
-	SPOT_PLAYLIST_PAGE_LIMIT
+	SPOT_LOGIN_WINDOW
 } from '@consts/spotify';
-
 import {
 	AuthError,
 	CustomError,
@@ -23,6 +20,7 @@ import {
 
 import { getUserPlaylistsApiRequest } from '@components/spotify/types';
 import { NextApiResponse } from 'next';
+import { checkAndUpdateEntry } from '@lib/database/redis/ratelimiting';
 
 // The assumption for this route is that every sign-on refreshes access token
 // Session never updates, and only exists until access token expiry
@@ -30,10 +28,6 @@ import { NextApiResponse } from 'next';
 const RATE_LIMIT_PREFIX = 'GUP';
 const RATE_LIMIT_ROLLING_LIMIT = 10;
 const RATE_LIMIT_DECAY_SECONDS = 5;
-
-const queryParser = z.object({
-	page: z.coerce.number().int().gte(0).lte(SPOT_PLAYLIST_PAGE_LIMIT)
-}).strict();
 
 export default async function handler(
 	req: getUserPlaylistsApiRequest,
@@ -79,7 +73,7 @@ export default async function handler(
 
 		let page;
 		try {
-			page = queryParser.parse(req.query).page;
+			page = pageQueryParser.parse(req.query).page;
 		} catch {
 			throw new MalformedError();
 		}
