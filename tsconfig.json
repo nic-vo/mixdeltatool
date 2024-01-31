@@ -11,6 +11,7 @@
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
 		"incremental": false,
+		"isolatedModules": true,
 		"jsx": "preserve",
 		"module": "ESNext",
 		"moduleResolution": "Node",
@@ -27,28 +28,25 @@
 			}
 		],
 		"paths": {
-			"@/*": [
-				"./src/*"
-			],
 			"@lib/*": [
-				"./lib/*"
+				"./src/lib/*"
 			],
 			"@components/*": [
-				"./components/*"
+				"./src/components/*"
 			],
 			"@types/*": [
-				"./types/*"
+				"./src/types/*"
 			],
 			"@consts/*": [
-				"./consts/*"
+				"./src/consts/*"
 			],
 			"@styles/*": [
 				"./styles/*"
 			],
 			"@hooks/*": [
-				"./hooks/*"
+				"./src/hooks/*"
 			]
-		}
+		},
 	},
 	"include": [
 		"next-env.d.ts",
