@@ -26,7 +26,7 @@ export default function SpotifyFrame(props: {
 				marginTop: '15svh'
 			}}>Sign in please!</h1>
 			<button
-				onClick={() => signIn()}
+				onClick={() => signIn('spotify')}
 				className={global.emptyButton}
 				style={{ margin: '5dvh' }}>Sign In</button>
 			<ServiceStatus {...props} />

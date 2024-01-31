@@ -24,6 +24,14 @@ export const userDeleter = async (id: string) => {
 					const message = 'Error deleting user';
 					reject({ message });
 				}
+			}),
+			new Promise(async (resolve, _): Promise<void> => {
+				try {
+					await sessionDeleter(id);
+				} catch {
+					// Silent catch for sessions: nbd
+				}
+				resolve(null)
 			})
 		]);
 	} catch (e: any) {

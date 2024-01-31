@@ -30,7 +30,7 @@ const Content = () => {
 					<button
 						id='header-signin'
 						className={global.emptyButton}
-						onClick={() => signIn()}>Sign in</button>
+						onClick={() => signIn('spotify')}>Sign in</button>
 					: (<>
 						<div style={{ width: '8svh', height: '8svh' }}>
 							<ImageLoader url={data.user.image}

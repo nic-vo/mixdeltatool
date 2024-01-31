@@ -105,7 +105,7 @@ function SpecificPlaylistProvider(props: { children: React.ReactNode }) {
 				throw { message: 'There is an error with this album / playlist link.' };
 
 			const raw = await fetch(`/api/spotify/getSpecific?id=${id}&type=${type}`);
-			if (raw.status === 401) signIn();
+			if (raw.status === 401) signIn('spotify');
 			if (raw.ok === false) {
 				const jsoned = await raw.json();
 				throw { message: jsoned.message };

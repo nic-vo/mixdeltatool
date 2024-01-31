@@ -5,9 +5,10 @@ const Canvas = (props: {
 	draw: (args: { ctx: CanvasRenderingContext2D, startTime: number, init: any }) => void,
 	initializer: (args: { height: number, width: number }) => {},
 	predraw?: (ctx: CanvasRenderingContext2D) => void,
-	postdraw?: (ctx: CanvasRenderingContext2D) => void
+	postdraw?: (ctx: CanvasRenderingContext2D) => void,
+	animated: boolean
 }) => {
-	const { draw, predraw, postdraw } = props;
+	const { draw, predraw, postdraw, animated } = props;
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 
 	const [width, setWidth] = useState(0);
@@ -31,6 +32,15 @@ const Canvas = (props: {
 		let last = Date.now();
 		const init = props.initializer({ height, width });
 
+		if (!animated) {
+			const render = () => {
+				if (predraw) predraw(context);
+				draw({ ctx: context, startTime, init })
+			}
+			requestAnimationFrame(render);
+			return;
+		}
+
 		const render = () => {
 			const rn = Date.now();
 			if (rn - last > 1000 / props.fps) {
@@ -38,6 +48,7 @@ const Canvas = (props: {
 				if (predraw) predraw(context);
 				draw({ ctx: context, startTime, init });
 			}
+
 			animationFrameId = requestAnimationFrame(render);
 		}
 		render();
@@ -45,7 +56,7 @@ const Canvas = (props: {
 		return () => {
 			window.cancelAnimationFrame(animationFrameId);
 		}
-	}, [draw, predraw, postdraw, width, height, error]);
+	}, [draw, predraw, postdraw, width, height, error, animated]);
 
 	useEffect(() => {
 		// const canvas = canvasRef.current;

@@ -72,7 +72,12 @@ const Background = () => {
 	}
 
 	return (
-		<Canvas fps={30} predraw={predraw} initializer={drawInit} draw={draw} />
+		<Canvas
+			fps={30}
+			predraw={predraw}
+			initializer={drawInit}
+			draw={draw}
+			animated={true} />
 	);
 }
 

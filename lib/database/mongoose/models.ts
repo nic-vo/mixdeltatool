@@ -1,10 +1,14 @@
 import mongoose, { Schema, model, SchemaTypes } from 'mongoose';
 
 const userSchema = new Schema({
+	_id: {
+		type: SchemaTypes.ObjectId,
+		required: true
+	},
 	name: SchemaTypes.String,
 	email: SchemaTypes.String,
 	image: SchemaTypes.String,
-	emailVerified: SchemaTypes.Number
+	emailVerified: SchemaTypes.Date,
 });
 const UserModel = model('user',
 	userSchema,
@@ -14,9 +18,19 @@ const UserModel = model('user',
 export const User = (mongoose.models['user'] as typeof UserModel) || UserModel;
 
 const sessionSchema = new Schema({
-	sessionToken: SchemaTypes.String,
-	expires: SchemaTypes.Date,
-	userId: SchemaTypes.ObjectId
+	sessionToken: {
+		type: SchemaTypes.String,
+		required: true
+	},
+	expires: {
+		type: SchemaTypes.Date,
+		required: true
+	},
+	userId: {
+		type: SchemaTypes.ObjectId,
+		required: true,
+		ref: 'user'
+	}
 });
 const SessionModel = model('session',
 	sessionSchema,
@@ -26,15 +40,40 @@ const SessionModel = model('session',
 export const Session = (mongoose.models['session'] as typeof SessionModel) || SessionModel;
 
 const accountSchema = new Schema({
-	provider: SchemaTypes.String,
-	providerAccountId: SchemaTypes.String,
-	type: SchemaTypes.String,
-	access_token: SchemaTypes.String,
-	token_type: SchemaTypes.String,
-	expires_at: SchemaTypes.Number,
-	refresh_token: SchemaTypes.String,
+	provider: {
+		type: SchemaTypes.String,
+		required: true
+	},
+	type: {
+		type: SchemaTypes.String,
+		required: true
+	},
+	providerAccountId: {
+		type: SchemaTypes.String,
+		required: true
+	},
+	access_token: {
+		type: SchemaTypes.String,
+		required: true
+	},
+	token_type: {
+		type: SchemaTypes.String,
+		required: true
+	},
+	expires_at: {
+		type: SchemaTypes.Number,
+		required: true
+	},
+	refresh_token: {
+		type: SchemaTypes.String,
+		required: true
+	},
 	scope: SchemaTypes.String,
-	userId: SchemaTypes.ObjectId
+	userId: {
+		type: SchemaTypes.ObjectId,
+		required: true,
+		ref: 'user'
+	}
 });
 const AccountModel = model('account',
 	accountSchema,
@@ -44,7 +83,11 @@ const AccountModel = model('account',
 export const Account = (mongoose.models['account'] as typeof AccountModel) || AccountModel;
 
 const globalStatusPointerSchema = new Schema({
-	current: SchemaTypes.ObjectId
+	current: {
+		type: SchemaTypes.ObjectId,
+		required: true,
+		ref: 'globalStatus'
+	}
 });
 const GlobalStatusPointerModel = model('globalStatusPointer',
 	globalStatusPointerSchema,
@@ -54,9 +97,18 @@ const GlobalStatusPointerModel = model('globalStatusPointer',
 export const GlobalStatusPointer = (mongoose.models['globalStatusPointer'] as typeof GlobalStatusPointerModel) || GlobalStatusPointerModel;
 
 const globalStatusSchema = new Schema({
-	active: SchemaTypes.Number,
-	status: SchemaTypes.String,
-	statusType: SchemaTypes.String
+	active: {
+		type: SchemaTypes.Number,
+		required: true
+	},
+	status: {
+		type: SchemaTypes.String,
+		required: true
+	},
+	statusType: {
+		type: SchemaTypes.String,
+		required: true
+	}
 });
 const GlobalStatusModel = model('globalStatus',
 	globalStatusSchema,
@@ -66,9 +118,18 @@ const GlobalStatusModel = model('globalStatus',
 export const GlobalStatus = (mongoose.models['globalStatus'] as typeof GlobalStatusModel) || GlobalStatusModel;
 
 const contactMessageSchema = new Schema({
-	ip: SchemaTypes.String,
-	name: SchemaTypes.String,
-	message: SchemaTypes.String,
+	ip: {
+		type: SchemaTypes.String,
+		required: true
+	},
+	name: {
+		type: SchemaTypes.String,
+		required: true
+	},
+	message: {
+		type: SchemaTypes.String,
+		required: true
+	},
 });
 const ContactMessageModel = model('contactMessage',
 	contactMessageSchema,
