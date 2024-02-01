@@ -1,11 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
-import gLoadingReducer from './gLoadingSlice';
+import loadStatesSliceReducer from './loadStatesSlice';
 import userPlaylistsReducer from './userPlaylistsSlice';
 import specificPlaylistsReducer from './specificPlaylistsSlice';
 
 export const store = configureStore({
 	reducer: {
-		gLoading: gLoadingReducer,
+		loadStates: loadStatesSliceReducer,
 		userPlaylists: userPlaylistsReducer,
 		specificPlaylists: specificPlaylistsReducer
 	}
