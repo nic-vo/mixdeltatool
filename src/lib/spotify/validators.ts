@@ -62,6 +62,14 @@ const spotPlaylistObjectParser = basicSpotObjectParser.extend({
 	type: z.literal('playlist')
 });
 
+const myPlaylistObjectParser = basicSpotObjectParser.pick({ id: true }).extend({
+	name: z.string(),
+	owner: z.array(z.object({ name: z.string(), id: z.string() })),
+	image: z.optional(spotImageObjectParser),
+	tracks: z.number().int().gt(0),
+	type: z.enum(['album', 'playlist'])
+});
+
 const spotAlbumObjectParser = basicSpotObjectParser.extend({
 	artists: z.array(spotArtistObjectParser),
 	total_tracks: z.number().int(),
@@ -85,5 +93,6 @@ export {
 	userPlaylistResponseParser,
 	spotPlaylistObjectParser,
 	spotAlbumObjectParser,
-	spotUserObjectParser
+	spotUserObjectParser,
+	myPlaylistObjectParser
 };
