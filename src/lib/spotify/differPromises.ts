@@ -8,9 +8,9 @@ import { genUId } from '@lib/misc/helpers';
 
 import {
 	AuthError,
-	CustomError,
 	FetchError,
 	ForbiddenError,
+	NotFoundError,
 	RateError
 } from '../errors';
 
@@ -43,75 +43,72 @@ const createEmptyPlaylist = async (args: {
 
 	return Promise.race([
 		localTimeout<MyPlaylistObject>(parentTimeoutMS),
-		new Promise<MyPlaylistObject>(async (res, rej) => {
-			let userId: string;
-			try {
-				userId = await userGetter({ globalTimeoutMS, accessToken });
-			}
-			catch (e: any) {
-				return rej(e)
-			}
+		(async (): Promise<MyPlaylistObject> => {
+
+			let userId: string = await userGetter({ globalTimeoutMS, accessToken });
 
 			const url = SPOT_URL_BASE.concat('users/', userId, '/playlists');
 			const headers = new Headers();
 			headers.append('Authorization', `Bearer ${accessToken}`);
 			headers.append('Content-Type', 'application/json');
+
+			const request = fetch(url, {
+				headers,
+				method: 'POST',
+				body: JSON.stringify({
+					name: `MixDelta - ${newName !== null ? newName : genUId(4)}`,
+					description: baseDescStr,
+					public: false
+				})
+			});
+
+			const response = await getOnePromise({
+				request, silentFail: false, parentTimeoutMS,
+				errorOverrides: [
+					{
+						status: 403,
+						message: "For some reason you can't create a playlist."
+					}
+				]
+			});
+			let returner: MyPlaylistObject;
 			try {
-				const request = fetch(url, {
-					headers,
-					method: 'POST',
-					body: JSON.stringify({
-						name: `MixDelta - ${newName !== null ? newName : genUId(4)}`,
-						description: baseDescStr,
-						public: false
-					})
-				});
-				const response = await getOnePromise({
-					request, silentFail: false, parentTimeoutMS,
-					errorOverrides: [
-						{ status: 403, message: "For some reason you can't create a playlist." }
-					]
-				});
-				let returner: MyPlaylistObject;
-				try {
-					const jsoned = await response.json();
-					const parsed = spotPlaylistObjectParser.parse(jsoned);
-					returner = {
-						...parsed,
-						owner: [{ ...parsed.owner, name: parsed.owner.display_name || 'Spotify User' }],
-						image: parsed.images[0],
-						tracks: 0
-					};
-				} catch {
-					throw new FetchError('There was an error creating a new playlist');
-				}
-				let putStart = Date.now();
-				// PUT Logo
-				const putUrl = SPOT_URL_BASE.concat('playlists/', returner.id, '/images');
-				const putHeaders = new Headers();
-				putHeaders.append('Authorization', `Bearer ${accessToken}`);
-				putHeaders.append('Content-Type', 'image/jpeg');
-				try {
-					const request = fetch(putUrl, {
-						headers: putHeaders,
-						method: 'PUT',
-						body: imgString
-					});
-					const response = await getOnePromise({
-						request, silentFail: true, parentTimeoutMS
-					});
-					if (!response.ok) throw new Error();
-					printTime('Thumb uploaded:', putStart);
-				} catch {
-					printTime('Thumb skipped:', putStart);
-				}
-				returner.image = { url: '/mdl.jpg' }
-				printTime('Created empty playlist and uploaded thumb:', start);
-				return res(returner);
-			} catch (e: any) {
-				return rej(e);
+				const jsoned = await response.json();
+				const parsed = spotPlaylistObjectParser.parse(jsoned);
+				returner = {
+					...parsed,
+					owner: [{ ...parsed.owner, name: parsed.owner.display_name || 'Spotify User' }],
+					image: parsed.images[0],
+					tracks: 0
+				};
+			} catch {
+				throw new FetchError('There was an error creating a new playlist');
 			}
-		})]);
+
+			let putStart = Date.now();
+			// PUT Logo
+			const putUrl = SPOT_URL_BASE.concat('playlists/', returner.id, '/images');
+			const putHeaders = new Headers();
+			putHeaders.append('Authorization', `Bearer ${accessToken}`);
+			putHeaders.append('Content-Type', 'image/jpeg');
+			try {
+				const putRequest = fetch(putUrl, {
+					headers: putHeaders,
+					method: 'PUT',
+					body: imgString
+				});
+				const putResponse = await getOnePromise({
+					request: putRequest, silentFail: true, parentTimeoutMS
+				});
+				if (!putResponse.ok) throw new Error();
+				printTime('Thumb uploaded:', putStart);
+			} catch {
+				printTime('Thumb skipped:', putStart);
+			}
+			returner.image = { url: '/mdl.jpg' }
+			printTime('Created empty playlist and uploaded thumb:', start);
+			return returner;
+		})()]);
 }
 
 const playlistGetter = async (args: {
@@ -122,12 +119,11 @@ const playlistGetter = async (args: {
 }): Promise<differInternalPlaylistPromise> => {
 	const start = Date.now();
 	const { accessToken, type, id, globalTimeoutMS } = args;
-	const localLimit = 2200;
 	const parentTimeoutMS = globalTimeoutMS - 2200;
 
 	return Promise.race([
 		localTimeout<differInternalPlaylistPromise>(parentTimeoutMS),
-		new Promise<differInternalPlaylistPromise>(async (res, rej) => {
+		(async (): Promise<differInternalPlaylistPromise> => {
 			// Initial url for fetching
 			const base = SPOT_URL_BASE.concat(type, 's/', id, '/tracks?');
 			const params = new URLSearchParams();
@@ -151,92 +147,88 @@ const playlistGetter = async (args: {
 			let next: string | null = initNext;
 			// One retry because for some reason on
 			// random playlists, the fetch instantly throws
-			try {
-				while (next !== null && (Date.now() + 500) < parentTimeoutMS) {
-					let response;
-					let networkRetry = true;
-					while (true) {
-						try {
-							response = await fetch(next, { headers });
-						} catch {
-							if (networkRetry === false)
-								throw new FetchError('There was an error getting a playlist');
-							networkRetry = false;
-							continue;
-						}
-						break;
-					}
-					networkRetry = true;
-					if (response.status === 429) {
-						const header = response.headers.get('Retry-After');
-						const wait = header !== null ? parseInt(header) * 1000 : 2000;
-						// Throw rate error if wait would pass the timeout time
-						if ((Date.now() + wait) > parentTimeoutMS) {
-							// Break early from rate limit if data exists
-							if (set.size > 0) break;
-							throw new RateError(5);
-						}
-						// Await retry if within timeout time
-						await new Promise(async r => setTimeout(r, wait));
+			while (next !== null && (Date.now() + 500) < parentTimeoutMS) {
+				let response;
+				let networkRetry = true;
+				while (true) {
+					try {
+						response = await fetch(next, { headers });
+					} catch {
+						if (networkRetry === false)
+							throw new FetchError('There was an error getting a playlist');
+						networkRetry = false;
 						continue;
 					}
-					if (response.ok === false) {
-						// This is if somehow after all this, Spotify detects something wrong
-						switch (response.status) {
-							case 401:
-								throw new AuthError();
-							case 403:
-								throw new ForbiddenError(`For some reason, you can't access `
-									+ `one of those playlists`);
-							case 404:
-								throw new CustomError(404, `One of those playlists doesn't exist`);
-							default:
-								throw new FetchError('Spotify had an error');
-						}
-					}
-					// Add this iteration to set
-					// Set next to either new url or null
-					let jsoned;
-					if (type === 'playlist') {
-						jsoned = await response.json() as SpotPlaylistTracksResponse;
-						for (const item of jsoned.items) {
-							// Filter for existing and local files;
-							// Local files have really weird URIs;
-							// Sometimes spotify returns null for a weird non-existing track
-							// And this whole thing throws
-							if (item === null
-								|| item.track === null
-								|| item.track.uri === null
-								|| item.is_local
-								|| /:local:/.test(item.track.uri)
-								|| set.has(item.track.uri) === true) continue;
-							// Show that some tracks returned null for some reason
-							// Don't increment completed
-							set.add(item.track.uri);
-							completed += 1;
-						}
-					} else {
-						jsoned = await response.json() as SpotAlbumTracksResponse;
-						for (const item of jsoned.items) {
-							if (!item.uri) continue;
-							set.add(item.uri);
-							completed += 1;
-						}
-					}
-					next = jsoned.next;
-					total = total === 0 ? jsoned.total : total;
+					break;
 				}
-			} catch (e: any) {
-				printTime(`ERROR - ${id} - ${completed}/${total} fetched in:`, start);
-				return rej(e);
+				networkRetry = true;
+				if (response.status === 429) {
+					const header = response.headers.get('Retry-After');
+					const wait = header !== null ? parseInt(header) * 1000 : 2000;
+					// Throw rate error if wait would pass the timeout time
+					if ((Date.now() + wait) > parentTimeoutMS) {
+						// Break early from rate limit if data exists
+						if (set.size > 0) break;
+						throw new RateError(5);
+					}
+					// Await retry if within timeout time
+					await new Promise(async r => setTimeout(r, wait));
+					continue;
+				}
+				if (response.ok === false) {
+					// This is if somehow after all this, Spotify detects something wrong
+					switch (response.status) {
+						case 401:
+							throw new AuthError();
+						case 403:
+							throw new ForbiddenError(`For some reason, you can't access `
+								+ `one of those playlists`);
+						case 404:
+							throw new NotFoundError(`One of those playlists doesn't exist`);
+						default:
+							throw new FetchError('Spotify had an error');
+					}
+				}
+				// Add this iteration to set
+				// Set next to either new url or null
+				let jsoned;
+				if (type === 'playlist') {
+					jsoned = await response.json() as SpotPlaylistTracksResponse;
+					for (const item of jsoned.items) {
+						// Filter for existing and local files;
+						// Local files have really weird URIs;
+						// Sometimes spotify returns null for a weird non-existing track
+						// And this whole thing throws
+						if (item === null
+							|| item.track === null
+							|| item.track.uri === null
+							|| item.is_local
+							|| /:local:/.test(item.track.uri)
+							|| set.has(item.track.uri) === true) continue;
+						// Show that some tracks returned null for some reason
+						// Don't increment completed
+						set.add(item.track.uri);
+						completed += 1;
+					}
+				} else {
+					jsoned = await response.json() as SpotAlbumTracksResponse;
+					for (const item of jsoned.items) {
+						if (!item.uri) continue;
+						set.add(item.uri);
+						completed += 1;
+					}
+				}
+				next = jsoned.next;
+				total = total === 0 ? jsoned.total : total;
 			}
+
 			printTime(`${id} - ${completed}/${total} fetched in:`, start);
-			return res({
+			return {
 				total,
 				completed,
 				items: set
-			});
-		})]);
+			};
+		})()]);
 }
 
 const outputAdder = (params: {
@@ -251,7 +243,7 @@ const outputAdder = (params: {
 
 	return Promise.race<differInternalAddPromise>([
 		localTimeout<differInternalAddPromise>(parentTimeoutMS),
-		new Promise<differInternalAddPromise>(async (res, rej) => {
+		(async (): Promise<differInternalAddPromise> => {
 			// Batch the uris into 100s for successive fetch bodies
 			const uris = Array.from(items);
 			const fetches: string[][] = [];
@@ -273,79 +265,66 @@ const outputAdder = (params: {
 			const total = uris.length;
 			let completed = 0;
 
-			try {
-				for (const uriArr of fetches) {
-					// Arbitrary early break just in case time might go over
-					if (Date.now() + 220 > parentTimeoutMS) break;
-					let response;
-					let networkRetry = true;
-					while (true) {
-						while (true) {
-							try {
-								response = await fetch(url,
-									{
-										headers,
-										method: 'POST',
-										body: JSON.stringify({ uris: uriArr })
-									}
-								);
-							} catch {
-								if (networkRetry === false)
-									throw new FetchError('There was an error adding tracks to the'
-										+ 'new playlist');
-								networkRetry = false;
-								continue;
-							}
-							break;
-						}
-						networkRetry = true;
-						if (response.status === 429) {
-							const header = response.headers.get('Retry-After');
-							const wait = header !== null ? parseInt(header) * 1000 : 2000;
-							// Throw rate error if wait would pass the timeout time
-							if ((Date.now() + wait) > parentTimeoutMS) {
-								// Break early from rate limit if data exists
-								if (completed > 0) break;
-								throw new RateError(5);
-							}
-							// Await retry if within timeout time
-							await new Promise(async r => setTimeout(r, wait));
-							continue;
-						}
+			// Flag to exit all fetches
+			let endAll = false;
+			for (const uriArr of fetches) {
+				// Arbitrary early break just in case time might go over
+				let response;
+				while (true) {
+					if (Date.now() + 220 > parentTimeoutMS) {
+						endAll = true;
 						break;
 					}
-					if (response.ok === false) {
-						// This is if somehow after all this, Spotify detects something wrong
-						switch (response.status) {
-							case 401:
-								throw new AuthError();
-							case 403:
-								throw new ForbiddenError(`For some reason, you can't access the `
-									+ `playlist`);
-							default:
-								throw new FetchError('There was an error populating the playlist');
+					const request = fetch(url, {
+						headers,
+						method: 'POST',
+						body: JSON.stringify({ uris: uriArr })
+					});
+					response = await getOnePromise({
+						request, silentFail: true, parentTimeoutMS
+					});
+					if (response.status === 429) {
+						const header = response.headers.get('Retry-After');
+						const wait = header !== null ? parseInt(header) * 1000 : 2000;
+						// Throw rate error if wait would pass the timeout time
+						if ((Date.now() + wait) > parentTimeoutMS) {
+							// Break early from rate limit if data exists
+							if (completed > 0) {
+								endAll = true;
+								break;
+							}
+							throw new RateError(10);
 						}
+						// Await retry if within timeout time
+						await new Promise(async r => setTimeout(r, wait));
+						continue;
 					}
-					if (!response)
-						throw new FetchError('There was an error getting a response ' +
-							'from Spotify');
-					// Add new number to completed, either a hundred or the remainder
-					if (iterations <= hundreds) completed += 100;
-					else if (remain > 0) completed += remain;
-					iterations += 1;
+					break;
 				}
-			} catch (e: any) {
-				rej(e);
+				// No response means there wasn't enough time to fetch anything
+				if (endAll || !response) break;
+				if (response.ok === false) {
+					// This is if somehow after all this, Spotify detects something wrong
+					switch (response.status) {
+						case 401:
+							throw new AuthError();
+						case 403:
+							throw new ForbiddenError(`For some reason, you can't access the `
+								+ `playlist`);
+						default:
+							throw new FetchError('There was an error populating the playlist');
+					}
+				}
+				// Add new number to completed, either a hundred or the remainder
+				if (iterations <= hundreds) completed += 100;
+				else if (remain > 0) completed += remain;
+				iterations += 1;
 			}
-
-			return res({
-				total,
-				completed
-			});
-		})]);
+			return { total, completed };
+		})()]);
 }
 
-const updateDescription = (params: {
+const updateDescription = async (params: {
 	accessToken: string,
 	globalTimeoutMS: number,
 	id: string,
@@ -365,24 +344,18 @@ const updateDescription = (params: {
 	headers.append('Content-Type', 'application/json');
 	const failMsg = "Diff completed but couldn't update playlist description";
 
-	return new Promise<string | null>(async res => {
-		try {
-			const request = fetch(SPOT_URL_BASE.concat('playlists/', id), {
-				method: 'PUT',
-				headers,
-				body: JSON.stringify(
-					{ description: baseDescStr.concat(' ', reasons.join(' ')) }
-				)
-			});
-			const response = await getOnePromise({
-				request, silentFail: true, parentTimeoutMS
-			})
-			if (response.ok === false) throw new Error();
-			return res(null);
-		} catch {
-			return res(failMsg);
-		}
+	const request = fetch(SPOT_URL_BASE.concat('playlists/', id), {
+		method: 'PUT',
+		headers,
+		body: JSON.stringify(
+			{ description: baseDescStr.concat(' ', reasons.join(' ')) }
+		)
 	});
+	const response = await getOnePromise({
+		request, silentFail: true, parentTimeoutMS
+	});
+	if (response.ok === false) return failMsg;
+	return null;
 }
 
 export {
