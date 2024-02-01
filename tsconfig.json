@@ -41,10 +41,13 @@
 				"./src/consts/*"
 			],
 			"@styles/*": [
-				"./styles/*"
+				"./src/styles/*"
 			],
 			"@hooks/*": [
 				"./src/hooks/*"
+			],
+			"@state/*": [
+				"./src/state/*"
 			]
 		},
 	},
