@@ -3,6 +3,7 @@ import { signIn } from 'next-auth/react';
 import { initPlaylists, persistPlaylists } from './helpers';
 
 import type { MyPlaylistObject } from '@components/spotify/types';
+import { endSpecificLoading, startSpecificLoading } from './loadStatesSlice';
 
 const PLAYLISTS_KEY = 'SPEC_PLAYLISTS';
 
@@ -20,9 +21,11 @@ const specificPlaylistsSlice = createSlice({
 	reducers: {},
 	extraReducers: (builder) => {
 		builder.addCase(retrieveSpecificListAsync.pending, (state) => {
+			startSpecificLoading();
 			state.error = null;
 		}).addCase(retrieveSpecificListAsync.fulfilled,
 			(state, action: PayloadAction<MyPlaylistObject>) => {
+				endSpecificLoading();
 				const idSet = new Set(state.playlists.map(playlist => playlist.id));
 				if (idSet.has(action.payload.id)) {
 					state.error = 'You already have this playlist';
@@ -34,6 +37,7 @@ const specificPlaylistsSlice = createSlice({
 					persistPlaylists(setted, PLAYLISTS_KEY);
 				}
 			}).addCase(retrieveSpecificListAsync.rejected, (state, action) => {
+				endSpecificLoading();
 				state.error = typeof (action.error.message) === 'string' ?
 					action.error.message : 'Unknown error';
 			})
