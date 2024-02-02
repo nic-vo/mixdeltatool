@@ -60,14 +60,14 @@ export const retrieveSpecificListAsync = createAsyncThunk(
 				throw { message: 'There was an error reaching our servers' };
 			}
 			const jsoned = await response.json();
-			if (!response.ok) {
-				if (response.status === 401) signIn();
-				const { message } = jsoned as { message: string };
-				throw { message };
-			}
-			return jsoned as MyPlaylistObject;
+			// Return early if okay
+			if (response.ok) return jsoned as MyPlaylistObject;
+			// Any errors get thrown as expected {message: string}
+			if (response.status === 401) signIn();
+			throw jsoned as { message: string };
 		} catch (e: any) {
-			throw e.message ? e.message : 'Unknown error';
+			// In case I missed something
+			throw e.message ? e.message : { message: 'Bad response from server' };
 		}
 	}
 );
