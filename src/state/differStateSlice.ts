@@ -24,7 +24,15 @@ const initialState: InitialDifferFormState = {
 const differFormSlice = createSlice({
 	name: 'differForm',
 	initialState,
-	reducers: {},
+	reducers: {
+		clearTarget: (state) => { state.target = '' },
+		clearDiffer: (state) => { state.differ = '' },
+		resetToForm: (state) => {
+			state.success = null;
+			state.playlist = null;
+			state.onForm = true;
+		}
+	},
 	extraReducers: (builder) => {
 		builder.addCase(differOperationAsync.fulfilled,
 			(state, action) => {
@@ -34,4 +42,10 @@ const differFormSlice = createSlice({
 	}
 });
 
-// export const differOperationAsync = createAsyncThunk
+export const {
+	clearTarget,
+	clearDiffer,
+	resetToForm
+} = differFormSlice.actions;
+
+export default differFormSlice.reducer;
