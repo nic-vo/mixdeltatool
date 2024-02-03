@@ -26,7 +26,8 @@ const createEmptyPlaylist = async (args: {
 	accessToken: string,
 	baseDescStr: string,
 	globalTimeoutMS: number,
-	newName: string | null
+	newName: string | null,
+	target: MyPlaylistObject | false
 }): Promise<MyPlaylistObject> => {
 	const {
 		accessToken,
@@ -35,11 +36,6 @@ const createEmptyPlaylist = async (args: {
 		newName } = args;
 	const start = Date.now();
 	const parentTimeoutMS = globalTimeoutMS - 2200;
-	const imgPath = path.join(
-		process.cwd(),
-		'consts',
-		'mdl.jpg');
-	const imgString = readFileSync(imgPath).toString('base64');
 
 	return Promise.race([
 		localTimeout<MyPlaylistObject>(parentTimeoutMS),
@@ -91,21 +87,46 @@ const createEmptyPlaylist = async (args: {
 			const putHeaders = new Headers();
 			putHeaders.append('Authorization', `Bearer ${accessToken}`);
 			putHeaders.append('Content-Type', 'image/jpeg');
+			const imgPath = path.join(
+				process.cwd(),
+				'src',
+				'consts',
+				'mdl.jpg');
+			// const imgString = readFileSync(imgPath).toString('base64');
+			let imgGetSuccess = false;
 			try {
-				const putRequest = fetch(putUrl, {
+				let imgString
+				try {
+					if (args.target === false || !args.target.image) throw {};
+					console.log('fetching original image', args.target.image.url)
+					const imageRaw = await fetch(args.target.image.url);
+					imgString = Buffer.from(await imageRaw.arrayBuffer())
+						.toString('base64');
+					imgGetSuccess = true;
+				} catch (e: any) {
+					console.log('image fetch threw')
+					console.error(e);
+					imgString = readFileSync(imgPath).toString('base64');
+				}
+				const putToPlaylistRequest = fetch(putUrl, {
 					headers: putHeaders,
 					method: 'PUT',
 					body: imgString
 				});
-				const putResponse = await getOnePromise({
-					request: putRequest, silentFail: true, parentTimeoutMS
+				const putToPlaylistResponse = await getOnePromise({
+					request: putToPlaylistRequest, silentFail: true, parentTimeoutMS
 				});
-				if (!putResponse.ok) throw new Error();
+				if (!putToPlaylistResponse.ok) throw new Error();
 				printTime('Thumb uploaded:', putStart);
 			} catch {
 				printTime('Thumb skipped:', putStart);
 			}
-			returner.image = { url: '/mdl.jpg' }
+			returner.image = {
+				url: imgGetSuccess
+					&& args.target !== false
+					&& args.target.image ?
+					args.target.image.url : '/mdl.jpg'
+			}
 			printTime('Created empty playlist and uploaded thumb:', start);
 			return returner;
 		})()]);

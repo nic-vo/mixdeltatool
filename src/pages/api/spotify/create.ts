@@ -79,7 +79,7 @@ export default async function handler(
 
 		nextStep = printTime('Rate limit passed:', start);
 		// Validate body and body values
-		let target, differ, actionType, newName, newDesc;
+		let target, differ, actionType, newName, newDesc, keepImg;
 		try {
 			const parsed = diffBodyParser.parse(req.body);
 			target = parsed.target;
@@ -87,6 +87,7 @@ export default async function handler(
 			actionType = parsed.type;
 			newName = parsed.newName;
 			newDesc = parsed.newDesc;
+			keepImg = parsed.keepImg;
 		} catch (e: any) {
 			const error = e as ZodError;
 			const map = new Map();
@@ -174,7 +175,8 @@ export default async function handler(
 				accessToken,
 				baseDescStr,
 				globalTimeoutMS,
-				newName
+				newName,
+				target: keepImg && target
 			})
 		]);
 		if (targetDetails.completed !== targetDetails.total) {

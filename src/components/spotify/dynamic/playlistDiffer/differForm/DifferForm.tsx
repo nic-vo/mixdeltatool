@@ -135,10 +135,15 @@ export default function DifferForm(props: {
 										autoComplete='off'
 										maxLength={120} />
 								</label>
-								{/* <label htmlFor='keepimg'>
+								<label htmlFor='keepImg'>
 									Keep original playlist thumbnail?
-									<input type='checkbox' id='keepimg' name='keepimg' />
-								</label> */}
+									<input
+										type='checkbox'
+										id='keepImg'
+										name='keepImg'
+										value='yes'
+										checked={true} />
+								</label>
 								<p className={local.caveat}><FaExclamationCircle /> This tool will never directly change a playlist. It will compare the two selected playlists and create a new one from that comparison.</p>
 								<button
 									disabled={userLoading

@@ -7,7 +7,7 @@ import { ActionType, MyPlaylistObject, differRouteResponse } from '@components/s
 import { CLIENT_DIFF_TYPES } from '@consts/spotify';
 import { GlobalLoadingContext } from '@components/spotify/dynamic/contexts/GlobalLoadingProvider';
 
-const radioArr = Object.keys(CLIENT_DIFF_TYPES);
+const typeArr = Object.keys(CLIENT_DIFF_TYPES);
 
 const useDifferForm = () => {
 	const [target, setTarget] = useState<MyPlaylistObject | ''>('');
@@ -99,7 +99,7 @@ const useDifferForm = () => {
 			|| gLoading === true
 			|| target === ''
 			|| differ === ''
-			|| radioArr.includes(type) === false) return null;
+			|| typeArr.includes(type) === false) return null;
 		updateGLoading(true);
 		setLoading(true);
 		setSuccess(null);
@@ -119,21 +119,10 @@ const useDifferForm = () => {
 				body: JSON.stringify({
 					newName,
 					newDesc,
-					target: {
-						id: target.id,
-						type: target.type,
-						name: target.name,
-						owner: target.owner,
-						tracks: target.tracks
-					},
-					differ: {
-						id: differ.id,
-						type: differ.type,
-						name: differ.name,
-						owner: differ.owner,
-						tracks: differ.tracks
-					},
-					type: type
+					target,
+					differ,
+					type,
+					keepImg: form.get('keepImg') !== null
 				})
 			});
 			if (raw.status === 401) signIn('spotify');

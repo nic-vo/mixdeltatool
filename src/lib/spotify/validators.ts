@@ -35,14 +35,6 @@ const playlistIdTypeParser = z.object({
 	tracks: z.number().int()
 }).strict();
 
-const diffBodyParser = z.object({
-	target: playlistIdTypeParser,
-	differ: playlistIdTypeParser,
-	type: z.enum(['adu', 'odu', 'otu', 'bu', 'stu']),
-	newName: z.nullable(z.string().max(150)),
-	newDesc: z.nullable(z.string().max(600))
-}).strict();
-
 const basicSpotAPIResponseParser = z.object({
 	href: z.string().url(),
 	next: z.nullable(z.string().url())
@@ -69,6 +61,15 @@ const myPlaylistObjectParser = basicSpotObjectParser.pick({ id: true }).extend({
 	tracks: z.number().int().gt(0),
 	type: z.enum(['album', 'playlist'])
 });
+
+const diffBodyParser = z.object({
+	target: myPlaylistObjectParser,
+	differ: myPlaylistObjectParser,
+	type: z.enum(['adu', 'odu', 'otu', 'bu', 'stu']),
+	newName: z.nullable(z.string().max(150)),
+	newDesc: z.nullable(z.string().max(600)),
+	keepImg: z.boolean()
+}).strict();
 
 const spotAlbumObjectParser = basicSpotObjectParser.extend({
 	artists: z.array(spotArtistObjectParser),
