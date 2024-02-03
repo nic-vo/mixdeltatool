@@ -44,5 +44,10 @@ export const store = configureStore({
 	}
 });
 
-export type RootState = ReturnType<typeof store.getState>;
+export const selectSpecificPlaylists = (s: RootState) => s.specificPlaylists;
+export const selectUserPlaylists = (s: RootState) => s.userPlaylists;
+export const selectTarget = (s: RootState) => s.differForm;
+export const selectDiffer = (s: RootState) => s.differForm;
+export const selectPage = (s: RootState) => s.userPlaylists;
+
 export type AppDispatch = typeof store.dispatch;
