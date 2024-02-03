@@ -136,7 +136,7 @@ export default function DifferForm(props: {
 										maxLength={120} />
 								</label>
 								<label htmlFor='keepImg'>
-									Keep original playlist thumbnail?
+									Try to keep target playlist thumbnail?
 									<input
 										type='checkbox'
 										id='keepImg'
