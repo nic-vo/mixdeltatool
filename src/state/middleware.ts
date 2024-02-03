@@ -1,6 +1,6 @@
 import { createListenerMiddleware } from '@reduxjs/toolkit';
 import { clearUser } from './userPlaylistsSlice';
-import { clearDiffer, clearTarget } from './differStateSlice';
+import { clearDiffer, clearTarget } from './differFormSlice';
 import { clearSpecific } from './specificPlaylistsSlice';
 
 import { RootState } from './state';
