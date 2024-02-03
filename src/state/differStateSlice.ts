@@ -1,10 +1,5 @@
-import {
-	PayloadAction,
-	createAsyncThunk,
-	createSlice
-} from '@reduxjs/toolkit';
-import { signIn } from 'next-auth/react';
-import { startGlobalLoading, endGlobalLoading } from './loadStatesSlice';
+import { createSlice } from '@reduxjs/toolkit';
+import { differOperationAsync } from './thunks';
 
 import type { ActionType, MyPlaylistObject } from '@components/spotify/types';
 
@@ -22,11 +17,16 @@ const initialState: {
 	success: null
 }
 
-const differStateSlice = createSlice({
-	name: 'differState',
+const differFormSlice = createSlice({
+	name: 'differForm',
 	initialState,
 	reducers: {},
 	extraReducers: (builder) => {
+		builder.addCase(differOperationAsync.fulfilled,
+			(state, action) => {
+				state.success = action.payload.part;
+				state.playlist = action.payload.playlist;
+			});
 	}
 });
 
