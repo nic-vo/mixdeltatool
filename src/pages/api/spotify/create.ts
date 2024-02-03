@@ -19,7 +19,7 @@ import {
 } from '@consts/spotify';
 import { authOptions } from '@lib/auth/options';
 
-import { NextApiResponse } from 'next';
+import { NextApiRequest, NextApiResponse } from 'next';
 import { ZodError } from 'zod/lib';
 import {
 	MyPlaylistObject,
@@ -40,7 +40,7 @@ const RATE_LIMIT_ROLLING_LIMIT = 5;
 const RATE_LIMIT_DECAY_SECONDS = 30;
 
 export default async function handler(
-	req: createDiffPlaylistApiRequest, res: NextApiResponse
+	req: NextApiRequest, res: NextApiResponse
 ) {
 	const start = Date.now();
 	let nextStep;
@@ -57,7 +57,7 @@ export default async function handler(
 	}, GLOBAL_EXECUTION_WINDOW);
 
 	let newPlaylist: MyPlaylistObject;
-	// Because of imeouts, allow partial flag and reasons
+	// Because of timeouts, allow partial flag and reasons
 	let part = [] as string[];
 	try {
 		// Validate req method
