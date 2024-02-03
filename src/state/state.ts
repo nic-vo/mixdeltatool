@@ -1,13 +1,46 @@
 import { configureStore } from '@reduxjs/toolkit';
-import loadStatesSliceReducer from './loadStatesSlice';
-import userPlaylistsReducer from './userPlaylistsSlice';
-import specificPlaylistsReducer from './specificPlaylistsSlice';
+
+// Slices and initial types
+// User
+import userPlaylistsReducer,
+{ InitialUserPlaylistsState } from './userPlaylistsSlice';
+import userFetchStateReducer from './userFetchStateSlice';
+// Specific
+import specificPlaylistsReducer,
+{ InitialSpecificPlaylistsState } from './specificPlaylistsSlice';
+import specificFetchStateReducer from './specificFetchStateSlice';
+// Differ
+import differFormSliceReducer,
+{ InitialDifferFormState } from './differFormSlice';
+import differFetchStateSliceReducer from './differFetchStateSlice';
+
+import listenerMiddleware from './middleware';
+
+export type LoadingState = {
+	loading: boolean,
+	error: string | null
+};
+
+export type RootState = {
+	userPlaylists: InitialUserPlaylistsState,
+	specificPlaylists: InitialSpecificPlaylistsState,
+	differForm: InitialDifferFormState,
+	userFetchState: LoadingState,
+	specificFetchState: LoadingState,
+	differFetchState: LoadingState
+};
 
 export const store = configureStore({
 	reducer: {
-		loadStates: loadStatesSliceReducer,
 		userPlaylists: userPlaylistsReducer,
-		specificPlaylists: specificPlaylistsReducer
+		specificPlaylists: specificPlaylistsReducer,
+		differForm: differFormSliceReducer,
+		specificFetchState: specificFetchStateReducer,
+		userFetchState: userFetchStateReducer,
+		differFetchState: differFetchStateSliceReducer
+	},
+	middleware: (getDefault) => {
+		return getDefault().concat(listenerMiddleware);
 	}
 });
 
