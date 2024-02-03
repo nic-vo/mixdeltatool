@@ -3,16 +3,15 @@ import { initPlaylists, persistPlaylists } from './helpers';
 import { retrieveSpecificAsync } from './thunks';
 
 import type { MyPlaylistObject } from '@components/spotify/types';
-import { endSpecificLoading, startSpecificLoading } from './loadStatesSlice';
 
 const PLAYLISTS_KEY = 'SPEC_PLAYLISTS';
 
-const initialState: {
-	playlists: MyPlaylistObject[],
-	error: string | null
-} = {
-	playlists: initPlaylists(PLAYLISTS_KEY),
-	error: null
+export type InitialSpecificPlaylistsState = {
+	playlists: MyPlaylistObject[]
+}
+
+const initialState: InitialSpecificPlaylistsState = {
+	playlists: initPlaylists(PLAYLISTS_KEY)
 };
 
 const specificPlaylistsSlice = createSlice({

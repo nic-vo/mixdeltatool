@@ -10,19 +10,17 @@ import { differOperationAsync, retrieveUserListsAsync } from './thunks';
 import type { MyPlaylistObject } from '@components/spotify/types';
 
 type userPage = number | null;
-type userError = string | null;
+export type InitialUserPlaylistsState = {
+	playlists: MyPlaylistObject[],
+	page: userPage
+}
 
 const PLAYLISTS_KEY = 'USER_PLAYLISTS';
 const PAGE_KEY = 'USER_PLAYLISTS_PAGE';
 
-const initialState: {
-	playlists: MyPlaylistObject[],
-	page: userPage,
-	error: userError,
-} = {
+const initialState: InitialUserPlaylistsState = {
 	playlists: initPlaylists(PLAYLISTS_KEY),
 	page: initPage(PAGE_KEY),
-	error: null,
 };
 
 const userPlaylistsSlice = createSlice({

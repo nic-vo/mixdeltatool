@@ -3,18 +3,22 @@ import { differOperationAsync } from './thunks';
 
 import type { ActionType, MyPlaylistObject } from '@components/spotify/types';
 
-const initialState: {
+export type InitialDifferFormState = {
 	target: MyPlaylistObject | '',
 	differ: MyPlaylistObject | '',
 	type: ActionType | '',
-	error: string | null,
 	success: string[] | null,
-} = {
+	playlist: MyPlaylistObject | null,
+	onForm: boolean
+};
+
+const initialState: InitialDifferFormState = {
+	onForm: true,
 	target: '',
 	differ: '',
 	type: '',
-	error: null,
-	success: null
+	success: null,
+	playlist: null,
 }
 
 const differFormSlice = createSlice({
