@@ -43,7 +43,7 @@ const userPlaylistsSlice = createSlice({
 					new Set([...state.playlists, ...action.payload.playlists])
 				);
 				state.playlists = setted;
-				persistPlaylists(setted, PLAYLISTS_KEY);
+				persistPlaylists(PLAYLISTS_KEY, setted);
 				persistPage(action.payload.next, PAGE_KEY);
 			}).addCase(differOperationAsync.fulfilled, (state, action) => {
 				state.playlists = state.playlists.concat(action.payload.playlist);

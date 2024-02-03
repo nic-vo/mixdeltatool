@@ -45,13 +45,14 @@ export const initPage = (key: string): number | null => {
 	try {
 		const parsed = parseInt(storage);
 		return parsed >= 0 && parsed < 50 ? parsed : 0;
-	} catch { }
-	return 0;
+	} catch {
+		return 0;
+	}
 }
 
 export const persistPlaylists = (
+	key: string,
 	playlists: MyPlaylistObject[],
-	key: string
 ) => {
 	sessionStorage.setItem(key, JSON.stringify(playlists));
 }
@@ -59,3 +60,12 @@ export const persistPlaylists = (
 export const persistPage = (page: number | null, key: string) => {
 	sessionStorage.setItem(key, page === null ? 'null' : page.toString());
 }
+
+/*
+	Unknown action snippet:
+
+		if (
+			typeof (action) !== 'object'
+		|| action === null
+		|| 'type' in action === false) return next(action);
+*/
