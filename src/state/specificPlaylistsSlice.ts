@@ -17,7 +17,11 @@ const initialState: InitialSpecificPlaylistsState = {
 const specificPlaylistsSlice = createSlice({
 	name: 'specificPlaylists',
 	initialState,
-	reducers: {},
+	reducers: {
+		clearSpecific: (state) => {
+			state.playlists = [];
+		}
+	},
 	extraReducers: (builder) => {
 		builder.addCase(retrieveSpecificAsync.fulfilled,
 			(state, action) => {
@@ -28,6 +32,6 @@ const specificPlaylistsSlice = createSlice({
 	}
 });
 
-export const selectSpecificPlaylists = (s: typeof initialState) => s.playlists;
+export const { clearSpecific } = specificPlaylistsSlice.actions;
 
 export default specificPlaylistsSlice.reducer;
