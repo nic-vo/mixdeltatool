@@ -4,7 +4,13 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 
 # Changelog
 
-## 0.23.2
+## 0.24.0
+  - Reduce promise boilerplate
+  - Make async/await approach more consistent
+  - Implement thumbnail persistence
+  - Define redux store
+
+### 0.23.2
   - Auth flow patch and bugfix
 
 ### 0.23.1
