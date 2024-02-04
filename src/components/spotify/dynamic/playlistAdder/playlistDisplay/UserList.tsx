@@ -1,15 +1,13 @@
-import { useContext, useMemo } from 'react';
-import { UserPlaylistContext } from '../../contexts/UserPlaylistProvider';
+import { ListItem } from '@components/misc';
+import { useSelector } from 'react-redux';
+import { selectUserPlaylists } from '@state/state';
 
 import local from './PlaylistDisplay.module.scss';
-import { ListItem } from '@components/misc';
 
 export default function UserList() {
-	const { userPlaylists } = useContext(UserPlaylistContext);
+	const userPlaylists = useSelector(selectUserPlaylists);
 
-	let memo = useMemo(() => userPlaylists, [userPlaylists.length]);
-
-	if (memo.length === 0)
+	if (userPlaylists.length === 0)
 		return (
 			<p style={{
 				color: '#666',
@@ -21,12 +19,11 @@ export default function UserList() {
 
 	return (
 		<ul className={local.list}>
-			{memo.map(playlist => (
+			{userPlaylists.map(playlist => (
 				<li key={playlist.id} >
 					<ListItem playlist={playlist} />
 				</li>
-			)
-			)}
+			))}
 		</ul>
 	);
 }

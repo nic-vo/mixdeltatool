@@ -1,15 +1,13 @@
-import { useContext, useMemo } from 'react';
-import { SpecificPlaylistContext } from '../../contexts/SpecificPlaylistProvider';
+import { ListItem } from '@components/misc';
+import { useSelector } from 'react-redux';
+import { selectSpecificPlaylists } from '@state/state';
 
 import local from './PlaylistDisplay.module.scss';
-import { ListItem } from '@components/misc';
 
 export default function SpecificList() {
-	const { specificPlaylists } = useContext(SpecificPlaylistContext);
+	const specificPlaylists = useSelector(selectSpecificPlaylists);
 
-	let memo = useMemo(() => specificPlaylists, [specificPlaylists.length]);
-
-	if (memo.length === 0)
+	if (specificPlaylists.length === 0)
 		return (
 			<p style={{
 				color: '#666',
@@ -22,7 +20,7 @@ export default function SpecificList() {
 
 	return (
 		<ul className={local.list}>
-			{memo.map(playlist => (
+			{specificPlaylists.map(playlist => (
 				<li key={playlist.id} >
 					<ListItem playlist={playlist} />
 				</li>
