@@ -1,13 +1,14 @@
+import { useSelector } from 'react-redux';
+import { selectOnForm } from '@state/state';
+
 import DifferForm from './differForm/DifferForm';
 import PlaylistOptions from './playlistOptions/PlaylistOptions';
-import { useContext } from 'react';
 import PendingWindow from './pendingWindow/PendingWindow';
-import { DifferContext } from '../contexts/DifferProvider';
 
 import local from './PlaylistDiffer.module.scss';
 
 export default function PlaylistDiffer() {
-	const { onForm } = useContext(DifferContext)
+	const onForm = useSelector(selectOnForm);
 
 	return (
 		<section className={local.container}>
