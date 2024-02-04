@@ -57,7 +57,7 @@ const userPlaylistGetter = async (args: {
 				const jsoned = await response.json();
 				const parsed = userPlaylistResponseParser.parse(jsoned);
 				items = parsed.items;
-				next = parsed.next;
+				next = parsed.next !== null ? page + 1 : null;
 			} catch (e: any) {
 				throw new FetchError("Something was wrong with Spotify's response");
 			}
