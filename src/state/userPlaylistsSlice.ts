@@ -30,6 +30,10 @@ const userPlaylistsSlice = createSlice({
 		clearUser: (state) => {
 			// This should trigger differ middleware
 			state.playlists = [];
+			state.page = 0;
+			persistPlaylists(PLAYLISTS_KEY, state.playlists);
+			persistPage(0, PAGE_KEY);
+
 		},
 		resetPage: (state) => {
 			state.page = 0;
@@ -46,7 +50,7 @@ const userPlaylistsSlice = createSlice({
 				persistPlaylists(PLAYLISTS_KEY, setted);
 				persistPage(action.payload.next, PAGE_KEY);
 			}).addCase(differOperationAsync.fulfilled, (state, action) => {
-				state.playlists = state.playlists.concat(action.payload.playlist);
+				state.playlists = [action.payload.playlist].concat(state.playlists);
 			});
 	}
 });
