@@ -1,20 +1,12 @@
-import { DifferProvider } from './contexts/DifferProvider';
-import { GlobalLoadingProvider } from './contexts/GlobalLoadingProvider';
-import { SpecificPlaylistProvider } from './contexts/SpecificPlaylistProvider';
-import { UserPlaylistProvider } from './contexts/UserPlaylistProvider';
 import SpotifyRouter from './SpotifyRouter';
+import { Provider } from 'react-redux';
+import { store } from '@state/state';
 
 const SpotifyMain = () => {
 	return (
-		<GlobalLoadingProvider>
-			<UserPlaylistProvider>
-				<SpecificPlaylistProvider>
-					<DifferProvider>
-						<SpotifyRouter />
-					</DifferProvider>
-				</SpecificPlaylistProvider>
-			</UserPlaylistProvider>
-		</GlobalLoadingProvider>
+		<Provider store={store}>
+			<SpotifyRouter />
+		</Provider>
 	);
 }
 
