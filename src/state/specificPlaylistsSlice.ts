@@ -20,12 +20,17 @@ const specificPlaylistsSlice = createSlice({
 	reducers: {
 		clearSpecific: (state) => {
 			state.playlists = [];
+			persistPlaylists(PLAYLISTS_KEY, state.playlists);
 		}
 	},
 	extraReducers: (builder) => {
 		builder.addCase(retrieveSpecificAsync.fulfilled,
 			(state, action) => {
-				const setted = [...state.playlists, action.payload];
+				const map = new Map();
+				for (const playlist of state.playlists) map.set(playlist.id, playlist);
+				if (!map.has(action.payload.id))
+					map.set(action.payload.id, action.payload);
+				const setted = Array.from(map.values());
 				state.playlists = setted;
 				persistPlaylists(PLAYLISTS_KEY, setted);
 			});
