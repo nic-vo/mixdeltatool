@@ -12,12 +12,12 @@ export const retrieveSpecificAsync = createAsyncThunk(
 	'specificPlaylists/retrieveSpecificAsync',
 	async (params: { type: 'album' | 'playlist', id: string }) => {
 		try {
+			const { id, type } = params;
+			if (type !== 'album' && type !== 'playlist')
+				throw { message: 'There is an error with this link.' };
 			let response;
 			try {
-				const { id, type } = params;
-				if (type !== 'album' && type !== 'playlist')
-					throw { message: 'There is an error with this link.' };
-				response = await fetch(`/api/spotify/getUser?id=${id}&type=${type}`);
+				response = await fetch(`/api/spotify/getSpecific?id=${id}&type=${type}`);
 			} catch {
 				throw { message: 'There was an error reaching our servers' };
 			}
@@ -36,7 +36,7 @@ export const retrieveSpecificAsync = createAsyncThunk(
 
 export const retrieveUserListsAsync = createAsyncThunk(
 	'userPlaylists/retrieveUserListsAsync',
-	async (page: number) => {
+	async (page: number | null) => {
 		if (page === null) throw { message: "You've reached the end." };
 		try {
 			let response;
