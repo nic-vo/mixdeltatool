@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { selectPage, selectUserFetch } from '@state/state';
+import { AppDispatch, selectPage, selectUserFetch } from '@state/state';
 import { retrieveUserListsAsync } from '@state/thunks';
 
 import { SmallStatus } from '@components/misc';
@@ -11,7 +11,7 @@ import global from '@styles/globals.module.scss';
 export default function UserAdder() {
 	const userCurrentPage = useSelector(selectPage);
 	const { loading: userLoading, error: userError } = useSelector(selectUserFetch);
-	const dispatch = useDispatch();
+	const dispatch = useDispatch<AppDispatch>();
 	const getUserPlaylistsHandler = () =>
 		dispatch(retrieveUserListsAsync(userCurrentPage));
 

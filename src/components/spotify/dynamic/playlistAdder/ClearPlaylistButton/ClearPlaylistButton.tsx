@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { selectSpecificFetch, selectUserFetch } from '@state/state';
+import { AppDispatch, selectSpecificFetch, selectUserFetch } from '@state/state';
 import { clearUser } from '@state/userPlaylistsSlice';
 import { clearSpecific } from '@state/specificPlaylistsSlice';
 import { FaTimes } from 'react-icons/fa';
@@ -8,7 +8,7 @@ import local from './ClearPlaylistButton.module.scss';
 import global from '@styles/globals.module.scss';
 
 const ClearPlaylistButton = (props: { user: boolean }) => {
-	const dispatch = useDispatch();
+	const dispatch = useDispatch<AppDispatch>();
 
 	const { loading: userLoading } = useSelector(selectUserFetch);
 	const { loading: specificLoading } = useSelector(selectSpecificFetch);

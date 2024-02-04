@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectSpecificFetch } from '@state/state';
+import { AppDispatch, selectSpecificFetch } from '@state/state';
 import { retrieveSpecificAsync } from '@state/thunks';
 import { badInput } from '@state/specificFetchStateSlice';
 import { SmallStatus } from '@components/misc';
@@ -25,7 +25,7 @@ export default function SpecificAdder() {
 		error: specificError
 	} = useSelector(selectSpecificFetch);
 
-	const dispatch = useDispatch();
+	const dispatch = useDispatch<AppDispatch>();
 
 	const specificPlaylistFormHandler = async (e: React.SyntheticEvent) => {
 		e.preventDefault();

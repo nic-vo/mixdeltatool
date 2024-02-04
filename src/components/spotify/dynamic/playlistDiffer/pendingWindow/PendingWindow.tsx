@@ -1,14 +1,14 @@
 import { FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 import { ListItem, InProgressLogo } from '@components/misc';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectDifferFetch, selectDifferForm } from '@state/state';
+import { AppDispatch, selectDifferFetch, selectDifferForm } from '@state/state';
 import { resetToForm } from '@state/differFormSlice';
 
 import local from './PendingWindow.module.scss';
 import global from '@styles/globals.module.scss';
 
 const PendingWindow = () => {
-	const dispatch = useDispatch();
+	const dispatch = useDispatch<AppDispatch>();
 	const { loading, error } = useSelector(selectDifferFetch);
 	const { success, playlist, target, differ } = useSelector(selectDifferForm);
 	const goToForm = () => dispatch(resetToForm());

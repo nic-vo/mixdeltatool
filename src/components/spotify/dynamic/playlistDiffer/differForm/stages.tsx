@@ -1,5 +1,6 @@
 import { setAction, setDiffer, setTarget } from '@state/differFormSlice';
 import {
+	AppDispatch,
 	selectDifferFetch,
 	selectDifferForm,
 	selectSpecificPlaylists,
@@ -15,7 +16,7 @@ import { ActionType } from '@components/spotify/types';
 import { ListItem } from '@components/misc';
 
 export const TargetSelector = (props: { children: React.ReactNode }) => {
-	const dispatch = useDispatch();
+	const dispatch = useDispatch<AppDispatch>();
 	const userPlaylists = useSelector(selectUserPlaylists);
 	const specificPlaylists = useSelector(selectSpecificPlaylists);
 	const { target } = useSelector(selectDifferForm);
@@ -54,7 +55,7 @@ export const TargetSelector = (props: { children: React.ReactNode }) => {
 }
 
 export const DifferSelector = (props: { children: React.ReactNode }) => {
-	const dispatch = useDispatch();
+	const dispatch = useDispatch<AppDispatch>();
 	const userPlaylists = useSelector(selectUserPlaylists);
 	const specificPlaylists = useSelector(selectSpecificPlaylists);
 	const { differ } = useSelector(selectDifferForm);
@@ -93,7 +94,7 @@ export const DifferSelector = (props: { children: React.ReactNode }) => {
 }
 
 export const MiscAndSubmit = () => {
-	const dispatch = useDispatch();
+	const dispatch = useDispatch<AppDispatch>();
 	const { target, differ, type } = useSelector(selectDifferForm);
 	const { loading } = useSelector(selectDifferFetch);
 

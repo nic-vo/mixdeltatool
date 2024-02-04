@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectDifferFetch, selectDifferForm } from '@state/state';
+import { AppDispatch, selectDifferFetch, selectDifferForm } from '@state/state';
 import {
 	DifferPreview,
 	DifferSelector,
@@ -20,7 +20,7 @@ export default function DifferForm(props: {
 }) {
 	const [stage, setStage] = useState(0);
 
-	const dispatch = useDispatch();
+	const dispatch = useDispatch<AppDispatch>();
 	const { type, target, differ } = useSelector(selectDifferForm);
 	const { loading } = useSelector(selectDifferFetch);
 
