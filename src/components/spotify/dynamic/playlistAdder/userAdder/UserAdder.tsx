@@ -1,5 +1,7 @@
-import { useContext } from 'react';
-import { UserPlaylistContext } from '../../contexts/UserPlaylistProvider';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectPage, selectUserFetch } from '@state/state';
+import { retrieveUserListsAsync } from '@state/thunks';
+
 import { SmallStatus } from '@components/misc';
 import { FaDownload } from 'react-icons/fa';
 
@@ -7,13 +9,11 @@ import local from './UserAdder.module.scss';
 import global from '@styles/globals.module.scss';
 
 export default function UserAdder() {
-	// Basically dump most of the context here because it requires every bit
-	const {
-		userCurrentPage,
-		userLoading,
-		userError,
-		getUserPlaylistsHandler
-	} = useContext(UserPlaylistContext);
+	const userCurrentPage = useSelector(selectPage);
+	const { loading: userLoading, error: userError } = useSelector(selectUserFetch);
+	const dispatch = useDispatch();
+	const getUserPlaylistsHandler = () =>
+		dispatch(retrieveUserListsAsync(userCurrentPage));
 
 	const buttonClasser = `${global.emptyButton} ${local.button}${userCurrentPage === null ?
 		` ${local.done}` : ''}`
@@ -27,6 +27,6 @@ export default function UserAdder() {
 				<FaDownload /> {userCurrentPage === null ? 'No more!' : 'Retrieve'}
 			</button>
 			<SmallStatus error={userError} loading={userLoading} />
-		</ >
+		</>
 	);
 };
