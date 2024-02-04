@@ -1,20 +1,17 @@
-import { useContext } from 'react';
-import { DifferContext } from '../../contexts/DifferProvider';
 import { FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
+import { ListItem, InProgressLogo } from '@components/misc';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectDifferFetch, selectDifferForm } from '@state/state';
+import { resetToForm } from '@state/differFormSlice';
 
 import local from './PendingWindow.module.scss';
 import global from '@styles/globals.module.scss';
-import { ListItem, InProgressLogo } from '@components/misc';
 
 const PendingWindow = () => {
-	const {
-		loading,
-		error,
-		success,
-		target,
-		differ,
-		goToForm
-	} = useContext(DifferContext);
+	const dispatch = useDispatch();
+	const { loading, error } = useSelector(selectDifferFetch);
+	const { success, playlist, target, differ } = useSelector(selectDifferForm);
+	const goToForm = () => dispatch(resetToForm());
 
 	const statusClass = loading === true ? local.loading
 		: error !== null ? local.error
@@ -33,15 +30,20 @@ const PendingWindow = () => {
 				}
 			</h2>
 			<section className={local.singles}>
-				{target !== '' && <ListItem playlist={target} />}
-				<div className={sectionClasser}>
-					{
-						loading ? <InProgressLogo />
-							: error !== null ? <FaExclamationCircle />
-								: <FaCheckCircle />
-					}
-				</div>
-				{differ !== '' && <ListItem playlist={differ} />}
+				{playlist === null ? (
+					<>
+						{target !== '' && <ListItem playlist={target} />}
+						<div className={sectionClasser}>
+							{
+								loading ? <InProgressLogo />
+									: error !== null ? <FaExclamationCircle />
+										: <FaCheckCircle />
+							}
+						</div>
+						{differ !== '' && <ListItem playlist={differ} />}
+					</>
+				) : <ListItem playlist={playlist} />
+				}
 			</section>
 			{success !== null && success.length > 0 && (
 				<ul>
