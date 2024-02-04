@@ -27,14 +27,6 @@ export default function SpecificAdder() {
 
 	const dispatch = useDispatch();
 
-	const getSpecificPlaylistHandler = (args:
-		{ type: 'album' | 'playlist', id: string }
-	) => {
-		const { id, type } = args;
-		dispatch(retrieveSpecificAsync({ id, type }))
-		return null;
-	}
-
 	const specificPlaylistFormHandler = async (e: React.SyntheticEvent) => {
 		e.preventDefault();
 		// Split off the domain and URI beginning, then the weird query
@@ -47,7 +39,7 @@ export default function SpecificAdder() {
 			const id = splitBegin.split('/')[1].split('?si')[0];
 			if ((type !== 'album' && type !== 'playlist') || id === undefined) throw new Error();
 			console.log(type, id);
-			getSpecificPlaylistHandler({ type, id });
+			dispatch(retrieveSpecificAsync({ id, type }))
 			setHref('');
 		} catch {
 			dispatch(badInput());
