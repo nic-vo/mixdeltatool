@@ -44,10 +44,15 @@ export const store = configureStore({
 	}
 });
 
-export const selectSpecificPlaylists = (s: RootState) => s.specificPlaylists;
-export const selectUserPlaylists = (s: RootState) => s.userPlaylists;
-export const selectTarget = (s: RootState) => s.differForm;
-export const selectDiffer = (s: RootState) => s.differForm;
-export const selectPage = (s: RootState) => s.userPlaylists;
+export const selectSpecificFetch = (s: RootState) => s.specificFetchState;
+export const selectSpecificPlaylists = (s: RootState) => s.specificPlaylists.playlists;
+
+export const selectUserPlaylists = (s: RootState) => s.userPlaylists.playlists;
+export const selectUserFetch = (s: RootState) => s.userFetchState;
+export const selectPage = (s: RootState) => s.userPlaylists.page;
+
+export const selectOnForm = (s: RootState) => s.differForm.onForm;
+export const selectDifferForm = (s: RootState) => s.differForm;
+export const selectDifferFetch = (s: RootState) => s.differFetchState;
 
 export type AppDispatch = typeof store.dispatch;
