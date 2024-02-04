@@ -30,7 +30,8 @@ export default function SpecificAdder() {
 	const getSpecificPlaylistHandler = (args:
 		{ type: 'album' | 'playlist', id: string }
 	) => {
-		dispatch(retrieveSpecificAsync({ ...args }))
+		const { id, type } = args;
+		dispatch(retrieveSpecificAsync({ id, type }))
 		return null;
 	}
 
