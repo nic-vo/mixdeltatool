@@ -11,7 +11,11 @@ const initialState: LoadingState = {
 const specificFetchStateSlice = createSlice({
 	name: 'specificFetchState',
 	initialState,
-	reducers: {},
+	reducers: {
+		badInput: (state) => {
+			state.error = 'That link is formatted incorrectly';
+		}
+	},
 	extraReducers: (builder) => {
 		builder.addCase(differOperationAsync.pending, (state) => {
 			state.loading = true;
@@ -31,5 +35,7 @@ const specificFetchStateSlice = createSlice({
 		});
 	}
 });
+
+export const { badInput } = specificFetchStateSlice.actions;
 
 export default specificFetchStateSlice.reducer;
