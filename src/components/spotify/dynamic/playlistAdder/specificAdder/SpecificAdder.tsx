@@ -1,5 +1,8 @@
-import { useContext, useRef, useState } from 'react';
-import { SpecificPlaylistContext } from '../../contexts/SpecificPlaylistProvider';
+import { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectSpecificFetch } from '@state/state';
+import { retrieveSpecificAsync } from '@state/thunks';
+import { badInput } from '@state/specificFetchStateSlice';
 import { SmallStatus } from '@components/misc';
 
 import local from './SpecificAdder.module.scss';
@@ -16,33 +19,38 @@ Has to adapt the playlist context's specificPlaylistHandler to a <form>
 
 export default function SpecificAdder() {
 	const [href, setHref] = useState<string | ''>('');
-	// Ref for non-stateful input
-	const fieldRef = useRef<HTMLInputElement | null>(null);
 
-	// Basically dump most of the context here because it requires every bit
 	const {
-		specificLoading,
-		specificError,
-		getSpecificPlaylistHandler
-	} = useContext(SpecificPlaylistContext);
+		loading: specificLoading,
+		error: specificError
+	} = useSelector(selectSpecificFetch);
+
+	const dispatch = useDispatch();
+
+	const getSpecificPlaylistHandler = (args:
+		{ type: 'album' | 'playlist', id: string }
+	) => {
+		dispatch(retrieveSpecificAsync({ ...args }))
+		return null;
+	}
 
 	const specificPlaylistFormHandler = async (e: React.SyntheticEvent) => {
-		// Adapts the UI to the UI-agnostic fetcher from the playlist context
 		e.preventDefault();
-		const hrefField = fieldRef.current;
-		if (hrefField !== null) {
-			// Split off the domain and URI beginning, then the weird query
-			// Hopefully the <input>'s pattern is broad enough
-			// Should accept any playlist/ or album/
-			const splitBegin = hrefField.value.split('.com/')[1];
-			const type = splitBegin.split('/')[0];
+		// Split off the domain and URI beginning, then the weird query
+		// Hopefully the <input>'s pattern is broad enough
+		// Should accept any playlist/ or album/
+		try {
+			const splitBegin = href.split('.com/')[1];
+			if (splitBegin === undefined) throw new Error();
+			const type = splitBegin.split('/')[0] as 'album' | 'playlist';
 			const id = splitBegin.split('/')[1].split('?si')[0];
-			// A bit weird that the logic for handling the error isn't here
-			// Possibly anti-pattern; but this UI is purely meant to adapt
-			// The handler
-			await getSpecificPlaylistHandler({ type, id });
-		};
-		setHref('');
+			if ((type !== 'album' && type !== 'playlist') || id === undefined) throw new Error();
+			console.log(type, id);
+			getSpecificPlaylistHandler({ type, id });
+			setHref('');
+		} catch {
+			dispatch(badInput());
+		}
 		return null;
 	};
 
@@ -66,7 +74,6 @@ export default function SpecificAdder() {
 					placeholder='Playlist/album link here...'
 					value={href}
 					onChange={hrefChangeHandler}
-					ref={fieldRef}
 					className={local.textInput} />
 				<button
 					type='submit'
