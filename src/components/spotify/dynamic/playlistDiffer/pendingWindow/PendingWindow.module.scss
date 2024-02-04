@@ -25,9 +25,9 @@
 .singles {
 	display: flex;
 	flex-direction: column;
+	justify-content: center;
 	align-items: center;
 	width: 100%;
-	justify-content: space-between;
 	gap: 1rem
 }
 
@@ -66,8 +66,6 @@
 
 @media (min-aspect-ratio: 0.75) {
 	.singles {
-		display: grid;
-		grid-template-columns: [left] 3fr [status] 1fr [right] 3fr;
-		grid-template-rows: auto;
+		flex-direction: row;
 	}
 }
