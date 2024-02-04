@@ -4,7 +4,23 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 
 # Changelog
 
-## 0.23.2
+## 0.25.0
+  - Adapt component tree to Redux
+    - Replace useRef with useState in specificAdder
+    - Remove useMemo in playlist displays since Redux is sliced
+    - Refactor DifferForm
+      - Each stage has its own component to update redux
+      - Simplify form submission logic
+    - Remove useMemo in options displays since Redux is sliced
+    - When diff completes, display new playlist in PendingWindow
+
+### 0.24.0
+  - Reduce promise boilerplate
+  - Make async/await approach more consistent
+  - Implement thumbnail persistence
+  - Define redux store
+
+### 0.23.2
   - Auth flow patch and bugfix
 
 ### 0.23.1

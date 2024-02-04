@@ -1,10 +1,6 @@
-import mongoosePromise, {
-	GlobalStatusPointer,
-	GlobalStatus
-} from '@lib/database/mongoose';
-import { CORSGet } from '@lib/misc/globalStatus';
+import { setNewGlobalStatus, CORSGet } from '@lib/database/mongoose';
 
-import { CustomError, FetchError } from '@lib/errors';
+import { CustomError } from '@lib/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(
@@ -32,27 +28,7 @@ export default async function handler(
 		return res.status(400).json({ message: 'Status needed' });
 
 	try {
-		try {
-			await mongoosePromise();
-		} catch {
-			throw new FetchError('There was an error connecting to MongoDB');
-		}
-		const newStatus = new GlobalStatus({
-			status, statusType, active: Date.now()
-		});
-		try {
-			await newStatus.save();
-			let currentPointer = await GlobalStatusPointer.findOneAndUpdate(
-				{},
-				{ current: newStatus._id }).exec();
-			if (currentPointer === null) {
-				currentPointer = new GlobalStatusPointer({ current: newStatus._id });
-				await currentPointer.save();
-			}
-		} catch {
-			throw new FetchError('There was an error creating a new status');
-		}
-
+		await setNewGlobalStatus({ status, statusType });
 		try {
 			await Promise.all([res.revalidate('/'), res.revalidate('/spotify')]);
 		} catch {

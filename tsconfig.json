@@ -7,45 +7,49 @@
 			"esnext"
 		],
 		"allowJs": true,
-		"skipLibCheck": true,
-		"strict": true,
-		"forceConsistentCasingInFileNames": true,
-		"noEmit": true,
+		"assumeChangesOnlyAffectDirectDependencies": true,
 		"esModuleInterop": true,
-		"module": "esnext",
-		"moduleResolution": "node",
-		"resolveJsonModule": true,
+		"forceConsistentCasingInFileNames": true,
+		"incremental": false,
 		"isolatedModules": true,
 		"jsx": "preserve",
-		"incremental": true,
+		"module": "ESNext",
+		"moduleResolution": "Node",
+		"noEmit": true,
+		"noImplicitAny": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"strict": true,
+		"strictFunctionTypes": true,
+		"strictNullChecks": true,
 		"plugins": [
 			{
 				"name": "next"
 			}
 		],
 		"paths": {
-			"@/*": [
-				"./src/*"
-			],
 			"@lib/*": [
-				"./lib/*"
+				"./src/lib/*"
 			],
 			"@components/*": [
-				"./components/*"
+				"./src/components/*"
 			],
 			"@types/*": [
-				"./types/*"
+				"./src/types/*"
 			],
 			"@consts/*": [
-				"./consts/*"
+				"./src/consts/*"
 			],
 			"@styles/*": [
-				"./styles/*"
+				"./src/styles/*"
 			],
 			"@hooks/*": [
-				"./hooks/*"
+				"./src/hooks/*"
+			],
+			"@state/*": [
+				"./src/state/*"
 			]
-		}
+		},
 	},
 	"include": [
 		"next-env.d.ts",

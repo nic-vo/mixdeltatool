@@ -36,9 +36,9 @@ yarn-error.log*
 next-env.d.ts
 
 # dev
-/components/dev
+/src/components/dev
 /src/pages/dev
-/lib/dev
+/src/lib/dev
 /src/pages/api/dev
 
 # yarn

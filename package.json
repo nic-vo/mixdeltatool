@@ -1,16 +1,16 @@
 {
   "name": "mixdeltatool",
-  "version": "0.23.2",
+  "version": "0.25.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-		"typecheck": "tsc --noEmit"
+    "lint": "next lint"
   },
   "dependencies": {
     "@next-auth/mongodb-adapter": "^1",
+    "@reduxjs/toolkit": "~2.1.0",
     "@upstash/redis": "^1",
     "isomorphic-dompurify": "^2",
     "mongodb": "^5",
@@ -20,6 +20,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-icons": "^4",
+    "react-redux": "~9.1.0",
     "sass": "^1",
     "typescript": "^5",
     "zod": "^3"

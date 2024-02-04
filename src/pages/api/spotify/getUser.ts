@@ -2,6 +2,7 @@ import { pageQueryParser } from '@lib/spotify/validators';
 import { getServerSession } from 'next-auth';
 import { routeKeyRetriever } from '@lib/auth/accessKey'
 import { userPlaylistGetter } from '@lib/spotify/getterPromises';
+import { checkAndUpdateEntry } from '@lib/database/redis/ratelimiting';
 
 import { authOptions } from '@lib/auth/options';
 import {
@@ -11,16 +12,12 @@ import {
 } from '@consts/spotify';
 import {
 	AuthError,
-	CustomError,
 	FetchError,
 	MalformedError,
-	RateError,
 	ReqMethodError
 } from '@lib/errors';
 
-import { getUserPlaylistsApiRequest } from '@components/spotify/types';
-import { NextApiResponse } from 'next';
-import { checkAndUpdateEntry } from '@lib/database/redis/ratelimiting';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 // The assumption for this route is that every sign-on refreshes access token
 // Session never updates, and only exists until access token expiry
@@ -30,7 +27,7 @@ const RATE_LIMIT_ROLLING_LIMIT = 10;
 const RATE_LIMIT_DECAY_SECONDS = 5;
 
 export default async function handler(
-	req: getUserPlaylistsApiRequest,
+	req: NextApiRequest,
 	res: NextApiResponse
 ) {
 	// return res.status(404).json({message: `Testing a proper error.`});
@@ -39,6 +36,7 @@ export default async function handler(
 		return res.status(504).json({ message: 'Server timed out' });
 	}, GLOBAL_EXECUTION_WINDOW);
 
+	// If auth doesn't resolve in window, something's wrong anyway and cancel
 	const authTimeout = setTimeout(() => {
 		clearTimeout(globalTimeout);
 		return res.status(504).json({ message: 'Server timed out' });

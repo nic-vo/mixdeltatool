@@ -7,16 +7,13 @@ import { checkAndUpdateEntry } from '@lib/database/redis/ratelimiting';
 import { authOptions } from '@lib/auth/options';
 import { SPOT_LOGIN_WINDOW } from '@consts/spotify';
 
-import { getSpecificPlaylistApiRequest } from '@components/spotify/types';
 import {
 	AuthError,
-	CustomError,
 	FetchError,
 	MalformedError,
-	RateError,
 	ReqMethodError
 } from '@lib/errors';
-import { NextApiResponse } from 'next';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 // The assumption for this route is that every sign-on refreshes access token
 // Session never updates, and only exists until access token expiry
@@ -26,7 +23,7 @@ const RATE_LIMIT_ROLLING_LIMIT = 10;
 const RATE_LIMIT_DECAY_SECONDS = 5;
 
 export default async function handler(
-	req: getSpecificPlaylistApiRequest, res: NextApiResponse
+	req: NextApiRequest, res: NextApiResponse
 ) {
 	// return res.status(404).json({message: `Testing a proper error message. ${Date.now()}`});
 	const globalTimeoutMS = Date.now() + 9000;
