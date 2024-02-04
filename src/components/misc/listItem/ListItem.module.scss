@@ -7,6 +7,7 @@
 	grid-template-rows: [name] auto [thumb info] auto;
 	align-items: start;
 	justify-items: start;
+	max-width: 600px;
 	row-gap: 1em;
 	column-gap: 1em;
 	padding: 1rem;
