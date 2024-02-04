@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { differOperationAsync } from './thunks';
 
 import type { ActionType, MyPlaylistObject } from '@components/spotify/types';
@@ -31,6 +31,15 @@ const differFormSlice = createSlice({
 			state.success = null;
 			state.playlist = null;
 			state.onForm = true;
+		},
+		setTarget: (state, action: PayloadAction<MyPlaylistObject | ''>) => {
+			state.target = action.payload;
+		},
+		setDiffer: (state, action: PayloadAction<MyPlaylistObject | ''>) => {
+			state.differ = action.payload;
+		},
+		setAction: (state, action: PayloadAction<ActionType | ''>) => {
+			state.type = action.payload;
 		}
 	},
 	extraReducers: (builder) => {
@@ -38,14 +47,20 @@ const differFormSlice = createSlice({
 			(state, action) => {
 				state.success = action.payload.part;
 				state.playlist = action.payload.playlist;
-			});
+			}).addCase(differOperationAsync.pending,
+				(state) => {
+					state.onForm = false;
+				});
 	}
 });
 
 export const {
 	clearTarget,
 	clearDiffer,
-	resetToForm
+	resetToForm,
+	setTarget,
+	setDiffer,
+	setAction
 } = differFormSlice.actions;
 
 export default differFormSlice.reducer;
