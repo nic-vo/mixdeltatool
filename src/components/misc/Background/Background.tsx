@@ -1,4 +1,6 @@
+import { useCallback, useContext } from 'react';
 import Canvas from '../Canvas/Canvas';
+import MotionContext from '../MotionContext/MotionContext';
 
 type FieldsInitValues = {
 	size: number,
@@ -9,23 +11,26 @@ type FieldsInitValues = {
 	totalY: number
 };
 
-const Background = () => {
-	const predraw = (ctx: CanvasRenderingContext2D) => {
+const DEFAULT_FPS = 30;
+
+const Background = (props: { fps?: number }) => {
+	const { animated } = useContext(MotionContext);
+
+	const predraw = useCallback((ctx: CanvasRenderingContext2D) => {
 		const { height, width } = ctx.canvas;
 		ctx.clearRect(0, 0, width, height);
-	}
+	}, []);
 
-	const draw = (args: {
+	const draw = useCallback((args: {
 		ctx: CanvasRenderingContext2D,
-		startTime: number,
+		frame: number,
 		init: FieldsInitValues[]
 	}) => {
-		const { ctx, startTime, init } = args;
+		const { ctx, frame, init } = args;
 		ctx.globalCompositeOperation = 'hard-light';
 		for (const square of init) {
-			const frameTime = Date.now();
 			const { posX, predrawY, hue, size, period, totalY } = square;
-			const percentOfPeriod = (frameTime - startTime) / period;
+			const percentOfPeriod = (frame % period) / period;
 			const currentYPercent = ((predrawY + (totalY * percentOfPeriod)) % totalY) - size;
 			ctx.fillStyle = `hsl(${hue}, 50%, 50%)`;
 			ctx.beginPath();
@@ -37,9 +42,9 @@ const Background = () => {
 				Math.floor(size / 4));
 			ctx.fill();
 		}
-	}
+	}, []);
 
-	const drawInit = (args: { height: number, width: number }): FieldsInitValues[] => {
+	const drawInit = useCallback((args: { height: number, width: number }): FieldsInitValues[] => {
 		const { height, width } = args;
 		// EVERYTHING is percents
 		let empty: FieldsInitValues[] = [];
@@ -58,7 +63,8 @@ const Background = () => {
 				size,
 				predrawY,
 				posX: Math.round(rawX),
-				period: Math.round((Math.random() * 90) + 30) * 1000,
+				period:
+					Math.round((Math.random() * 100) + 20) * (props.fps ? props.fps : DEFAULT_FPS),
 				totalY,
 				hue: Math.round(hue)
 			});
@@ -68,16 +74,17 @@ const Background = () => {
 		// Speed / time inversely proportional to size
 		// Initial pre-draw distance based on percentage
 		// Max travel distance of 0-size to size + canvas height
+		// Period as number of seconds * fps
 		return empty;
-	}
+	}, []);
 
 	return (
 		<Canvas
-			fps={30}
+			fps={props.fps || DEFAULT_FPS}
 			predraw={predraw}
 			initializer={drawInit}
 			draw={draw}
-			animated={true} />
+			animated={animated !== undefined ? animated : false} />
 	);
 }
 

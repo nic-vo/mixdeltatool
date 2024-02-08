@@ -1,7 +1,11 @@
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { signIn, useSession } from 'next-auth/react';
-import { LogoToAnimate, LoadingForDynamic } from '@components/misc';
+import {
+	LogoToAnimate,
+	LoadingForDynamic,
+	MotionContext
+} from '@components/misc';
 import { FaBars, FaHourglassHalf } from 'react-icons/fa';
 import ImageLoader from '@components/misc/ImageLoader/ImageLoader';
 
@@ -57,6 +61,7 @@ const Content = () => {
 const Toggler = (props: {
 	children: React.ReactNode
 }) => {
+	const { animated, toggleAnimated } = useContext(MotionContext);
 	const [toggle, setToggle] = useState(false);
 	const classer = toggle === true ?
 		`${local.header} ${local.active}` : local.header;
@@ -94,6 +99,11 @@ const Toggler = (props: {
 				onClick={() => setToggle(false)} />
 			{props.children}
 			<section className={local.innerContainer}>
+				<button
+					onClick={() => toggleAnimated()}
+					className={local.flatButton}>
+					{animated ? 'Disable' : 'Enable'} animation
+				</button>
 				<a
 					id='home'
 					href='/'

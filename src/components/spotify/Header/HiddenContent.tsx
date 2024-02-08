@@ -1,8 +1,8 @@
 import { signOut } from 'next-auth/react';
 import DeleteDialog from './deleteDialog/DeleteDialog';
+import { FaPowerOff } from 'react-icons/fa';
 
 import local from './Header.module.scss';
-import { FaPowerOff } from 'react-icons/fa';
 
 const HiddenContent = () => {
 	return (
