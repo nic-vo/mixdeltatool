@@ -33,14 +33,7 @@ export default function SpecificAdder() {
 		// Hopefully the <input>'s pattern is broad enough
 		// Should accept any playlist/ or album/
 		try {
-			const splitBegin = href.split('.com/')[1];
-			if (splitBegin === undefined) throw new Error();
-			const type = splitBegin.split('/')[0] as 'album' | 'playlist';
-			const id = splitBegin.split('/')[1].split('?si')[0];
-			if ((type !== 'album' && type !== 'playlist') || id === undefined) throw new Error();
-			console.log(type, id);
-			dispatch(retrieveSpecificAsync({ id, type }))
-			setHref('');
+			dispatch(retrieveSpecificAsync({ url: href }));
 		} catch {
 			dispatch(badInput());
 		}

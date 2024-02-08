@@ -2,19 +2,26 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { signIn } from 'next-auth/react';
 
 import {
-	ActionType,
 	MyPlaylistObject,
 	MyUserAPIRouteResponse,
 	differRouteResponse
 } from '@components/spotify/types';
+import { InitialDifferFormState } from './differFormSlice';
 
 export const retrieveSpecificAsync = createAsyncThunk(
 	'specificPlaylists/retrieveSpecificAsync',
-	async (params: { type: 'album' | 'playlist', id: string }) => {
+	async (params: { url: string }) => {
 		try {
-			const { id, type } = params;
-			if (type !== 'album' && type !== 'playlist')
+			// Check input before fetching
+			const splitBegin = params.url.split('.com/')[1];
+			if (splitBegin === undefined)
 				throw { message: 'There is an error with this link.' };
+
+			const type = splitBegin.split('/')[0] as 'album' | 'playlist';
+			const id = splitBegin.split('/')[1].split('?si')[0];
+			if ((type !== 'album' && type !== 'playlist') || id === undefined)
+				throw { message: 'There is an error with this link.' };
+
 			let response;
 			try {
 				response = await fetch(`/api/spotify/getSpecific?id=${id}&type=${type}`);
