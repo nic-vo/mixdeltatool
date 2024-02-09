@@ -7,6 +7,8 @@ export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
+	if (process.env.GLOBAL_SAFETY === 'ON')
+		return res.status(404).json({ message: 'Error' });
 	const { obfus } = req.query;
 
 	res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -26,6 +28,8 @@ export default async function handler(
 		return res.status(404).json({ message: 'Not found' });
 	if (!status || !statusType)
 		return res.status(400).json({ message: 'Status needed' });
+
+	console.log('headers:', req.headers);
 
 	try {
 		await setNewGlobalStatus({ status, statusType });

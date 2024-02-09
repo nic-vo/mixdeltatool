@@ -2,19 +2,26 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { signIn } from 'next-auth/react';
 
 import {
-	ActionType,
 	MyPlaylistObject,
 	MyUserAPIRouteResponse,
 	differRouteResponse
 } from '@components/spotify/types';
+import { InitialDifferFormState } from './differFormSlice';
 
 export const retrieveSpecificAsync = createAsyncThunk(
 	'specificPlaylists/retrieveSpecificAsync',
-	async (params: { type: 'album' | 'playlist', id: string }) => {
+	async (params: { url: string }) => {
 		try {
-			const { id, type } = params;
-			if (type !== 'album' && type !== 'playlist')
+			// Check input before fetching
+			const splitBegin = params.url.split('.com/')[1];
+			if (splitBegin === undefined)
 				throw { message: 'There is an error with this link.' };
+
+			const type = splitBegin.split('/')[0] as 'album' | 'playlist';
+			const id = splitBegin.split('/')[1].split('?si')[0];
+			if ((type !== 'album' && type !== 'playlist') || id === undefined)
+				throw { message: 'There is an error with this link.' };
+
 			let response;
 			try {
 				response = await fetch(`/api/spotify/getSpecific?id=${id}&type=${type}`);
@@ -60,15 +67,16 @@ export const retrieveUserListsAsync = createAsyncThunk(
 
 export const differOperationAsync = createAsyncThunk(
 	'differForm/differOperationAsync',
-	async (params: {
+	async (params: Pick<InitialDifferFormState, 'target' | 'differ' | 'type'> & {
 		newName: string | null,
 		newDesc: string | null,
-		target: MyPlaylistObject,
-		differ: MyPlaylistObject,
-		type: ActionType,
 		keepImg: boolean
 	}) => {
 		try {
+			const { target, differ, type } = params;
+			if (target === '') throw { message: 'Target missing' }
+			if (differ === '') throw { message: 'Differ missing' }
+			if (type === '') throw { message: 'Type missing' }
 			const response = await fetch('/api/spotify/create', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },

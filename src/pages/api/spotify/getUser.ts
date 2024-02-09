@@ -12,8 +12,10 @@ import {
 } from '@consts/spotify';
 import {
 	AuthError,
+	CustomError,
 	FetchError,
 	MalformedError,
+	RateError,
 	ReqMethodError
 } from '@lib/errors';
 
@@ -30,6 +32,8 @@ export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
+	if (process.env.GLOBAL_SAFETY === 'ON')
+		return res.status(404).json({ message: 'Error' });
 	// return res.status(404).json({message: `Testing a proper error.`});
 	const globalTimeoutMS = Date.now() + GLOBAL_EXECUTION_WINDOW;
 	const globalTimeout = setTimeout(() => {
@@ -44,6 +48,9 @@ export default async function handler(
 
 	try {
 		if (req.method !== 'GET') throw new ReqMethodError('GET');
+
+		console.log('headers:', req.headers);
+		console.log('socket remoteAddress:', req.socket.remoteAddress);
 
 		/*
 			***

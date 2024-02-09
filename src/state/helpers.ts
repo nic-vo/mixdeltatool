@@ -11,12 +11,18 @@ export const sanitizePlaylists = (playlists: MyPlaylistObject[]) => {
 		const sanitized = parsed.map(playlist => {
 			return {
 				...playlist,
-				name: sanitize(playlist.name),
-				id: sanitize(playlist.id),
+				name: sanitize(playlist.name, {
+					ALLOWED_TAGS: []
+				}),
+				id: sanitize(playlist.id, {
+					ALLOWED_TAGS: []
+				}),
 				image: !playlist.image ? undefined :
 					{
 						...playlist.image,
-						url: sanitize(playlist.image.url)
+						url: sanitize(playlist.image.url, {
+							ALLOWED_TAGS: []
+						})
 					}
 			};
 		});

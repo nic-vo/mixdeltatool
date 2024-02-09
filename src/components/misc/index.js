@@ -8,6 +8,7 @@ import LogoToAnimate from './LogoToAnimate/LogoToAnimate';
 import ImageLoadingLogo from './ImageLoadingLogo/ImageLoadingLogo';
 import Footer from './Footer/Footer';
 import InProgressLogo from './InProgressLogo/InProgressLogo';
+import MotionContext, {MotionContextProvider} from './MotionContext/MotionContext';
 
 export {
 	Background,
@@ -19,5 +20,7 @@ export {
 	LogoToAnimate,
 	ImageLoadingLogo,
 	InProgressLogo,
-	Footer
+	Footer,
+	MotionContext,
+	MotionContextProvider
 };

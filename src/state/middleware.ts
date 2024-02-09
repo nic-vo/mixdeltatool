@@ -4,9 +4,11 @@ import { clearDiffer, clearTarget } from './differFormSlice';
 import { clearSpecific } from './specificPlaylistsSlice';
 
 import { RootState } from './state';
+import { retrieveSpecificAsync } from './thunks';
 
 const listenerMiddleware = createListenerMiddleware<RootState>();
 
+// Check if target or differ were cleared with userPlaylists
 listenerMiddleware.startListening({
 	actionCreator: clearUser,
 	effect: (_, api) => {
@@ -19,6 +21,7 @@ listenerMiddleware.startListening({
 		if (target !== '' && map.has(target.id)) api.dispatch(clearTarget());
 	}
 });
+// Check if target or differ were cleared with specificPlaylists
 listenerMiddleware.startListening({
 	actionCreator: clearSpecific,
 	effect: (_, api) => {
@@ -31,5 +34,7 @@ listenerMiddleware.startListening({
 		if (target !== '' && map.has(target.id)) api.dispatch(clearTarget());
 	}
 });
+// At some point, maybe a middleware that can block retrieveSpecific
+// With an ID that already exists
 
 export default listenerMiddleware.middleware;
