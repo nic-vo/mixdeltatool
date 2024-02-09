@@ -42,6 +42,8 @@ const RATE_LIMIT_DECAY_SECONDS = 30;
 export default async function handler(
 	req: NextApiRequest, res: NextApiResponse
 ) {
+	if (process.env.GLOBAL_SAFETY === 'ON')
+		return res.status(404).json({ message: 'Error' });
 	const start = Date.now();
 	let nextStep;
 
@@ -63,10 +65,10 @@ export default async function handler(
 		// Validate req method
 		if (req.method !== 'POST') throw new ReqMethodError('POST');
 
-		const forHeader = req.headers['x-forwarded-for'];
-		if (!forHeader)
+		const incomingIp = req.headers['x-real-ip'];
+		if (!incomingIp)
 			throw new CustomError(500, 'Internal Error');
-		const ip = Array.isArray(forHeader) ? forHeader[0] : forHeader;
+		const ip = Array.isArray(incomingIp) ? incomingIp[0] : incomingIp;
 		const rateLimit = await checkAndUpdateEntry({
 			ip,
 			prefix: RATE_LIMIT_PREFIX,

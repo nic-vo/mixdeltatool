@@ -1,7 +1,12 @@
 import { setNewGlobalStatus, CORSGet } from '@lib/database/mongoose';
+import { checkAndUpdateEntry } from '@lib/database/redis/ratelimiting';
 
-import { CustomError } from '@lib/errors';
+import { CustomError, RateError } from '@lib/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
+
+const RATE_LIMIT_PREFIX = 'GSU';
+const RATE_LIMIT_ROLLING_LIMIT = 5;
+const RATE_LIMIT_DECAY_SECONDS = 30;
 
 export default async function handler(
 	req: NextApiRequest,
@@ -29,9 +34,21 @@ export default async function handler(
 	if (!status || !statusType)
 		return res.status(400).json({ message: 'Status needed' });
 
-	console.log('headers:', req.headers);
-
 	try {
+		const incomingIp = req.headers['x-real-ip'];
+		if (!incomingIp)
+			throw new CustomError(500, 'Internal Error');
+		const ip = Array.isArray(incomingIp) ? incomingIp[0] : incomingIp;
+		const rateLimit = await checkAndUpdateEntry({
+			ip,
+			prefix: RATE_LIMIT_PREFIX,
+			rollingLimit: RATE_LIMIT_ROLLING_LIMIT,
+			rollingDecaySeconds: RATE_LIMIT_DECAY_SECONDS
+		});
+
+		if (rateLimit !== null)
+			throw new RateError(rateLimit);
+
 		await setNewGlobalStatus({ status, statusType });
 		try {
 			await Promise.all([res.revalidate('/'), res.revalidate('/spotify')]);

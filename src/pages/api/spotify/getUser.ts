@@ -59,19 +59,19 @@ export default async function handler(
 			***
 		*/
 
-		// const forHeader = req.headers['x-forwarded-for'];
-		// if (!forHeader)
-		// 	throw new CustomError(500, 'Internal Error');
-		// const ip = Array.isArray(forHeader) ? forHeader[0] : forHeader;
-		// const rateLimit = await checkAndUpdateEntry({
-		// 	ip,
-		// 	prefix: RATE_LIMIT_PREFIX,
-		// 	rollingLimit: RATE_LIMIT_ROLLING_LIMIT,
-		// 	rollingDecaySeconds: RATE_LIMIT_DECAY_SECONDS
-		// });
+		const incomingIp = req.headers['x-real-ip'];
+		if (!incomingIp)
+			throw new CustomError(500, 'Internal Error');
+		const ip = Array.isArray(incomingIp) ? incomingIp[0] : incomingIp;
+		const rateLimit = await checkAndUpdateEntry({
+			ip,
+			prefix: RATE_LIMIT_PREFIX,
+			rollingLimit: RATE_LIMIT_ROLLING_LIMIT,
+			rollingDecaySeconds: RATE_LIMIT_DECAY_SECONDS
+		});
 
-		// if (rateLimit !== null)
-		// 	throw new RateError(rateLimit);
+		if (rateLimit !== null)
+			throw new RateError(rateLimit);
 
 		// Validate req method
 		// Initialize page var and validate query parameters

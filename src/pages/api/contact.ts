@@ -15,7 +15,7 @@ const RATE_LIMIT_DECAY_SECONDS = 30;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 	try {
-		const forHeader = req.headers['x-forwarded-for'];
+		const forHeader = req.headers['x-real-ip'];
 		if (!forHeader)
 			throw new CustomError(500, 'Internal Error');
 		const ip = Array.isArray(forHeader) ? forHeader[0] : forHeader;
