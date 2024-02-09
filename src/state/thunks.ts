@@ -67,15 +67,16 @@ export const retrieveUserListsAsync = createAsyncThunk(
 
 export const differOperationAsync = createAsyncThunk(
 	'differForm/differOperationAsync',
-	async (params: {
+	async (params: Pick<InitialDifferFormState, 'target' | 'differ' | 'type'> & {
 		newName: string | null,
 		newDesc: string | null,
-		target: MyPlaylistObject,
-		differ: MyPlaylistObject,
-		type: ActionType,
 		keepImg: boolean
 	}) => {
 		try {
+			const { target, differ, type } = params;
+			if (target === '') throw { message: 'Target missing' }
+			if (differ === '') throw { message: 'Differ missing' }
+			if (type === '') throw { message: 'Type missing' }
 			const response = await fetch('/api/spotify/create', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
