@@ -82,13 +82,12 @@ export async function setNewGlobalStatus(params:
 		status, statusType, active: Date.now()
 	});
 	try {
-		let currentPointer = await GlobalStatusPointer.findOneAndUpdate(
-			{},
-			{ current: newStatus._id }).exec();
+		let currentPointer = await GlobalStatusPointer.findOne().exec();
 		if (currentPointer === null) {
 			currentPointer = new GlobalStatusPointer({ current: newStatus._id });
-			await Promise.all([newStatus.save(), currentPointer.save()]);
 		}
+		currentPointer.current = newStatus._id;
+		await Promise.all([newStatus.save(), currentPointer.save()]);
 	} catch {
 		throw new FetchError('There was an error creating a new status');
 	}
