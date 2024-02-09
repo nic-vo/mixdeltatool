@@ -3,7 +3,8 @@ import {
 	initPage,
 	initPlaylists,
 	persistPage,
-	persistPlaylists
+	persistPlaylists,
+	sanitizePlaylists
 } from './helpers';
 import { differOperationAsync, retrieveUserListsAsync } from './thunks';
 
@@ -34,18 +35,14 @@ const userPlaylistsSlice = createSlice({
 			persistPlaylists(PLAYLISTS_KEY, state.playlists);
 			persistPage(0, PAGE_KEY);
 
-		},
-		resetPage: (state) => {
-			state.page = 0;
 		}
 	},
 	extraReducers: (builder) => {
 		builder.addCase(retrieveUserListsAsync.fulfilled,
 			(state, action) => {
 				state.page = action.payload.next;
-				const setted = Array.from(
-					new Set([...state.playlists, ...action.payload.playlists])
-				);
+				const sanitized = sanitizePlaylists([...action.payload.playlists]);
+				const setted = Array.from(new Set([...state.playlists, ...sanitized]));
 				state.playlists = setted;
 				persistPlaylists(PLAYLISTS_KEY, setted);
 				persistPage(action.payload.next, PAGE_KEY);

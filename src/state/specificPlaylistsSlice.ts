@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { initPlaylists, persistPlaylists } from './helpers';
+import { initPlaylists, persistPlaylists, sanitizePlaylists } from './helpers';
 import { retrieveSpecificAsync } from './thunks';
 
 import type { MyPlaylistObject } from '@components/spotify/types';
@@ -27,8 +27,9 @@ const specificPlaylistsSlice = createSlice({
 		builder.addCase(retrieveSpecificAsync.fulfilled,
 			(state, action) => {
 				const map = new Map();
+				const sanitized = sanitizePlaylists([action.payload])[0];
 				for (const playlist of state.playlists) map.set(playlist.id, playlist);
-				if (!map.has(action.payload.id))
+				if (!map.has(sanitized.id))
 					map.set(action.payload.id, action.payload);
 				const setted = Array.from(map.values());
 				state.playlists = setted;
