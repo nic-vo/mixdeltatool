@@ -9,8 +9,10 @@ import { SPOT_LOGIN_WINDOW } from '@consts/spotify';
 
 import {
 	AuthError,
+	CustomError,
 	FetchError,
 	MalformedError,
+	RateError,
 	ReqMethodError
 } from '@lib/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -25,6 +27,8 @@ const RATE_LIMIT_DECAY_SECONDS = 5;
 export default async function handler(
 	req: NextApiRequest, res: NextApiResponse
 ) {
+	if (process.env.GLOBAL_SAFETY === 'ON')
+		return res.status(404).json({ message: 'Error' });
 	// return res.status(404).json({message: `Testing a proper error message. ${Date.now()}`});
 	const globalTimeoutMS = Date.now() + 9000;
 	const globalTimeout = setTimeout(() => {
@@ -47,18 +51,19 @@ export default async function handler(
 			***
 		*/
 
-		// const forHeader = req.headers['x-forwarded-for'];
-		// if (!forHeader)
-		// 	throw new CustomError(500, 'Internal Error');
-		// const ip = Array.isArray(forHeader) ? forHeader[0] : forHeader;
-		// const rateLimit = await checkAndUpdateEntry({
-		// 	ip,
-		// 	prefix: RATE_LIMIT_PREFIX,
-		// 	rollingLimit: RATE_LIMIT_ROLLING_LIMIT,
-		// 	rollingDecaySeconds: RATE_LIMIT_DECAY_SECONDS
-		// });
-		// if (rateLimit !== null)
-		// 	throw new RateError(rateLimit);
+		const incomingIp = req.headers['x-real-ip'];
+		if (!incomingIp)
+			throw new CustomError(500, 'Internal Error');
+		const ip = Array.isArray(incomingIp) ? incomingIp[0] : incomingIp;
+		const rateLimit = await checkAndUpdateEntry({
+			ip,
+			prefix: RATE_LIMIT_PREFIX,
+			rollingLimit: RATE_LIMIT_ROLLING_LIMIT,
+			rollingDecaySeconds: RATE_LIMIT_DECAY_SECONDS
+		});
+
+		if (rateLimit !== null)
+			throw new RateError(rateLimit);
 
 		// Validate query parameters
 		let id, type;

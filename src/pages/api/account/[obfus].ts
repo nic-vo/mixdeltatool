@@ -15,9 +15,11 @@ export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
+	if (process.env.GLOBAL_SAFETY === 'ON')
+		return res.status(404).json({ message: 'Error' });
 	const { obfus } = req.query;
 	if (obfus !== process.env.NEXT_PUBLIC_ACCOUNT_ROUTE_OBFUS)
-		return res.status(404).json({ message: 'Not found' })
+		return res.status(404).json({ message: 'Not found' });
 	if (req.method !== 'GET')
 		return res.status(405).json({ message: 'GET only' });
 
@@ -30,22 +32,23 @@ export default async function handler(
 		return res.status(504).json({ message: 'Server timed out' });
 	}, AUTH_WINDOW);
 
-	let session, ratelimit;
+	let session;
 	try {
-		const forHeader = req.headers['x-forwarded-for'];
-		const ip = Array.isArray(forHeader) ? forHeader[0] : forHeader;
-		if (!ip)
+		const incomingIp = req.headers['x-real-ip'];
+		if (!incomingIp)
 			throw new CustomError(500, 'Internal Error');
-		[session, ratelimit] = await Promise.all([
-			getServerSession(req, res, authOptions),
-			checkAndUpdateEntry({
-				ip,
-				prefix: RATE_LIMIT_PREFIX,
-				rollingDecaySeconds: RATE_LIMIT_DECAY_SECONDS,
-				rollingLimit: RATE_LIMIT_ROLLING_LIMIT
-			})
-		]);
-		if (ratelimit !== null) throw new RateError(ratelimit);
+		const ip = Array.isArray(incomingIp) ? incomingIp[0] : incomingIp;
+		const rateLimit = await checkAndUpdateEntry({
+			ip,
+			prefix: RATE_LIMIT_PREFIX,
+			rollingLimit: RATE_LIMIT_ROLLING_LIMIT,
+			rollingDecaySeconds: RATE_LIMIT_DECAY_SECONDS
+		});
+
+		if (rateLimit !== null)
+			throw new RateError(rateLimit);
+
+		session = await getServerSession(req, res, authOptions);
 		if (session === null || session === undefined) throw new AuthError();
 		clearTimeout(authTimeout);
 		await userDeleter(session.user.id);

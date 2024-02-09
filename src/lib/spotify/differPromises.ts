@@ -98,13 +98,11 @@ const createEmptyPlaylist = async (args: {
 				let imgString
 				try {
 					if (args.target === false || !args.target.image) throw {};
-					console.log('fetching original image', args.target.image.url)
 					const imageRaw = await fetch(args.target.image.url);
 					imgString = Buffer.from(await imageRaw.arrayBuffer())
 						.toString('base64');
 					imgGetSuccess = true;
 				} catch (e: any) {
-					console.log('image fetch threw')
 					console.error(e);
 					imgString = readFileSync(imgPath).toString('base64');
 				}

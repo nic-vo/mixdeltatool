@@ -4,7 +4,12 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 
 # Changelog
 
-## 0.25.0
+## 0.25.1
+  - Adjust playlist sanitization
+  - Add reduce animation toggle to tool
+  - Fix IP logic and rl all relevant routes
+
+### 0.25.0
   - Adapt component tree to Redux
     - Replace useRef with useState in specificAdder
     - Remove useMemo in playlist displays since Redux is sliced
