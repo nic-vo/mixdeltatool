@@ -163,6 +163,12 @@ export const MiscAndSubmit = () => {
 }
 
 const lengthComplaint = 'has more than 500 tracks, so it may be truncated.';
+const NextButton = (props: { changeStage: () => void }) => {
+	return <button
+		type='button'
+		onClick={props.changeStage}
+		className={global.emptyButton}>Next</button>
+}
 
 export const TargetPreview = (props: { changeStage: () => void }) => {
 	const { target } = useSelector(selectDifferForm);
@@ -175,10 +181,7 @@ export const TargetPreview = (props: { changeStage: () => void }) => {
 						&& <p className={local.warning}>
 							<FaExclamationCircle />Target {lengthComplaint}
 						</p>}
-					<button
-						type='button'
-						onClick={props.changeStage}
-						className={global.emptyButton}>Next</button>
+					<NextButton changeStage={props.changeStage} />
 				</>)}
 		</div>
 	);
@@ -195,11 +198,17 @@ export const DifferPreview = (props: { changeStage: () => void }) => {
 						&& <p className={local.warning}>
 							<FaExclamationCircle />Target {lengthComplaint}
 						</p>}
-					<button
-						type='button'
-						onClick={props.changeStage}
-						className={global.emptyButton}>Next</button>
+					<NextButton changeStage={props.changeStage} />
 				</>)}
+		</div>
+	);
+}
+
+export const ActionPreview = (props: { changeStage: () => void }) => {
+	const { type } = useSelector(selectDifferForm);
+	return (
+		<div className={local.emptyItem}>
+			{type !== '' && <NextButton changeStage={props.changeStage} />}
 		</div>
 	);
 }
