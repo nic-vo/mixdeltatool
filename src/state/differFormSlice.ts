@@ -8,7 +8,11 @@ export type InitialDifferFormState = {
 	differ: MyPlaylistObject | '',
 	type: ActionType | '',
 	success: string[] | null,
-	playlist: MyPlaylistObject | null,
+	endPlaylist: MyPlaylistObject | null,
+	newName: string | '',
+	newDesc: string | '',
+	keepImg: boolean,
+
 	onForm: boolean
 };
 
@@ -18,7 +22,10 @@ const initialState: InitialDifferFormState = {
 	differ: '',
 	type: '',
 	success: null,
-	playlist: null,
+	newName: '',
+	newDesc: '',
+	keepImg: true,
+	endPlaylist: null,
 }
 
 const differFormSlice = createSlice({
@@ -29,7 +36,7 @@ const differFormSlice = createSlice({
 		clearDiffer: (state) => { state.differ = '' },
 		resetToForm: (state) => {
 			state.success = null;
-			state.playlist = null;
+			state.endPlaylist = null;
 			state.onForm = true;
 		},
 		setTarget: (state, action: PayloadAction<MyPlaylistObject | ''>) => {
@@ -40,13 +47,22 @@ const differFormSlice = createSlice({
 		},
 		setAction: (state, action: PayloadAction<ActionType | ''>) => {
 			state.type = action.payload;
+		},
+		updateName: (state, action: PayloadAction<string>) => {
+			state.newName = action.payload;
+		},
+		updateDesc: (state, action: PayloadAction<string>) => {
+			state.newDesc = action.payload;
+		},
+		toggleKeepImage: (state) => {
+			state.keepImg = !state.keepImg;
 		}
 	},
 	extraReducers: (builder) => {
 		builder.addCase(differOperationAsync.fulfilled,
 			(state, action) => {
 				state.success = action.payload.part;
-				state.playlist = action.payload.playlist;
+				state.endPlaylist = action.payload.playlist;
 			}).addCase(differOperationAsync.pending,
 				(state) => {
 					state.onForm = false;
