@@ -13,7 +13,7 @@ export default function UserAdder() {
 	const { loading: userLoading, error: userError } = useSelector(selectUserFetch);
 	const dispatch = useDispatch<AppDispatch>();
 	const getUserPlaylistsHandler = () =>
-		dispatch(retrieveUserListsAsync(userCurrentPage));
+		dispatch(retrieveUserListsAsync());
 
 	const buttonClasser = `${global.emptyButton} ${local.button}${userCurrentPage === null ?
 		` ${local.done}` : ''}`
