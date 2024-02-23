@@ -10,7 +10,7 @@ import global from '@styles/globals.module.scss';
 const PendingWindow = () => {
 	const dispatch = useDispatch<AppDispatch>();
 	const { loading, error } = useSelector(selectDifferFetch);
-	const { success, playlist, target, differ } = useSelector(selectDifferForm);
+	const { success, endPlaylist, target, differ } = useSelector(selectDifferForm);
 	const goToForm = () => dispatch(resetToForm());
 
 	const statusClass = loading === true ? local.loading
@@ -30,7 +30,7 @@ const PendingWindow = () => {
 				}
 			</h2>
 			<section className={local.singles}>
-				{playlist === null ? (
+				{endPlaylist === null ? (
 					<>
 						{target !== '' && <ListItem playlist={target} />}
 						<div className={sectionClasser}>
@@ -42,7 +42,7 @@ const PendingWindow = () => {
 						</div>
 						{differ !== '' && <ListItem playlist={differ} />}
 					</>
-				) : <ListItem playlist={playlist} />
+				) : <ListItem playlist={endPlaylist} />
 				}
 			</section>
 			{success !== null && success.length > 0 && (
