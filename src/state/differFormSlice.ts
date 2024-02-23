@@ -54,7 +54,7 @@ const differFormSlice = createSlice({
 		updateDesc: (state, action: PayloadAction<string>) => {
 			state.newDesc = action.payload;
 		},
-		toggleKeepImage: (state) => {
+		toggleKeepImg: (state) => {
 			state.keepImg = !state.keepImg;
 		}
 	},
@@ -76,7 +76,10 @@ export const {
 	resetToForm,
 	setTarget,
 	setDiffer,
-	setAction
+	setAction,
+	updateDesc,
+	updateName,
+	toggleKeepImg
 } = differFormSlice.actions;
 
 export default differFormSlice.reducer;
