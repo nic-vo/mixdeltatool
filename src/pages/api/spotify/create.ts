@@ -65,7 +65,8 @@ export default async function handler(
 		// Validate req method
 		if (req.method !== 'POST') throw new ReqMethodError('POST');
 
-		const incomingIp = req.headers['x-real-ip'];
+		const incomingIp = process.env.IS_DEV !== 'YES' ?
+			req.headers['x-real-ip'] : req.socket.remoteAddress;
 		if (!incomingIp)
 			throw new CustomError(500, 'Internal Error');
 		const ip = Array.isArray(incomingIp) ? incomingIp[0] : incomingIp;
