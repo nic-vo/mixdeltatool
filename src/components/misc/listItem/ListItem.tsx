@@ -4,10 +4,16 @@ import { SpotifyLogo } from '@consts/spotify';
 import { FaExternalLinkAlt } from 'react-icons/fa';
 
 import local from './ListItem.module.scss';
+import differLook from '../../spotify/dynamic/playlistDiffer/PlaylistDiffer.module.scss';
 
-const ListItem = (props: { playlist: MyPlaylistObject }) => {
+const ListItem = (props: { playlist?: MyPlaylistObject }) => {
+	if (props.playlist === undefined) return (
+		<div className={differLook.emptyItem}>
+			<p>nothing here...</p>
+		</div>
+	);
+
 	const { name, owner, tracks, image, id, type } = props.playlist;
-
 	return (
 		<div className={local.item}>
 			<p className={local.name}>
@@ -30,7 +36,7 @@ const ListItem = (props: { playlist: MyPlaylistObject }) => {
 								href={`https://open.spotify.com/user/${id}`}
 								target='_blank'
 								className={local.link}>
-								<strong>{name}</strong> <FaExternalLinkAlt />
+								{name} <FaExternalLinkAlt />
 							</a>
 						);
 					})}</li>

@@ -114,7 +114,6 @@
 	flex-direction: column;
 	align-items: center;
 	align-self: center;
-	width: 90%;
 	gap: 1em;
 	margin-bottom: 1rem;
 }
@@ -143,6 +142,18 @@
 	align-items: center;
 	border-bottom: 1px solid g.$white;
 	padding-bottom: 1rem;
+
+	button:not(.progressSeg) {
+		display: none;
+	}
+}
+
+@media (min-aspect-ratio: 0.75) {
+	.stageControls {
+		button:not(.progressSeg) {
+			display: block;
+		}
+	}
 }
 
 .progressBar {

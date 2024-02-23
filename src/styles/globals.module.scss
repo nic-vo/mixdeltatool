@@ -32,6 +32,11 @@ $buttonBorder: 2px;
 	* {
 		color: inherit;
 	}
+
+	svg {
+		display: flex;
+		align-items: center;
+	}
 }
 
 .emptyButton:is([disabled]) {

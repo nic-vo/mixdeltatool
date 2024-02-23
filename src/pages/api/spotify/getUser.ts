@@ -49,9 +49,6 @@ export default async function handler(
 	try {
 		if (req.method !== 'GET') throw new ReqMethodError('GET');
 
-		console.log('headers:', req.headers);
-		console.log('socket remoteAddress:', req.socket.remoteAddress);
-
 		/*
 			***
 			Hopefully this is a low-impact route that doesn't require rate-limiting;
@@ -59,7 +56,8 @@ export default async function handler(
 			***
 		*/
 
-		const incomingIp = req.headers['x-real-ip'];
+		const incomingIp = process.env.IS_DEV !== 'YES' ?
+			req.headers['x-real-ip'] : req.socket.remoteAddress;
 		if (!incomingIp)
 			throw new CustomError(500, 'Internal Error');
 		const ip = Array.isArray(incomingIp) ? incomingIp[0] : incomingIp;

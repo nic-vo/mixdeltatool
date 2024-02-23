@@ -4,7 +4,13 @@ This will essentially be a glorified playlist cleanup / diffing / combining tool
 
 # Changelog
 
-## 0.25.1
+## 0.26.0
+	- Unite differ form stages / previews
+	- Add review stage
+	- Clean up mobile styling a little bit
+	- Control some form inputs
+
+### 0.25.1
   - Adjust playlist sanitization
   - Add reduce animation toggle to tool
   - Fix IP logic and rl all relevant routes

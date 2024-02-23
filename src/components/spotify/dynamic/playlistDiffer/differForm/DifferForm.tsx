@@ -1,14 +1,12 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, selectDifferFetch, selectDifferForm } from '@state/state';
+import { AppDispatch, selectDifferForm } from '@state/state';
 import {
-	DifferPreview,
 	DifferSelector,
-	MiscAndSubmit,
-	TargetPreview,
+	ActionSelector,
 	TargetSelector,
-	WarningDiv
+	ReviewAndSubmit,
 } from './stages';
 
 import local from './DifferForm.module.scss';
@@ -22,48 +20,42 @@ export default function DifferForm(props: {
 
 	const dispatch = useDispatch<AppDispatch>();
 	const { type, target, differ } = useSelector(selectDifferForm);
-	const { loading } = useSelector(selectDifferFetch);
 
 	const formHandler = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		if (loading
-			|| target === ''
-			|| differ === ''
-			|| type === '') return null;
-
-		const form = new FormData(e.target as HTMLFormElement);
-		let rawName = form.get('name');
-		const newName = typeof (rawName) === 'string' && rawName !== '' ? rawName : null;
-		let rawDesc = form.get('desc');
-		const newDesc = typeof (rawDesc) === 'string' && rawDesc !== '' ? rawDesc : null;
-
-		dispatch(differOperationAsync({
-			newName,
-			newDesc,
-			target,
-			differ,
-			type,
-			keepImg: form.get('keepImg') !== null
-		}));
-
+		dispatch(differOperationAsync());
 		return null;
 	};
 
-	const dummy = [target, differ, type];
-	const progClasser = useCallback((value: typeof target | typeof type) => {
+	const dummy = [target, differ, type, 'review'];
+	const progClasser = (value: typeof target | typeof type | string) => {
 		if (value === '') return [local.progressSeg, local.missing];
+		if (value === 'review') {
+			const satisfied = dummy.reduce((sum, value) => {
+				if (value === '') return sum + 1;
+				return sum;
+			}, 0);
+			switch (satisfied) {
+				case 0:
+					return [local.progressSeg, local.playlist];
+				case 3:
+					return [local.progressSeg, local.missing];
+				default:
+					return [local.progressSeg, local.album];
+			};
+		}
 		return [
 			local.progressSeg,
 			typeof (value) === 'string' || value.type === 'playlist' ?
 				local.playlist : local.album];
-	}, []);
+	}
 
 	return (
 		<form onSubmit={formHandler} className={local.form}>
 			<div className={local.stageControls}>
 				<button
-					onClick={() => setStage(Math.max(stage - 1, 0))}
-					disabled={stage === 0}
+					onClick={() => setStage(stage - 1)}
+					disabled={stage <= 0}
 					type='button'
 					className={global.emptyButton}><FaAngleLeft /></button>
 				<div className={local.progressBar}>
@@ -75,26 +67,29 @@ export default function DifferForm(props: {
 							className={classer}
 							type='button'
 							onClick={() => setStage(index)}>
-							{index === 0 ? 'Target' : index === 1 ? 'Differ' : 'Result'}</button>
+							{index === 0 ? 'Target'
+								: index === 1 ? 'Differ'
+									: index === 2 ? 'Action' :
+										'Review'}</button>
 					})}
 				</div>
-				<button onClick={() => setStage(Math.min(stage + 1, 2))}
-					disabled={stage === 2}
+				<button onClick={() => setStage(stage + 1)}
+					disabled={stage >= 3}
 					type='button'
 					className={global.emptyButton}><FaAngleRight /></button>
 			</div>
 			{
-				stage === 0 ? <TargetSelector>{props.children}</TargetSelector>
-					: stage === 1 ? <DifferSelector>{props.children}</DifferSelector>
-						: <MiscAndSubmit />
+				stage === 0 ?
+					<TargetSelector changeStage={() => setStage(1)}>
+						{props.children}
+					</TargetSelector>
+					: stage === 1 ?
+						<DifferSelector changeStage={() => setStage(2)}>
+							{props.children}
+						</DifferSelector>
+						: stage === 2 ? <ActionSelector changeStage={() => setStage(3)} />
+							: <ReviewAndSubmit />
 			}
-			<div className={local.previewContainer}>
-				{
-					stage === 0 ? <TargetPreview changeStage={() => setStage(stage + 1)} />
-						: stage === 1 ? <DifferPreview changeStage={() => setStage(stage + 1)} />
-							: <WarningDiv />
-				}
-			</div>
 		</form>
 	);
 };

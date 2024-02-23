@@ -25,7 +25,7 @@ export default function Spotify(props: {
 						display: 'flex',
 						flexDirection: 'column',
 						alignItems: 'center',
-						gap: '2svh',
+						gap: '2ch',
 						width: '80svw',
 						height: '100svh',
 						margin: 'auto',

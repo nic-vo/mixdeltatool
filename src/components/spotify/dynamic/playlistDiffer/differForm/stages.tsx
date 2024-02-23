@@ -1,4 +1,11 @@
-import { setAction, setDiffer, setTarget } from '@state/differFormSlice';
+import {
+	setAction,
+	setDiffer,
+	setTarget,
+	toggleKeepImg,
+	updateDesc,
+	updateName
+} from '@state/differFormSlice';
 import {
 	AppDispatch,
 	selectDifferFetch,
@@ -15,7 +22,10 @@ import { CLIENT_DIFF_TYPES } from '@consts/spotify';
 import { ActionType } from '@components/spotify/types';
 import { ListItem } from '@components/misc';
 
-export const TargetSelector = (props: { children: React.ReactNode }) => {
+export const TargetSelector = (props: {
+	children: React.ReactNode,
+	changeStage: () => void
+}) => {
 	const dispatch = useDispatch<AppDispatch>();
 	const userPlaylists = useSelector(selectUserPlaylists);
 	const specificPlaylists = useSelector(selectSpecificPlaylists);
@@ -39,22 +49,37 @@ export const TargetSelector = (props: { children: React.ReactNode }) => {
 	}
 
 	return (
-		<label htmlFor='target' className={local.label}>
-			Choose the Target playlist:
-			<select
-				autoComplete='off'
-				required
-				id='target'
-				value={target !== '' ? target.id : ''}
-				onChange={targetChangeHandler}
-				className={local.select}>
-				{props.children}
-			</select>
-		</label>
+		<>
+			<label htmlFor='target' className={local.label}>
+				Pick a Target playlist:
+				<select
+					autoComplete='off'
+					required
+					id='target'
+					value={target !== '' ? target.id : ''}
+					onChange={targetChangeHandler}
+					className={local.select}>
+					{props.children}
+				</select>
+			</label>
+			<div className={target === '' ? local.emptyItem : local.warningDiv}>
+				{target !== '' && (<>
+					<ListItem playlist={target} />
+					{target.tracks > 500
+						&& <p className={local.warning}>
+							<FaExclamationCircle />Target {lengthComplaint}
+						</p>}
+					<NextButton changeStage={props.changeStage} />
+				</>)}
+			</div>
+		</>
 	);
 }
 
-export const DifferSelector = (props: { children: React.ReactNode }) => {
+export const DifferSelector = (props: {
+	children: React.ReactNode,
+	changeStage: () => void
+}) => {
 	const dispatch = useDispatch<AppDispatch>();
 	const userPlaylists = useSelector(selectUserPlaylists);
 	const specificPlaylists = useSelector(selectSpecificPlaylists);
@@ -78,31 +103,55 @@ export const DifferSelector = (props: { children: React.ReactNode }) => {
 	}
 
 	return (
-		<label htmlFor='differ' className={local.label}>
-			Choose the Differ playlist:
-			<select
-				autoComplete='off'
-				required
-				id='differ'
-				value={differ !== '' ? differ.id : ''}
-				onChange={differChangeHandler}
-				className={local.select}>
-				{props.children}
-			</select>
-		</label>
+		<>
+			<label htmlFor='differ' className={local.label}>
+				Pick a Differ playlist:
+				<select
+					autoComplete='off'
+					required
+					id='differ'
+					value={differ !== '' ? differ.id : ''}
+					onChange={differChangeHandler}
+					className={local.select}>
+					{props.children}
+				</select>
+			</label>
+			<div className={differ === '' ? local.emptyItem : local.warningDiv}>
+				{differ !== '' && (<>
+					<ListItem playlist={differ} />
+					{differ.tracks > 500
+						&& <p className={local.warning}>
+							<FaExclamationCircle />Differ {lengthComplaint}
+						</p>}
+					<NextButton changeStage={props.changeStage} />
+				</>)}
+			</div>
+		</>
 	);
 }
 
-export const MiscAndSubmit = () => {
+export const ActionSelector = (props: {
+	changeStage: () => void
+}) => {
 	const dispatch = useDispatch<AppDispatch>();
-	const { target, differ, type } = useSelector(selectDifferForm);
-	const { loading } = useSelector(selectDifferFetch);
+	const { type, newName, newDesc, keepImg } = useSelector(selectDifferForm);
+
+	const newNameHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+		dispatch(updateName(e.target.value));
+		return null;
+	}
+
+	const newDescHandler = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		dispatch(updateDesc(e.target.value));
+		return null;
+	}
 
 	const actionHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		const newval = e.target.value as ActionType | '';
 		dispatch(setAction(newval));
 		return null;
 	};
+
 	return (
 		<>
 			<label htmlFor='actionType' className={local.label}>
@@ -125,32 +174,79 @@ export const MiscAndSubmit = () => {
 				</select>
 			</label>
 			<label htmlFor='name' className={local.label}>
-				New playlist name (optional):
+				Rename playlist?
 				<input
 					id='name'
-					name='name'
 					type='text'
+					value={newName}
+					onChange={newNameHandler}
 					autoComplete='off'
 					maxLength={30} />
 			</label>
 			<label htmlFor='desc' className={local.label}>
-				New playlist description (optional):
+				New playlist description?
 				<textarea
 					id='desc'
-					name='desc'
+					value={newDesc}
+					onChange={newDescHandler}
 					autoComplete='off'
 					maxLength={120} />
 			</label>
 			<label htmlFor='keepImg'>
-				Try to keep target playlist thumbnail?
+				Keep playlist thumbnail?
 				<input
 					type='checkbox'
 					id='keepImg'
-					name='keepImg'
-					value='yes'
-					checked={true} />
+					onChange={() => dispatch(toggleKeepImg())}
+					checked={keepImg} />
 			</label>
-			<p className={local.caveat}><FaExclamationCircle /> This tool will never directly change a playlist. It will compare the two selected playlists and create a new one from that comparison.</p>
+			{type !== '' && <NextButton changeStage={props.changeStage} />}
+		</>
+	);
+}
+
+export const ReviewAndSubmit = () => {
+	const { target, differ, type } = useSelector(selectDifferForm);
+	const { loading } = useSelector(selectDifferFetch);
+	const targetLengthCheck = target !== '' && target.tracks > 500
+	const differLengthCheck = differ !== '' && differ.tracks > 500
+
+	return (
+		<>
+			<div className={target === '' ? local.emptyItem : local.warningDiv}>
+				{target === '' ? <p>nothing here...</p>
+					: (<>
+						<ListItem playlist={target} />
+						{target.tracks > 500
+							&& <p className={local.warning}>
+								<FaExclamationCircle />Target {lengthComplaint}
+							</p>}
+					</>)}
+			</div>
+			<div className={differ === '' ? local.emptyItem : local.warningDiv}>
+				{differ === '' ? <p>No differ</p>
+					: (<>
+						<ListItem playlist={differ} />
+						{differ.tracks > 500
+							&& <p className={local.warning}>
+								<FaExclamationCircle />Differ {lengthComplaint}
+							</p>}
+					</>)}
+			</div>
+			{
+				(targetLengthCheck || differLengthCheck) &&
+				<div className={local.warningDiv}>
+					{
+						targetLengthCheck && <p className={local.warning}>
+							<FaExclamationCircle />Target {lengthComplaint}
+						</p>
+					}
+					{
+						differLengthCheck && <p className={local.warning}>
+							<FaExclamationCircle />Differ {lengthComplaint}
+						</p>
+					}
+				</div>}
 			<button
 				disabled={loading
 					|| target === ''
@@ -164,62 +260,9 @@ export const MiscAndSubmit = () => {
 
 const lengthComplaint = 'has more than 500 tracks, so it may be truncated.';
 
-export const TargetPreview = (props: { changeStage: () => void }) => {
-	const { target } = useSelector(selectDifferForm);
-	return (
-		<div className={target === '' ? local.emptyItem : local.warningDiv}>
-			{target === '' ? <p>nothing here...</p>
-				: (<>
-					<ListItem playlist={target} />
-					{target.tracks > 500
-						&& <p className={local.warning}>
-							<FaExclamationCircle />Target {lengthComplaint}
-						</p>}
-					<button
-						type='button'
-						onClick={props.changeStage}
-						className={global.emptyButton}>Next</button>
-				</>)}
-		</div>
-	);
-}
-
-export const DifferPreview = (props: { changeStage: () => void }) => {
-	const { differ } = useSelector(selectDifferForm);
-	return (
-		<div className={differ === '' ? local.emptyItem : local.warningDiv}>
-			{differ === '' ? <p>nothing here...</p>
-				: (<>
-					<ListItem playlist={differ} />
-					{differ.tracks > 500
-						&& <p className={local.warning}>
-							<FaExclamationCircle />Target {lengthComplaint}
-						</p>}
-					<button
-						type='button'
-						onClick={props.changeStage}
-						className={global.emptyButton}>Next</button>
-				</>)}
-		</div>
-	);
-}
-
-export const WarningDiv = () => {
-	const { differ, target } = useSelector(selectDifferForm);
-	return (
-		<div className={local.warningDiv}>
-			{
-				(target !== '' && target.tracks > 500)
-				&& <p className={local.warning}>
-					<FaExclamationCircle />Target {lengthComplaint}
-				</p>
-			}
-			{
-				(differ !== '' && differ.tracks > 500)
-				&& <p className={local.warning}>
-					<FaExclamationCircle />Differ {lengthComplaint}
-				</p>
-			}
-		</div>
-	);
+const NextButton = (props: { changeStage: () => void }) => {
+	return <button
+		type='button'
+		onClick={props.changeStage}
+		className={global.emptyButton}>Next</button>
 }
