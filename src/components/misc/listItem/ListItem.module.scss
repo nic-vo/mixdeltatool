@@ -3,7 +3,7 @@
 .item {
 	height: fit-content;
 	display: grid;
-	grid-template-columns: [name] 0.5rem [thumb] 3fr [info] 6fr;
+	grid-template-columns: [name thumb] 3fr [info] 6fr;
 	grid-template-rows: [name] auto [thumb info] auto;
 	align-items: start;
 	justify-items: start;
@@ -33,6 +33,7 @@
 	grid-row: name;
 	grid-column: name/span4;
 	width: 100%;
+	font-weight: bold;
 }
 
 .thumb {
