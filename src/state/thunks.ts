@@ -6,7 +6,7 @@ import {
 	MyUserAPIRouteResponse,
 	differRouteResponse
 } from '@components/spotify/types';
-import { InitialDifferFormState } from './differFormSlice';
+import { RootState } from './state';
 
 export const retrieveSpecificAsync = createAsyncThunk(
 	'specificPlaylists/retrieveSpecificAsync',
@@ -43,7 +43,9 @@ export const retrieveSpecificAsync = createAsyncThunk(
 
 export const retrieveUserListsAsync = createAsyncThunk(
 	'userPlaylists/retrieveUserListsAsync',
-	async (page: number | null) => {
+	async (_, thunkAPI) => {
+		const { userPlaylists } = thunkAPI.getState() as RootState;
+		const { page } = userPlaylists;
 		if (page === null) throw { message: "You've reached the end." };
 		try {
 			let response;
@@ -67,20 +69,24 @@ export const retrieveUserListsAsync = createAsyncThunk(
 
 export const differOperationAsync = createAsyncThunk(
 	'differForm/differOperationAsync',
-	async (params: Pick<InitialDifferFormState, 'target' | 'differ' | 'type'> & {
-		newName: string | null,
-		newDesc: string | null,
-		keepImg: boolean
-	}) => {
+	async (_, thunkAPI) => {
 		try {
-			const { target, differ, type } = params;
+			const { differForm: df } = thunkAPI.getState() as RootState;
+
+			const { target, differ, type, keepImg } = df;
 			if (target === '') throw { message: 'Target missing' }
 			if (differ === '') throw { message: 'Differ missing' }
 			if (type === '') throw { message: 'Type missing' }
+			const body = {
+				target, differ, type,
+				keepImg,
+				newName: df.newName !== '' ? df.newName : null,
+				newDesc: df.newDesc !== '' ? df.newDesc : null,
+			};
 			const response = await fetch('/api/spotify/create', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ ...params })
+				body: JSON.stringify(body)
 			});
 			const jsoned = await response.json();
 			if (response.ok) return jsoned as differRouteResponse;
