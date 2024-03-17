@@ -1,14 +1,24 @@
+# MixDelta tool for Spotify playlist managmenet
+
 Welcome! For now this is a Spotify-only tool and it'll probably remain that way for a while.
 
-This will essentially be a glorified playlist cleanup / diffing / combining tool.
+Spotify is my primary choice for music streaming. I maintain a master playlist and several smaller playlists that are subsets of that master playlist. These sub-playlists must only contain tracks that are in the master playlist; if the master doesn't have a track, it can't exist on a sub-playlist. Typically, all these playlists are fairly large (>200 tracks).
 
-# Changelog
+I change my master playlist a lot, and I don't typically know which of the sub-playlists contain tracks I remove from the master, so I created this tool to easily diff and compare my playlists. Hopefuly this is useful for you, too.
 
-## 0.26.0
-	- Unite differ form stages / previews
-	- Add review stage
-	- Clean up mobile styling a little bit
-	- Control some form inputs
+You can either use [the live version](https://mixdeltatool.vercel.app) or clone this repo and run it locally. This project **does** require several .env variables, specifically for the auth functionality, so make sure to search for 'process.env' to find the ones you need.
+
+## Changelog
+
+### 0.26.1
+  - Alter footer layout
+  - Add panel for action type in review stage of differ
+
+### 0.26.0
+  - Unite differ form stages / previews
+  - Add review stage
+  - Clean up mobile styling a little bit
+  - Control some form inputs
 
 ### 0.25.1
   - Adjust playlist sanitization
