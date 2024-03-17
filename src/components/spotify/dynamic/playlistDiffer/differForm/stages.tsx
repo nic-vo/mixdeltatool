@@ -223,6 +223,11 @@ export const ReviewAndSubmit = () => {
 							</p>}
 					</>)}
 			</div>
+			<div className={type === '' ? local.emptyItem : local.warningDiv}>
+				<p>
+					{type && CLIENT_DIFF_TYPES[type].replace(/.$/, ' will remain.')}
+				</p>
+			</div>
 			<div className={differ === '' ? local.emptyItem : local.warningDiv}>
 				{differ === '' ? <p>No differ</p>
 					: (<>
