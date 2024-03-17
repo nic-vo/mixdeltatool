@@ -2,15 +2,16 @@
 
 .footer {
 	display: flex;
+	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	width: 100%;
 	min-height: 10svh;
 	color: g.$white;
-	padding: 1rem;
+	padding: 4svh 0 4svh 0;
+	gap: 1rem;
 	z-index: 1;
 	background: linear-gradient(0deg, g.$black, transparent);
-
 }
 
 .spacer {
@@ -24,12 +25,26 @@
 	}
 
 	a {
-		border-left: 1px solid g.$white;
+		border-right: 1px solid g.$white;
+	}
+
+	a:last-child {
+		border-right: none;
 	}
 
 	a:hover,
 	a:focus,
 	a:active {
 		text-decoration: underline;
+	}
+}
+
+@media (min-aspect-ratio: 1) {
+	.footer {
+		flex-direction: row;
+	}
+
+	.spacer a:last-child {
+		border-right: 1px solid g.$white;
 	}
 }
