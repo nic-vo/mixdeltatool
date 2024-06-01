@@ -1,4 +1,4 @@
-@use '@styles/globals.module.scss' as global;
+@use '@/styles/globals.module.scss' as global;
 
 .container {
 	@include global.flexCenter;
@@ -11,7 +11,7 @@
 	max-height: 90%;
 }
 
-@media(min-aspect-ratio: 1.25) {
+@media (min-aspect-ratio: 1.25) {
 	.container {
 		max-width: 1000px;
 	}

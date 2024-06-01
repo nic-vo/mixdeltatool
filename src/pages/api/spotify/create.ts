@@ -1,30 +1,30 @@
-import { routeKeyRetriever } from '@lib/auth/accessKey';
+import { routeKeyRetriever } from '@/lib/auth/accessKey';
 import { getServerSession } from 'next-auth';
 import {
 	createEmptyPlaylist,
 	outputAdder,
 	playlistGetter,
 	updateDescription,
-} from '@lib/spotify/differPromises';
-import { diffBodyParser } from '@lib/spotify/validators';
-import { printTime } from '@lib/misc';
-import { checkAndUpdateEntry } from '@lib/database/redis/ratelimiting';
+} from '@/lib/spotify/differPromises';
+import { diffBodyParser } from '@/lib/spotify/validators';
+import { printTime } from '@/lib/misc';
+import { checkAndUpdateEntry } from '@/lib/database/redis/ratelimiting';
 import { sanitize } from 'isomorphic-dompurify';
 
 import {
 	AUTH_WINDOW,
 	GLOBAL_EXECUTION_WINDOW,
 	SERVER_DIFF_TYPES,
-	SPOT_LOGIN_WINDOW
-} from '@consts/spotify';
-import { authOptions } from '@lib/auth/options';
+	SPOT_LOGIN_WINDOW,
+} from '@/consts/spotify';
+import { authOptions } from '@/lib/auth/options';
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ZodError } from 'zod/lib';
 import {
 	MyPlaylistObject,
 	createDiffPlaylistApiRequest,
-} from '@components/spotify/types';
+} from '@/components/spotify/types';
 import {
 	AuthError,
 	CustomError,
@@ -32,15 +32,16 @@ import {
 	MalformedError,
 	RateError,
 	ReqMethodError,
-	UnprocessableError
-} from '@lib/errors';
+	UnprocessableError,
+} from '@/lib/errors';
 
 const RATE_LIMIT_PREFIX = 'CDP';
 const RATE_LIMIT_ROLLING_LIMIT = 5;
 const RATE_LIMIT_DECAY_SECONDS = 30;
 
 export default async function handler(
-	req: NextApiRequest, res: NextApiResponse
+	req: NextApiRequest,
+	res: NextApiResponse
 ) {
 	if (process.env.GLOBAL_SAFETY === 'ON')
 		return res.status(404).json({ message: 'Error' });
@@ -50,12 +51,12 @@ export default async function handler(
 	// return res.status(400).json({message: 'Testing diff message'});
 	const globalTimeoutMS = Date.now() + GLOBAL_EXECUTION_WINDOW;
 	const authTimeout = setTimeout(() => {
-		return res.status(504).json({ message: 'Server timed out' })
+		return res.status(504).json({ message: 'Server timed out' });
 	}, AUTH_WINDOW);
 	const globalTimeout = setTimeout(() => {
 		if (newPlaylist !== undefined)
 			return res.status(200).json({ part, playlist: newPlaylist });
-		return res.status(504).json({ message: 'Server timed out' })
+		return res.status(504).json({ message: 'Server timed out' });
 	}, GLOBAL_EXECUTION_WINDOW);
 
 	let newPlaylist: MyPlaylistObject;
@@ -65,20 +66,20 @@ export default async function handler(
 		// Validate req method
 		if (req.method !== 'POST') throw new ReqMethodError('POST');
 
-		const incomingIp = process.env.IS_DEV !== 'YES' ?
-			req.headers['x-real-ip'] : req.socket.remoteAddress;
-		if (!incomingIp)
-			throw new CustomError(500, 'Internal Error');
+		const incomingIp =
+			process.env.IS_DEV !== 'YES'
+				? req.headers['x-real-ip']
+				: req.socket.remoteAddress;
+		if (!incomingIp) throw new CustomError(500, 'Internal Error');
 		const ip = Array.isArray(incomingIp) ? incomingIp[0] : incomingIp;
 		const rateLimit = await checkAndUpdateEntry({
 			ip,
 			prefix: RATE_LIMIT_PREFIX,
 			rollingLimit: RATE_LIMIT_ROLLING_LIMIT,
-			rollingDecaySeconds: RATE_LIMIT_DECAY_SECONDS
+			rollingDecaySeconds: RATE_LIMIT_DECAY_SECONDS,
 		});
 
-		if (rateLimit !== null)
-			throw new RateError(rateLimit);
+		if (rateLimit !== null) throw new RateError(rateLimit);
 
 		nextStep = printTime('Rate limit passed:', start);
 		// Validate body and body values
@@ -100,9 +101,11 @@ export default async function handler(
 		}
 
 		// Undefined check for TypeScript -_-
-		if (target === undefined
-			|| differ === undefined
-			|| actionType === undefined)
+		if (
+			target === undefined ||
+			differ === undefined ||
+			actionType === undefined
+		)
 			throw new MalformedError();
 
 		let session;
@@ -130,9 +133,13 @@ export default async function handler(
 
 		// Check if session is being accessed when access token might not be live
 		const { expiresAt, accessToken } = token;
-		if ((expiresAt === undefined || expiresAt === null)
-			|| (accessToken === undefined || accessToken === null)
-			|| (Date.now() - expiresAt) < (3600 - SPOT_LOGIN_WINDOW))
+		if (
+			expiresAt === undefined ||
+			expiresAt === null ||
+			accessToken === undefined ||
+			accessToken === null ||
+			Date.now() - expiresAt < 3600 - SPOT_LOGIN_WINDOW
+		)
 			throw new AuthError();
 
 		nextStep = printTime('Auth finished:', nextStep);
@@ -140,23 +147,28 @@ export default async function handler(
 		const targetTemp = target.owner.length;
 		const differTemp = differ.owner.length;
 
-		const baseDescStr = newDesc !== null ?
-			sanitize(newDesc) : SERVER_DIFF_TYPES({
-				actionType, target:
-				{
-					name: target.name,
-					owner: target.owner.reduce((str, current, index) => {
-						let newstr = str + `${current.name}${index < targetTemp - 1 ? ', ' : ''}`;
-						return newstr;
-					}, '')
-				}, differ: {
-					name: differ.name,
-					owner: differ.owner.reduce((str, current, index) => {
-						let newstr = str + `${current.name}${index < differTemp - 1 ? ', ' : ''}`;
-						return newstr;
-					}, '')
-				}
-			});
+		const baseDescStr =
+			newDesc !== null
+				? sanitize(newDesc)
+				: SERVER_DIFF_TYPES({
+						actionType,
+						target: {
+							name: target.name,
+							owner: target.owner.reduce((str, current, index) => {
+								let newstr =
+									str + `${current.name}${index < targetTemp - 1 ? ', ' : ''}`;
+								return newstr;
+							}, ''),
+						},
+						differ: {
+							name: differ.name,
+							owner: differ.owner.reduce((str, current, index) => {
+								let newstr =
+									str + `${current.name}${index < differTemp - 1 ? ', ' : ''}`;
+								return newstr;
+							}, ''),
+						},
+				  });
 
 		newName = newName === null ? null : sanitize(newName);
 
@@ -166,29 +178,33 @@ export default async function handler(
 				accessToken,
 				type: target.type,
 				id: target.id,
-				globalTimeoutMS
+				globalTimeoutMS,
 			}),
 			playlistGetter({
 				accessToken,
 				type: differ.type,
 				id: differ.id,
-				globalTimeoutMS
+				globalTimeoutMS,
 			}),
 			createEmptyPlaylist({
 				accessToken,
 				baseDescStr,
 				globalTimeoutMS,
 				newName,
-				target: keepImg && target
-			})
+				target: keepImg && target,
+			}),
 		]);
 		if (targetDetails.completed !== targetDetails.total) {
 			const { completed, total } = targetDetails;
-			part.push(`Spotify returned only ${completed}/${total} tracks for the target.`);
+			part.push(
+				`Spotify returned only ${completed}/${total} tracks for the target.`
+			);
 		}
 		if (differDetails.completed !== differDetails.total) {
 			const { completed, total } = differDetails;
-			part.push(`Spotify returned only ${completed}/${total} tracks for the differ.`);
+			part.push(
+				`Spotify returned only ${completed}/${total} tracks for the differ.`
+			);
 		}
 		newPlaylist = emptyPlaylist;
 
@@ -215,9 +231,11 @@ export default async function handler(
 				for (const uri of differDetails.items)
 					if (targetDetails.items.has(uri) === false) {
 						result.add(uri);
-						du++
+						du++;
 					}
-				part.push(`The target was replaced by ${du} unique tracks from the differ.`);
+				part.push(
+					`The target was replaced by ${du} unique tracks from the differ.`
+				);
 				break;
 			case 'otu':
 				// Only target uniques
@@ -225,11 +243,14 @@ export default async function handler(
 				for (const uri of targetDetails.items)
 					if (differDetails.items.has(uri) === false) {
 						result.add(uri);
-						tu++
+						tu++;
 					}
 				part.push(
-					`${targetDetails.items.size - tu} shared tracks were removed from the target;`
-					+ ` ${tu} tracks remain.`);
+					`${
+						targetDetails.items.size - tu
+					} shared tracks were removed from the target;` +
+						` ${tu} tracks remain.`
+				);
 				break;
 			case 'bu':
 				shared = 0;
@@ -242,13 +263,12 @@ export default async function handler(
 						result.add(uri);
 					}
 				}
-				for (const uri of differDetails.items)
-					result.add(uri)
+				for (const uri of differDetails.items) result.add(uri);
 				part.push(
-					`The target had ${targetDetails.items.size} unique tracks. `
-					+ `The differ had ${differDetails.items.size} unique tracks. `
-					+ `${shared} shared tracks were removed.`
-				)
+					`The target had ${targetDetails.items.size} unique tracks. ` +
+						`The differ had ${differDetails.items.size} unique tracks. ` +
+						`${shared} shared tracks were removed.`
+				);
 				break;
 			case 'stu':
 				// Subtract target uniques
@@ -259,12 +279,12 @@ export default async function handler(
 						result.add(uri);
 					}
 				part.push(
-					`The target had ${targetDetails.items.size} unique tracks. `
-					+ `The differ had ${differDetails.items.size} unique tracks. `
-					+ `The target now contains ${result.size} shared tracks.`
-				)
+					`The target had ${targetDetails.items.size} unique tracks. ` +
+						`The differ had ${differDetails.items.size} unique tracks. ` +
+						`The target now contains ${result.size} shared tracks.`
+				);
 				break;
-		};
+		}
 
 		nextStep = printTime('Diff operation complete:', nextStep);
 
@@ -272,16 +292,19 @@ export default async function handler(
 			accessToken,
 			id: newPlaylist.id,
 			items: result,
-			globalTimeoutMS
+			globalTimeoutMS,
 		});
 		if (addedToPlaylist.completed % addedToPlaylist.total !== 0) {
 			const { completed, total } = addedToPlaylist;
-			part.push(`New playlist has ${completed}/${total} tracks from the comparison.`);
+			part.push(
+				`New playlist has ${completed}/${total} tracks from the comparison.`
+			);
 		}
 
 		nextStep = printTime(
 			`${addedToPlaylist.completed}/${addedToPlaylist.total} tracks added: `,
-			nextStep);
+			nextStep
+		);
 
 		newPlaylist.tracks = addedToPlaylist.total;
 		const updatedDescription = await updateDescription({
@@ -289,8 +312,8 @@ export default async function handler(
 			globalTimeoutMS,
 			baseDescStr,
 			id: newPlaylist.id,
-			reasons: part
-		})
+			reasons: part,
+		});
 		if (updatedDescription !== null) part.push(updatedDescription);
 		clearTimeout(globalTimeout);
 		printTime('Completed:', start);
@@ -299,7 +322,8 @@ export default async function handler(
 		clearTimeout(authTimeout);
 		clearTimeout(globalTimeout);
 		if (e.status === 429) res.setHeader('Retry-After', e.retryTime);
-		return res.status(e.status ? e.status : 500)
+		return res
+			.status(e.status ? e.status : 500)
 			.json({ message: e.message ? e.message : 'Unknown error' });
-	};
-};
+	}
+}

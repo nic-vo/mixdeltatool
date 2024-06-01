@@ -1,9 +1,8 @@
-@use '@styles/globals.module.scss' as g;
+@use '@/styles/globals.module.scss' as g;
 
 .form {
 	display: grid;
-	grid-template-areas:
-		'input input input submit';
+	grid-template-areas: 'input input input submit';
 	width: 100%;
 	font-size: inherit;
 	gap: 0.5em;

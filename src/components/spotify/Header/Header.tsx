@@ -4,87 +4,89 @@ import { signIn, useSession } from 'next-auth/react';
 import {
 	LogoToAnimate,
 	LoadingForDynamic,
-	MotionContext
-} from '@components/misc';
+	MotionContext,
+} from '@/components/misc';
 import { FaBars, FaHourglassHalf } from 'react-icons/fa';
-import ImageLoader from '@components/misc/ImageLoader/ImageLoader';
+import ImageLoader from '@/components/misc/ImageLoader/ImageLoader';
 
 import local from './Header.module.scss';
-import global from '@styles/globals.module.scss';
+import global from '@/styles/globals.module.scss';
 
-const Hidden = dynamic(import('./HiddenContent'),
-	{
-		ssr: false,
-		loading: (props: {
-			error?: Error | null,
-			pastDelay?: boolean,
-			timedOut?: boolean
-		}) => <LoadingForDynamic
-				error={props.error}
-				pastDelay={props.pastDelay}
-				timedOut={props.timedOut} />
-	});
+const Hidden = dynamic(import('./HiddenContent'), {
+	ssr: false,
+	loading: (props: {
+		error?: Error | null;
+		pastDelay?: boolean;
+		timedOut?: boolean;
+	}) => (
+		<LoadingForDynamic
+			error={props.error}
+			pastDelay={props.pastDelay}
+			timedOut={props.timedOut}
+		/>
+	),
+});
 
 const Content = () => {
 	const { data, status } = useSession();
 	return (
 		<>
 			<section className={local.info}>
-				{status !== 'authenticated' ?
+				{status !== 'authenticated' ? (
 					<button
 						id='header-signin'
 						className={global.emptyButton}
-						onClick={() => signIn('spotify')}>Sign in</button>
-					: (<>
+						onClick={() => signIn('spotify')}>
+						Sign in
+					</button>
+				) : (
+					<>
 						<div style={{ width: '8svh', height: '8svh' }}>
-							<ImageLoader url={data.user.image}
-								alt={'Profile picture'} />
+							<ImageLoader
+								url={data.user.image}
+								alt={'Profile picture'}
+							/>
 						</div>
 						<p>
-							{
-								data.user.name ? data.user.name
-									: data.user.email ? data.user.email
-										: data.user.id
-							}
+							{data.user.name
+								? data.user.name
+								: data.user.email
+								? data.user.email
+								: data.user.id}
 						</p>
 					</>
-					)
-				}
+				)}
 			</section>
 			<section className={local.hidden}>
 				{status === 'authenticated' ? <Hidden /> : <FaHourglassHalf />}
 			</section>
 		</>
 	);
-}
+};
 
-const Toggler = (props: {
-	children: React.ReactNode
-}) => {
+const Toggler = (props: { children: React.ReactNode }) => {
 	const { animated, toggleAnimated } = useContext(MotionContext);
 	const [toggle, setToggle] = useState(false);
-	const classer = toggle === true ?
-		`${local.header} ${local.active}` : local.header;
+	const classer =
+		toggle === true ? `${local.header} ${local.active}` : local.header;
 
 	const onFocusHandler = (e: React.FocusEvent) => {
 		if (e.target.id === 'toggler') return null;
 		setToggle(true);
-	}
+	};
 
 	const onBlurHandler = (e: React.FocusEvent) => {
 		if (
-			(e.target.id !== 'toggler' || (
-				e.relatedTarget !== null && (
-					e.relatedTarget.id === 'header-signin'
-					|| e.relatedTarget.id === 'delete-account'
-				)
-			))
-			&&
-			(e.target.id !== 'home'
-				|| (e.relatedTarget !== null
-					&& e.relatedTarget.id === 'privacy-policy'))) return null;
+			(e.target.id !== 'toggler' ||
+				(e.relatedTarget !== null &&
+					(e.relatedTarget.id === 'header-signin' ||
+						e.relatedTarget.id === 'delete-account'))) &&
+			(e.target.id !== 'home' ||
+				(e.relatedTarget !== null && e.relatedTarget.id === 'privacy-policy'))
+		)
+			return null;
 		setToggle(false);
-	}
+	};
 
 	return (
 		<header
@@ -94,9 +96,13 @@ const Toggler = (props: {
 			<button
 				id='toggler'
 				onClick={() => setToggle(!toggle)}
-				className={local.toggler}><FaBars /></button>
-			<div className={local.returner}
-				onClick={() => setToggle(false)} />
+				className={local.toggler}>
+				<FaBars />
+			</button>
+			<div
+				className={local.returner}
+				onClick={() => setToggle(false)}
+			/>
 			{props.children}
 			<section className={local.innerContainer}>
 				<button
@@ -113,7 +119,7 @@ const Toggler = (props: {
 			</section>
 		</header>
 	);
-}
+};
 
 const Header = () => {
 	return (
@@ -121,6 +127,6 @@ const Header = () => {
 			<Content />
 		</Toggler>
 	);
-}
+};
 
 export default Header;

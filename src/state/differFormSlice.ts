@@ -1,19 +1,19 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { differOperationAsync } from './thunks';
 
-import type { ActionType, MyPlaylistObject } from '@components/spotify/types';
+import type { ActionType, MyPlaylistObject } from '@/components/spotify/types';
 
 export type InitialDifferFormState = {
-	target: MyPlaylistObject | '',
-	differ: MyPlaylistObject | '',
-	type: ActionType | '',
-	success: string[] | null,
-	endPlaylist: MyPlaylistObject | null,
-	newName: string | '',
-	newDesc: string | '',
-	keepImg: boolean,
+	target: MyPlaylistObject | '';
+	differ: MyPlaylistObject | '';
+	type: ActionType | '';
+	success: string[] | null;
+	endPlaylist: MyPlaylistObject | null;
+	newName: string | '';
+	newDesc: string | '';
+	keepImg: boolean;
 
-	onForm: boolean
+	onForm: boolean;
 };
 
 const initialState: InitialDifferFormState = {
@@ -26,14 +26,18 @@ const initialState: InitialDifferFormState = {
 	newDesc: '',
 	keepImg: true,
 	endPlaylist: null,
-}
+};
 
 const differFormSlice = createSlice({
 	name: 'differForm',
 	initialState,
 	reducers: {
-		clearTarget: (state) => { state.target = '' },
-		clearDiffer: (state) => { state.differ = '' },
+		clearTarget: (state) => {
+			state.target = '';
+		},
+		clearDiffer: (state) => {
+			state.differ = '';
+		},
 		resetToForm: (state) => {
 			state.success = null;
 			state.endPlaylist = null;
@@ -56,18 +60,18 @@ const differFormSlice = createSlice({
 		},
 		toggleKeepImg: (state) => {
 			state.keepImg = !state.keepImg;
-		}
+		},
 	},
 	extraReducers: (builder) => {
-		builder.addCase(differOperationAsync.fulfilled,
-			(state, action) => {
+		builder
+			.addCase(differOperationAsync.fulfilled, (state, action) => {
 				state.success = action.payload.part;
 				state.endPlaylist = action.payload.playlist;
-			}).addCase(differOperationAsync.pending,
-				(state) => {
-					state.onForm = false;
-				});
-	}
+			})
+			.addCase(differOperationAsync.pending, (state) => {
+				state.onForm = false;
+			});
+	},
 });
 
 export const {
@@ -79,7 +83,7 @@ export const {
 	setAction,
 	updateDesc,
 	updateName,
-	toggleKeepImg
+	toggleKeepImg,
 } = differFormSlice.actions;
 
 export default differFormSlice.reducer;

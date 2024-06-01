@@ -1,6 +1,6 @@
 import SpotifyRouter from './SpotifyRouter';
 import { Provider } from 'react-redux';
-import { store } from '@state/state';
+import { store } from '@/state/state';
 
 const SpotifyMain = () => {
 	return (
@@ -8,6 +8,6 @@ const SpotifyMain = () => {
 			<SpotifyRouter />
 		</Provider>
 	);
-}
+};
 
 export default SpotifyMain;

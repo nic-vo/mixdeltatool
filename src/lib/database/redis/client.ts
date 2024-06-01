@@ -1,5 +1,5 @@
-import { CustomError } from '@lib/errors';
-import { Redis } from '@upstash/redis'
+import { CustomError } from '@/lib/errors';
+import { Redis } from '@upstash/redis';
 
 const url = process.env.REDIS_EAST_URL;
 const token = process.env.REDIS_EAST_TOKEN;

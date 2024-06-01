@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { AppDispatch, selectSpecificFetch } from '@state/state';
-import { retrieveSpecificAsync } from '@state/thunks';
-import { badInput } from '@state/specificFetchStateSlice';
-import { SmallStatus } from '@components/misc';
+import { AppDispatch, selectSpecificFetch } from '@/state/state';
+import { retrieveSpecificAsync } from '@/state/thunks';
+import { badInput } from '@/state/specificFetchStateSlice';
+import { SmallStatus } from '@/components/misc';
 
 import local from './SpecificAdder.module.scss';
-import global from '@styles/globals.module.scss';
+import global from '@/styles/globals.module.scss';
 
 /*
 
@@ -20,10 +20,8 @@ Has to adapt the playlist context's specificPlaylistHandler to a <form>
 export default function SpecificAdder() {
 	const [href, setHref] = useState<string | ''>('');
 
-	const {
-		loading: specificLoading,
-		error: specificError
-	} = useSelector(selectSpecificFetch);
+	const { loading: specificLoading, error: specificError } =
+		useSelector(selectSpecificFetch);
 
 	const dispatch = useDispatch<AppDispatch>();
 
@@ -60,13 +58,19 @@ export default function SpecificAdder() {
 					placeholder='Playlist/album link here...'
 					value={href}
 					onChange={hrefChangeHandler}
-					className={local.textInput} />
+					className={local.textInput}
+				/>
 				<button
 					type='submit'
 					disabled={specificLoading}
-					className={global.emptyButton}>Add</button>
+					className={global.emptyButton}>
+					Add
+				</button>
 			</form>
-			<SmallStatus error={specificError} loading={specificLoading} />
+			<SmallStatus
+				error={specificError}
+				loading={specificLoading}
+			/>
 		</>
 	);
-};
+}

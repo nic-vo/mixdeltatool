@@ -4,8 +4,8 @@ import { signIn } from 'next-auth/react';
 import {
 	MyPlaylistObject,
 	MyUserAPIRouteResponse,
-	differRouteResponse
-} from '@components/spotify/types';
+	differRouteResponse,
+} from '@/components/spotify/types';
 import { RootState } from './state';
 
 export const retrieveSpecificAsync = createAsyncThunk(
@@ -24,7 +24,9 @@ export const retrieveSpecificAsync = createAsyncThunk(
 
 			let response;
 			try {
-				response = await fetch(`/api/spotify/getSpecific?id=${id}&type=${type}`);
+				response = await fetch(
+					`/api/spotify/getSpecific?id=${id}&type=${type}`
+				);
 			} catch {
 				throw { message: 'There was an error reaching our servers' };
 			}
@@ -74,11 +76,13 @@ export const differOperationAsync = createAsyncThunk(
 			const { differForm: df } = thunkAPI.getState() as RootState;
 
 			const { target, differ, type, keepImg } = df;
-			if (target === '') throw { message: 'Target missing' }
-			if (differ === '') throw { message: 'Differ missing' }
-			if (type === '') throw { message: 'Type missing' }
+			if (target === '') throw { message: 'Target missing' };
+			if (differ === '') throw { message: 'Differ missing' };
+			if (type === '') throw { message: 'Type missing' };
 			const body = {
-				target, differ, type,
+				target,
+				differ,
+				type,
 				keepImg,
 				newName: df.newName !== '' ? df.newName : null,
 				newDesc: df.newDesc !== '' ? df.newDesc : null,
@@ -86,7 +90,7 @@ export const differOperationAsync = createAsyncThunk(
 			const response = await fetch('/api/spotify/create', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(body)
+				body: JSON.stringify(body),
 			});
 			const jsoned = await response.json();
 			if (response.ok) return jsoned as differRouteResponse;
@@ -94,9 +98,11 @@ export const differOperationAsync = createAsyncThunk(
 			throw jsoned as { message: string };
 		} catch (e: any) {
 			throw {
-				message: e.message && typeof (e.message) === 'string' ?
-					e.message : 'Received a bad response from the server'
-			}
+				message:
+					e.message && typeof e.message === 'string'
+						? e.message
+						: 'Received a bad response from the server',
+			};
 		}
 	}
 );

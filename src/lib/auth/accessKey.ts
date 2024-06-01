@@ -1,6 +1,5 @@
-import mongoosePromise, { Account } from '@lib/database/mongoose';
+import mongoosePromise, { Account } from '@/lib/database/mongoose';
 import type { Account as AccountType } from 'next-auth';
-
 
 export const signInUpdater = async (account: AccountType) => {
 	// Update existing access_key
@@ -10,26 +9,27 @@ export const signInUpdater = async (account: AccountType) => {
 	try {
 		// This shouldn't happen because next-auth should always hit
 		// The Spotify OAuth endpoint
-		if (!account.access_token
-			|| !account.expires_at) throw new Error();
+		if (!account.access_token || !account.expires_at) throw new Error();
 		await mongoosePromise();
 		// Use findOneAndUpdate because hopefully it's atomic on MongoDB's side
 		await Account.findOneAndUpdate(
 			{
 				providerAccountId: account.providerAccountId,
-				provider: 'spotify'
-			}, {
-			access_token: account.access_token,
-			expires_at: account.expires_at
-		}).exec();
+				provider: 'spotify',
+			},
+			{
+				access_token: account.access_token,
+				expires_at: account.expires_at,
+			}
+		).exec();
 	} catch {
 		// The only errors should be at network level hopefully;
 		// Assumes Account model is correct
 		// + next-auth adapters don't change their schema suddenly
-		throw 'Network error'
+		throw 'Network error';
 	}
 	return null;
-}
+};
 
 export const routeKeyRetriever = async (id: string) => {
 	// This function assumes that my signIn callback works
@@ -47,13 +47,13 @@ export const routeKeyRetriever = async (id: string) => {
 		if (query !== null)
 			token = {
 				accessToken: query.access_token,
-				expiresAt: query.expires_at
+				expiresAt: query.expires_at,
 			};
 	} catch {
 		// The only errors should be at network level hopefully;
 		// Assumes Account model is correct
 		// + next-auth adapters don't change their schema suddenly
-		throw 'Network error'
+		throw 'Network error';
 	}
 	return token;
-}
+};

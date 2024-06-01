@@ -1,11 +1,11 @@
 import { getServerSession } from 'next-auth';
-import { routeKeyRetriever } from '@lib/auth/accessKey';
-import { specificQueryParser } from '@lib/spotify/validators';
-import { specificPlaylistGetter } from '@lib/spotify/getterPromises';
-import { checkAndUpdateEntry } from '@lib/database/redis/ratelimiting';
+import { routeKeyRetriever } from '@/lib/auth/accessKey';
+import { specificQueryParser } from '@/lib/spotify/validators';
+import { specificPlaylistGetter } from '@/lib/spotify/getterPromises';
+import { checkAndUpdateEntry } from '@/lib/database/redis/ratelimiting';
 
-import { authOptions } from '@lib/auth/options';
-import { SPOT_LOGIN_WINDOW } from '@consts/spotify';
+import { authOptions } from '@/lib/auth/options';
+import { SPOT_LOGIN_WINDOW } from '@/consts/spotify';
 
 import {
 	AuthError,
@@ -13,8 +13,8 @@ import {
 	FetchError,
 	MalformedError,
 	RateError,
-	ReqMethodError
-} from '@lib/errors';
+	ReqMethodError,
+} from '@/lib/errors';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 // The assumption for this route is that every sign-on refreshes access token
@@ -25,7 +25,8 @@ const RATE_LIMIT_ROLLING_LIMIT = 10;
 const RATE_LIMIT_DECAY_SECONDS = 5;
 
 export default async function handler(
-	req: NextApiRequest, res: NextApiResponse
+	req: NextApiRequest,
+	res: NextApiResponse
 ) {
 	if (process.env.GLOBAL_SAFETY === 'ON')
 		return res.status(404).json({ message: 'Error' });
@@ -39,7 +40,6 @@ export default async function handler(
 		return res.status(504).json({ message: 'Server timed out' });
 	}, 3000);
 
-
 	try {
 		// Validate req method
 		if (req.method !== 'GET') throw new ReqMethodError('GET');
@@ -51,20 +51,20 @@ export default async function handler(
 			***
 		*/
 
-		const incomingIp = process.env.IS_DEV !== 'YES' ?
-			req.headers['x-real-ip'] : req.socket.remoteAddress;
-		if (!incomingIp)
-			throw new CustomError(500, 'Internal Error');
+		const incomingIp =
+			process.env.IS_DEV !== 'YES'
+				? req.headers['x-real-ip']
+				: req.socket.remoteAddress;
+		if (!incomingIp) throw new CustomError(500, 'Internal Error');
 		const ip = Array.isArray(incomingIp) ? incomingIp[0] : incomingIp;
 		const rateLimit = await checkAndUpdateEntry({
 			ip,
 			prefix: RATE_LIMIT_PREFIX,
 			rollingLimit: RATE_LIMIT_ROLLING_LIMIT,
-			rollingDecaySeconds: RATE_LIMIT_DECAY_SECONDS
+			rollingDecaySeconds: RATE_LIMIT_DECAY_SECONDS,
 		});
 
-		if (rateLimit !== null)
-			throw new RateError(rateLimit);
+		if (rateLimit !== null) throw new RateError(rateLimit);
 
 		// Validate query parameters
 		let id, type;
@@ -101,29 +101,30 @@ export default async function handler(
 
 		// Check if session is being accessed when access token might not be live
 		const { expiresAt, accessToken } = token;
-		if (expiresAt === undefined
-			|| expiresAt === null
-			|| accessToken === undefined
-			|| accessToken === null
-			|| (Date.now() - expiresAt) < (3600 - SPOT_LOGIN_WINDOW))
+		if (
+			expiresAt === undefined ||
+			expiresAt === null ||
+			accessToken === undefined ||
+			accessToken === null ||
+			Date.now() - expiresAt < 3600 - SPOT_LOGIN_WINDOW
+		)
 			throw new AuthError();
 
 		// Hit spotify API with retrieved access token
-		const data = await specificPlaylistGetter(
-			{
-				type,
-				id,
-				accessToken,
-				globalTimeoutMS
-			}
-		);
+		const data = await specificPlaylistGetter({
+			type,
+			id,
+			accessToken,
+			globalTimeoutMS,
+		});
 		clearTimeout(globalTimeout);
 		return res.status(200).json(data);
 	} catch (e: any) {
 		clearTimeout(authTimeout);
 		clearTimeout(globalTimeout);
 		if (e.status === 429) res.setHeader('Retry-After', e.retryTime);
-		return res.status(e.status ? e.status : 500)
+		return res
+			.status(e.status ? e.status : 500)
 			.json({ message: e.message ? e.message : 'Unknown error' });
 	}
 }

@@ -1,4 +1,4 @@
-@use '@styles/globals.module.scss' as g;
+@use '@/styles/globals.module.scss' as g;
 
 .item {
 	height: fit-content;
@@ -88,8 +88,6 @@
 			border: none;
 		}
 	}
-
-
 }
 
 .link {

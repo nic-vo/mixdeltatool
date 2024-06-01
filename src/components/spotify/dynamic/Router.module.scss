@@ -1,4 +1,4 @@
-@use '@styles/globals.module.scss' as g;
+@use '@/styles/globals.module.scss' as g;
 
 .router {
 	margin-top: 5svh;
@@ -41,14 +41,14 @@ $routerBorderWidth: 2px;
 .rightButton {
 	border-top-right-radius: g.$rounded;
 	border-bottom-right-radius: g.$rounded;
-	border-left-width: calc(0.5*$routerBorderWidth);
+	border-left-width: calc(0.5 * $routerBorderWidth);
 	border-left-width: 0;
 }
 
 .leftButton {
 	border-top-left-radius: g.$rounded;
 	border-bottom-left-radius: g.$rounded;
-	border-right-width: calc(0.5*$routerBorderWidth);
+	border-right-width: calc(0.5 * $routerBorderWidth);
 	border-right-width: 0;
 }
 

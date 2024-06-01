@@ -1,7 +1,7 @@
-import mongoosePromise from '@lib/database/mongoose';
-import { ContactMessage } from '@lib/database/mongoose/models';
+import mongoosePromise from '@/lib/database/mongoose';
+import { ContactMessage } from '@/lib/database/mongoose/models';
 
-import { CustomError, FetchError, MalformedError } from '@lib/errors';
+import { CustomError, FetchError, MalformedError } from '@/lib/errors';
 
 // Returns null or causes an instant throw in the parent
 export const hCaptchaPromise = async (token: string): Promise<null> => {
@@ -17,9 +17,9 @@ export const hCaptchaPromise = async (token: string): Promise<null> => {
 				response = await fetch('https://api.hcaptcha.com/siteverify', {
 					method: 'POST',
 					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded'
+						'Content-Type': 'application/x-www-form-urlencoded',
 					},
-					body: params
+					body: params,
 				});
 			} catch {
 				if (retries < 3) {
@@ -30,15 +30,18 @@ export const hCaptchaPromise = async (token: string): Promise<null> => {
 			}
 			break;
 		}
-		if (response === undefined) return rej(new CustomError(500, 'Internal error.'));
+		if (response === undefined)
+			return rej(new CustomError(500, 'Internal error.'));
 		const jsoned = await response.json();
 		if (!jsoned.success) return rej(new MalformedError());
 		return res(null);
 	});
-}
+};
 
 // Rate limit contact form by having a hard limit on how many messages from a certain ip
-export const checkExistingMessages = async (checkIP: string): Promise<boolean> => {
+export const checkExistingMessages = async (
+	checkIP: string
+): Promise<boolean> => {
 	return new Promise(async (res, rej) => {
 		try {
 			await mongoosePromise();
@@ -51,15 +54,17 @@ export const checkExistingMessages = async (checkIP: string): Promise<boolean> =
 		} catch {
 			return rej(new CustomError(500, 'Internal error'));
 		}
-		return res(existing !== undefined && existing !== null && existing.length < 5);
+		return res(
+			existing !== undefined && existing !== null && existing.length < 5
+		);
 	});
-}
+};
 
 // Adds a new message if the ^ passes in parent
 export const addNewMessage = async (params: {
-	ip: string,
-	name: string,
-	message: string
+	ip: string;
+	name: string;
+	message: string;
 }): Promise<null> => {
 	const { ip, name, message } = params;
 
@@ -77,4 +82,4 @@ export const addNewMessage = async (params: {
 		}
 		return res(null);
 	});
-}
+};

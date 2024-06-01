@@ -1,29 +1,26 @@
-import { SPOT_URL_BASE } from '@consts/spotify';
-import {
-	FetchError,
-	NotFoundError,
-} from '../errors';
+import { SPOT_URL_BASE } from '@/consts/spotify';
+import { FetchError, NotFoundError } from '../errors';
 
 import { getOnePromise, localTimeout } from './commonPromises';
 import {
 	spotAlbumObjectParser,
 	spotPlaylistObjectParser,
-	userPlaylistResponseParser
+	userPlaylistResponseParser,
 } from './validators';
 
 import {
 	MyPlaylistObject,
 	MyUserAPIRouteResponse,
 	SpotAlbumObject,
-	SpotPlaylistObject
-} from '@components/spotify/types';
+	SpotPlaylistObject,
+} from '@/components/spotify/types';
 
 const SPOT_PLAYLIST_ITER_INT = 10;
 
 const userPlaylistGetter = async (args: {
-	page: number,
-	accessToken: string,
-	globalTimeoutMS: number
+	page: number;
+	accessToken: string;
+	globalTimeoutMS: number;
 }): Promise<MyUserAPIRouteResponse> => {
 	// Timeout MS reflects global timeout in Next.js Handler
 	// Unknown how long it would take to get to this fetch function
@@ -36,7 +33,7 @@ const userPlaylistGetter = async (args: {
 	const headers = new Headers();
 	const params = new URLSearchParams({
 		offset: offset.toString(),
-		limit: SPOT_PLAYLIST_ITER_INT.toString()
+		limit: SPOT_PLAYLIST_ITER_INT.toString(),
 	});
 	headers.append('Authorization', `Bearer ${accessToken}`);
 	const url = `${SPOT_URL_BASE}me/playlists?${params.toString()}`;
@@ -46,11 +43,13 @@ const userPlaylistGetter = async (args: {
 		(async (): Promise<MyUserAPIRouteResponse> => {
 			const request = fetch(url, { headers });
 			const response = await getOnePromise({
-				request, silentFail: false, parentTimeoutMS,
+				request,
+				silentFail: false,
+				parentTimeoutMS,
 				errorOverrides: [
 					{ status: 403, message: "Can't access your playlists." },
-					{ status: 404, message: "Can't find you, somehow." }
-				]
+					{ status: 404, message: "Can't find you, somehow." },
+				],
 			});
 			let items, next;
 			try {
@@ -63,7 +62,7 @@ const userPlaylistGetter = async (args: {
 			}
 			return {
 				next,
-				playlists: items.map(item => {
+				playlists: items.map((item) => {
 					const { images, tracks } = item;
 					return {
 						...item,
@@ -71,19 +70,20 @@ const userPlaylistGetter = async (args: {
 						image: images[0],
 						tracks: tracks.total,
 					};
-				})
+				}),
 			} as MyUserAPIRouteResponse;
-		})()]);
-}
+		})(),
+	]);
+};
 
 const specificPlaylistGetter = async (args: {
-	type: 'album' | 'playlist',
-	id: string,
-	accessToken: string,
-	globalTimeoutMS: number
+	type: 'album' | 'playlist';
+	id: string;
+	accessToken: string;
+	globalTimeoutMS: number;
 }): Promise<MyPlaylistObject> => {
 	const { accessToken, type, id, globalTimeoutMS } = args;
-	const parentTimeoutMS = globalTimeoutMS - 100
+	const parentTimeoutMS = globalTimeoutMS - 100;
 	const headers = new Headers();
 	headers.append('Authorization', `Bearer ${accessToken}`);
 	const url = `${SPOT_URL_BASE}${type}s/${id}`;
@@ -93,24 +93,27 @@ const specificPlaylistGetter = async (args: {
 		(async () => {
 			const request = fetch(url, { headers });
 			const response = await getOnePromise({
-				request, silentFail: false, parentTimeoutMS,
+				request,
+				silentFail: false,
+				parentTimeoutMS,
 				errorOverrides: [
-					{ status: 403, message: "Spotify forbids that playlist." },
-					{ status: 404, message: "Info is wrong / playlist doesn't exist." }
-				]
+					{ status: 403, message: 'Spotify forbids that playlist.' },
+					{ status: 404, message: "Info is wrong / playlist doesn't exist." },
+				],
 			});
 			let returner: MyPlaylistObject;
 			try {
 				// User may submit a playlist or an album
-				const jsoned: SpotAlbumObject | SpotPlaylistObject = await response.json();
+				const jsoned: SpotAlbumObject | SpotPlaylistObject =
+					await response.json();
 				if (jsoned.type === 'album') {
 					const parsed = spotAlbumObjectParser.parse(jsoned);
 					returner = {
 						...parsed,
 						image: parsed.images[0],
-						owner: parsed.artists.map(artist => {
+						owner: parsed.artists.map((artist) => {
 							const { name, id } = artist;
-							return { name, id }
+							return { name, id };
 						}),
 						tracks: parsed.total_tracks,
 					};
@@ -120,20 +123,20 @@ const specificPlaylistGetter = async (args: {
 						...parsed,
 						image: parsed.images[0],
 						tracks: parsed.tracks.total,
-						owner: [{
-							...parsed.owner,
-							name: parsed.owner.display_name || 'Spotify User'
-						}]
+						owner: [
+							{
+								...parsed.owner,
+								name: parsed.owner.display_name || 'Spotify User',
+							},
+						],
 					};
 				} else throw new Error();
 			} catch {
 				throw new NotFoundError('That was not a valid playlist.');
 			}
 			return returner;
-		})()]);
-}
-
-export {
-	userPlaylistGetter,
-	specificPlaylistGetter
+		})(),
+	]);
 };
+
+export { userPlaylistGetter, specificPlaylistGetter };

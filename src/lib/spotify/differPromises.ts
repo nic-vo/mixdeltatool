@@ -1,17 +1,17 @@
-import { SPOT_URL_BASE } from '@consts/spotify';
+import { SPOT_URL_BASE } from '@/consts/spotify';
 import { getOnePromise, localTimeout, userGetter } from './commonPromises';
 import { spotPlaylistObjectParser } from './validators';
-import { printTime } from '@lib/misc';
+import { printTime } from '@/lib/misc';
 import { readFileSync } from 'fs';
 import path from 'path';
-import { genUId } from '@lib/misc/helpers';
+import { genUId } from '@/lib/misc/helpers';
 
 import {
 	AuthError,
 	FetchError,
 	ForbiddenError,
 	NotFoundError,
-	RateError
+	RateError,
 } from '../errors';
 
 import {
@@ -19,28 +19,23 @@ import {
 	SpotAlbumTracksResponse,
 	SpotPlaylistTracksResponse,
 	differInternalAddPromise,
-	differInternalPlaylistPromise
-} from '@components/spotify/types';
+	differInternalPlaylistPromise,
+} from '@/components/spotify/types';
 
 const createEmptyPlaylist = async (args: {
-	accessToken: string,
-	baseDescStr: string,
-	globalTimeoutMS: number,
-	newName: string | null,
-	target: MyPlaylistObject | false
+	accessToken: string;
+	baseDescStr: string;
+	globalTimeoutMS: number;
+	newName: string | null;
+	target: MyPlaylistObject | false;
 }): Promise<MyPlaylistObject> => {
-	const {
-		accessToken,
-		globalTimeoutMS,
-		baseDescStr,
-		newName } = args;
+	const { accessToken, globalTimeoutMS, baseDescStr, newName } = args;
 	const start = Date.now();
 	const parentTimeoutMS = globalTimeoutMS - 2200;
 
 	return Promise.race([
 		localTimeout<MyPlaylistObject>(parentTimeoutMS),
 		(async (): Promise<MyPlaylistObject> => {
-
 			let userId: string = await userGetter({ globalTimeoutMS, accessToken });
 
 			const url = SPOT_URL_BASE.concat('users/', userId, '/playlists');
@@ -54,18 +49,20 @@ const createEmptyPlaylist = async (args: {
 				body: JSON.stringify({
 					name: `MixDelta - ${newName !== null ? newName : genUId(4)}`,
 					description: baseDescStr,
-					public: false
-				})
+					public: false,
+				}),
 			});
 
 			const response = await getOnePromise({
-				request, silentFail: false, parentTimeoutMS,
+				request,
+				silentFail: false,
+				parentTimeoutMS,
 				errorOverrides: [
 					{
 						status: 403,
-						message: "For some reason you can't create a playlist."
-					}
-				]
+						message: "For some reason you can't create a playlist.",
+					},
+				],
 			});
 			let returner: MyPlaylistObject;
 			try {
@@ -73,9 +70,14 @@ const createEmptyPlaylist = async (args: {
 				const parsed = spotPlaylistObjectParser.parse(jsoned);
 				returner = {
 					...parsed,
-					owner: [{ ...parsed.owner, name: parsed.owner.display_name || 'Spotify User' }],
+					owner: [
+						{
+							...parsed.owner,
+							name: parsed.owner.display_name || 'Spotify User',
+						},
+					],
 					image: parsed.images[0],
-					tracks: 0
+					tracks: 0,
 				};
 			} catch {
 				throw new FetchError('There was an error creating a new playlist');
@@ -87,20 +89,17 @@ const createEmptyPlaylist = async (args: {
 			const putHeaders = new Headers();
 			putHeaders.append('Authorization', `Bearer ${accessToken}`);
 			putHeaders.append('Content-Type', 'image/jpeg');
-			const imgPath = path.join(
-				process.cwd(),
-				'src',
-				'consts',
-				'mdl.jpg');
+			const imgPath = path.join(process.cwd(), 'src', 'consts', 'mdl.jpg');
 			// const imgString = readFileSync(imgPath).toString('base64');
 			let imgGetSuccess = false;
 			try {
-				let imgString
+				let imgString;
 				try {
 					if (args.target === false || !args.target.image) throw {};
 					const imageRaw = await fetch(args.target.image.url);
-					imgString = Buffer.from(await imageRaw.arrayBuffer())
-						.toString('base64');
+					imgString = Buffer.from(await imageRaw.arrayBuffer()).toString(
+						'base64'
+					);
 					imgGetSuccess = true;
 				} catch (e: any) {
 					console.error(e);
@@ -109,10 +108,12 @@ const createEmptyPlaylist = async (args: {
 				const putToPlaylistRequest = fetch(putUrl, {
 					headers: putHeaders,
 					method: 'PUT',
-					body: imgString
+					body: imgString,
 				});
 				const putToPlaylistResponse = await getOnePromise({
-					request: putToPlaylistRequest, silentFail: true, parentTimeoutMS
+					request: putToPlaylistRequest,
+					silentFail: true,
+					parentTimeoutMS,
 				});
 				if (!putToPlaylistResponse.ok) throw new Error();
 				printTime('Thumb uploaded:', putStart);
@@ -120,21 +121,22 @@ const createEmptyPlaylist = async (args: {
 				printTime('Thumb skipped:', putStart);
 			}
 			returner.image = {
-				url: imgGetSuccess
-					&& args.target !== false
-					&& args.target.image ?
-					args.target.image.url : '/mdl.jpg'
-			}
+				url:
+					imgGetSuccess && args.target !== false && args.target.image
+						? args.target.image.url
+						: '/mdl.jpg',
+			};
 			printTime('Created empty playlist and uploaded thumb:', start);
 			return returner;
-		})()]);
-}
+		})(),
+	]);
+};
 
 const playlistGetter = async (args: {
-	accessToken: string,
-	type: 'playlist' | 'album',
-	id: string,
-	globalTimeoutMS: number
+	accessToken: string;
+	type: 'playlist' | 'album';
+	id: string;
+	globalTimeoutMS: number;
 }): Promise<differInternalPlaylistPromise> => {
 	const start = Date.now();
 	const { accessToken, type, id, globalTimeoutMS } = args;
@@ -166,7 +168,7 @@ const playlistGetter = async (args: {
 			let next: string | null = initNext;
 			// One retry because for some reason on
 			// random playlists, the fetch instantly throws
-			while (next !== null && (Date.now() + 500) < parentTimeoutMS) {
+			while (next !== null && Date.now() + 500 < parentTimeoutMS) {
 				let response;
 				let networkRetry = true;
 				while (true) {
@@ -185,13 +187,13 @@ const playlistGetter = async (args: {
 					const header = response.headers.get('Retry-After');
 					const wait = header !== null ? parseInt(header) * 1000 : 2000;
 					// Throw rate error if wait would pass the timeout time
-					if ((Date.now() + wait) > parentTimeoutMS) {
+					if (Date.now() + wait > parentTimeoutMS) {
 						// Break early from rate limit if data exists
 						if (set.size > 0) break;
 						throw new RateError(5);
 					}
 					// Await retry if within timeout time
-					await new Promise(async r => setTimeout(r, wait));
+					await new Promise(async (r) => setTimeout(r, wait));
 					continue;
 				}
 				if (response.ok === false) {
@@ -200,8 +202,9 @@ const playlistGetter = async (args: {
 						case 401:
 							throw new AuthError();
 						case 403:
-							throw new ForbiddenError(`For some reason, you can't access `
-								+ `one of those playlists`);
+							throw new ForbiddenError(
+								`For some reason, you can't access ` + `one of those playlists`
+							);
 						case 404:
 							throw new NotFoundError(`One of those playlists doesn't exist`);
 						default:
@@ -212,25 +215,28 @@ const playlistGetter = async (args: {
 				// Set next to either new url or null
 				let jsoned;
 				if (type === 'playlist') {
-					jsoned = await response.json() as SpotPlaylistTracksResponse;
+					jsoned = (await response.json()) as SpotPlaylistTracksResponse;
 					for (const item of jsoned.items) {
 						// Filter for existing and local files;
 						// Local files have really weird URIs;
 						// Sometimes spotify returns null for a weird non-existing track
 						// And this whole thing throws
-						if (item === null
-							|| item.track === null
-							|| item.track.uri === null
-							|| item.is_local
-							|| /:local:/.test(item.track.uri)
-							|| set.has(item.track.uri) === true) continue;
+						if (
+							item === null ||
+							item.track === null ||
+							item.track.uri === null ||
+							item.is_local ||
+							/:local:/.test(item.track.uri) ||
+							set.has(item.track.uri) === true
+						)
+							continue;
 						// Show that some tracks returned null for some reason
 						// Don't increment completed
 						set.add(item.track.uri);
 						completed += 1;
 					}
 				} else {
-					jsoned = await response.json() as SpotAlbumTracksResponse;
+					jsoned = (await response.json()) as SpotAlbumTracksResponse;
 					for (const item of jsoned.items) {
 						if (!item.uri) continue;
 						set.add(item.uri);
@@ -245,16 +251,17 @@ const playlistGetter = async (args: {
 			return {
 				total,
 				completed,
-				items: set
+				items: set,
 			};
-		})()]);
-}
+		})(),
+	]);
+};
 
 const outputAdder = (params: {
-	accessToken: string,
-	items: Set<string>,
-	id: string,
-	globalTimeoutMS: number
+	accessToken: string;
+	items: Set<string>;
+	id: string;
+	globalTimeoutMS: number;
 }) => {
 	const { accessToken, items, id, globalTimeoutMS } = params;
 	const parentTimeoutMS = globalTimeoutMS - 200;
@@ -270,7 +277,7 @@ const outputAdder = (params: {
 			const remain = uris.length % 100;
 			const hundreds = Math.floor(uris.length / 100);
 			for (let i = 0; i < hundreds; i++)
-				fetches.push(uris.slice(0 + (100 * i), 100 + (100 * i)));
+				fetches.push(uris.slice(0 + 100 * i, 100 + 100 * i));
 			// Add remainder if necessary
 			if (remain !== 0) fetches.push(uris.slice(0 - remain));
 
@@ -297,16 +304,18 @@ const outputAdder = (params: {
 					const request = fetch(url, {
 						headers,
 						method: 'POST',
-						body: JSON.stringify({ uris: uriArr })
+						body: JSON.stringify({ uris: uriArr }),
 					});
 					response = await getOnePromise({
-						request, silentFail: true, parentTimeoutMS
+						request,
+						silentFail: true,
+						parentTimeoutMS,
 					});
 					if (response.status === 429) {
 						const header = response.headers.get('Retry-After');
 						const wait = header !== null ? parseInt(header) * 1000 : 2000;
 						// Throw rate error if wait would pass the timeout time
-						if ((Date.now() + wait) > parentTimeoutMS) {
+						if (Date.now() + wait > parentTimeoutMS) {
 							// Break early from rate limit if data exists
 							if (completed > 0) {
 								endAll = true;
@@ -315,7 +324,7 @@ const outputAdder = (params: {
 							throw new RateError(10);
 						}
 						// Await retry if within timeout time
-						await new Promise(async r => setTimeout(r, wait));
+						await new Promise(async (r) => setTimeout(r, wait));
 						continue;
 					}
 					break;
@@ -328,10 +337,13 @@ const outputAdder = (params: {
 						case 401:
 							throw new AuthError();
 						case 403:
-							throw new ForbiddenError(`For some reason, you can't access the `
-								+ `playlist`);
+							throw new ForbiddenError(
+								`For some reason, you can't access the ` + `playlist`
+							);
 						default:
-							throw new FetchError('There was an error populating the playlist');
+							throw new FetchError(
+								'There was an error populating the playlist'
+							);
 					}
 				}
 				// Add new number to completed, either a hundred or the remainder
@@ -340,23 +352,18 @@ const outputAdder = (params: {
 				iterations += 1;
 			}
 			return { total, completed };
-		})()]);
-}
+		})(),
+	]);
+};
 
 const updateDescription = async (params: {
-	accessToken: string,
-	globalTimeoutMS: number,
-	id: string,
-	baseDescStr: string,
-	reasons: string[]
+	accessToken: string;
+	globalTimeoutMS: number;
+	id: string;
+	baseDescStr: string;
+	reasons: string[];
 }): Promise<string | null> => {
-	const {
-		accessToken,
-		id,
-		globalTimeoutMS,
-		reasons,
-		baseDescStr
-	} = params;
+	const { accessToken, id, globalTimeoutMS, reasons, baseDescStr } = params;
 	const parentTimeoutMS = globalTimeoutMS - 200;
 	const headers = new Headers();
 	headers.append('Authorization', `Bearer ${accessToken}`);
@@ -366,21 +373,23 @@ const updateDescription = async (params: {
 	const request = fetch(SPOT_URL_BASE.concat('playlists/', id), {
 		method: 'PUT',
 		headers,
-		body: JSON.stringify(
-			{ description: baseDescStr.concat(' ', reasons.join(' ')) }
-		)
+		body: JSON.stringify({
+			description: baseDescStr.concat(' ', reasons.join(' ')),
+		}),
 	});
 	const response = await getOnePromise({
-		request, silentFail: true, parentTimeoutMS
+		request,
+		silentFail: true,
+		parentTimeoutMS,
 	});
 	if (response.ok === false) return failMsg;
 	return null;
-}
+};
 
 export {
 	userGetter,
 	createEmptyPlaylist,
 	playlistGetter,
 	outputAdder,
-	updateDescription
+	updateDescription,
 };

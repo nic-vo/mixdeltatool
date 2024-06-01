@@ -1,4 +1,4 @@
-@use '@styles/globals.module.scss' as g;
+@use '@/styles/globals.module.scss' as g;
 
 .container {
 	width: 100%;
@@ -31,10 +31,9 @@
 	}
 }
 
-
 .concern {
-	border-color: #F79824;
-	background-color: #FFFBDB;
+	border-color: #f79824;
+	background-color: #fffbdb;
 
 	p,
 	strong {
@@ -42,13 +41,13 @@
 	}
 
 	svg * {
-		color: #F79824;
+		color: #f79824;
 	}
 }
 
 .severe {
-	border-color: #B20D30;
-	background-color: #FAE3E3;
+	border-color: #b20d30;
+	background-color: #fae3e3;
 
 	p,
 	strong {
@@ -56,7 +55,7 @@
 	}
 
 	svg * {
-		color: #B20D30;
+		color: #b20d30;
 	}
 }
 

@@ -1,4 +1,4 @@
-@use '@styles/globals.module.scss' as g;
+@use '@/styles/globals.module.scss' as g;
 
 .pending {
 	@include g.flexCenter;
@@ -14,11 +14,11 @@
 
 @keyframes fadeIn {
 	0% {
-		opacity: 0%
+		opacity: 0%;
 	}
 
 	100% {
-		opacity: 100%
+		opacity: 100%;
 	}
 }
 
@@ -28,7 +28,7 @@
 	justify-content: center;
 	align-items: center;
 	width: 100%;
-	gap: 1rem
+	gap: 1rem;
 }
 
 .status {
@@ -50,7 +50,6 @@
 	}
 }
 
-
 .error {
 	color: crimson;
 }
@@ -61,7 +60,6 @@
 
 .total {
 	color: limegreen;
-
 }
 
 @media (min-aspect-ratio: 0.75) {

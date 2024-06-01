@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux';
-import { selectOnForm } from '@state/state';
+import { selectOnForm } from '@/state/state';
 
 import DifferForm from './differForm/DifferForm';
 import PlaylistOptions from './playlistOptions/PlaylistOptions';
@@ -12,13 +12,13 @@ export default function PlaylistDiffer() {
 
 	return (
 		<section className={local.container}>
-			{
-				onForm ? (
-					<DifferForm>
-						<PlaylistOptions />
-					</DifferForm>)
-					: <PendingWindow />
-			}
+			{onForm ? (
+				<DifferForm>
+					<PlaylistOptions />
+				</DifferForm>
+			) : (
+				<PendingWindow />
+			)}
 		</section>
 	);
 }

@@ -1,4 +1,4 @@
-@use '@styles/globals.module.scss' as g;
+@use '@/styles/globals.module.scss' as g;
 
 $doneColor: #ff5454;
 
@@ -13,5 +13,5 @@ $doneColor: #ff5454;
 	cursor: default;
 	background-color: $doneColor;
 	color: g.$white;
-	border-color: $doneColor
+	border-color: $doneColor;
 }

@@ -1,4 +1,4 @@
-@use '@styles/globals.module.scss' as g;
+@use '@/styles/globals.module.scss' as g;
 
 .dialog {
 	background-color: g.$black;
@@ -43,7 +43,7 @@
 	}
 
 	button {
-		cursor: pointer
+		cursor: pointer;
 	}
 }
 
@@ -96,7 +96,7 @@
 	margin-left: 1rem;
 }
 
-@media(min-aspect-ratio: 1) {
+@media (min-aspect-ratio: 1) {
 	.form {
 		gap: 2rem;
 		padding: 2svw;

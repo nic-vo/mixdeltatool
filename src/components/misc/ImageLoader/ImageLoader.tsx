@@ -1,10 +1,13 @@
 import { useState } from 'react';
-import { MixDeltaLogo } from '@consts/spotify';
+import { MixDeltaLogo } from '@/consts/spotify';
 
 import local from './ImageLoader.module.scss';
 import ImageLoadingLogo from '../ImageLoadingLogo/ImageLoadingLogo';
 
-const ImageLoader = (props: { url?: string | null | undefined, alt?: string }) => {
+const ImageLoader = (props: {
+	url?: string | null | undefined;
+	alt?: string;
+}) => {
 	const [loaded, setLoaded] = useState(false);
 	const [error, setError] = useState(false);
 
@@ -12,23 +15,25 @@ const ImageLoader = (props: { url?: string | null | undefined, alt?: string }) =
 		// setTimeout(() => setLoaded(true), 5000);
 		setLoaded(true);
 		setError(false);
-	}
+	};
 
 	const errorHandler = () => {
 		setError(true);
-	}
+	};
 
-	const containerClass = `${local.container}${!error
-		&& !loaded
-		&& props.url ? ` ${local.loading}` : ''}`;
+	const containerClass = `${local.container}${
+		!error && !loaded && props.url ? ` ${local.loading}` : ''
+	}`;
 	const imgClass = `${local.img}${loaded ? ` ${local.loaded}` : ''}`;
 
 	if (props.url === null || props.url === undefined || error)
 		return (
 			<div className={containerClass}>
-				<img src={MixDeltaLogo.src}
+				<img
+					src={MixDeltaLogo.src}
 					alt={`Album art placeholder`}
-					className={imgClass} />
+					className={imgClass}
+				/>
 			</div>
 		);
 
@@ -45,6 +50,6 @@ const ImageLoader = (props: { url?: string | null | undefined, alt?: string }) =
 			/>
 		</div>
 	);
-}
+};
 
 export default ImageLoader;

@@ -1,4 +1,8 @@
-import mongoosePromise, { Account, Session, User } from '@lib/database/mongoose';
+import mongoosePromise, {
+	Account,
+	Session,
+	User,
+} from '@/lib/database/mongoose';
 
 export const userDeleter = async (id: string) => {
 	try {
@@ -31,14 +35,14 @@ export const userDeleter = async (id: string) => {
 				} catch {
 					// Silent catch for sessions: nbd
 				}
-				resolve(null)
-			})
+				resolve(null);
+			}),
 		]);
 	} catch (e: any) {
-		throw ({ message: e.message || 'Unknown error deleting user' });
+		throw { message: e.message || 'Unknown error deleting user' };
 	}
 	return;
-}
+};
 
 export const sessionDeleter = async (id: string) => {
 	try {
@@ -50,4 +54,4 @@ export const sessionDeleter = async (id: string) => {
 	} catch {
 		throw { message: `Error deleting sessions for ${id}` };
 	}
-}
+};
