@@ -19,7 +19,7 @@ export default function Home(props: {
 				</title>
 				<meta
 					name='description'
-					content='A tool for Spotify users to compare playlists and edit them based on the comparisons.'
+					content=''
 				/>
 			</Head>
 
