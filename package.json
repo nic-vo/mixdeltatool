@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@auth/mongodb-adapter": "^3.1.0",
     "@next-auth/mongodb-adapter": "^1",
     "@reduxjs/toolkit": "~2.1.0",
     "@upstash/redis": "^1",
