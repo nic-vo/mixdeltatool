@@ -1,28 +1,15 @@
+import { notosans, overpass } from '@/styles/fonts';
+import Background from './_components/Background';
+
 import { PropsWithChildren } from 'react';
-import { Overpass, Noto_Sans } from 'next/font/google';
 
 import '@/styles/globals.css';
-import { Background } from '@/components/misc';
-
-const overpass = Overpass({
-	weight: 'variable',
-	preload: false,
-	subsets: ['cyrillic', 'latin', 'latin-ext'],
-	variable: '--font-overpass',
-});
-
-const notosans = Noto_Sans({
-	weight: 'variable',
-	preload: false,
-	subsets: ['latin', 'latin-ext', 'cyrillic'],
-	variable: '--font-notosans',
-});
 
 const RootLayout = (props: PropsWithChildren) => {
 	return (
 		<html lang='en'>
 			<body
-				className={`${overpass.variable} ${notosans.variable} font-notosans bg-slate-950`}>
+				className={`${overpass.variable} ${notosans.variable} font-notosans bg-black text-white`}>
 				{props.children}
 				<Background />
 			</body>
