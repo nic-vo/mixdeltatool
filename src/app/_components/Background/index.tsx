@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useContext } from 'react';
 import Canvas from './Canvas';
 import MotionContext from './MotionContext';

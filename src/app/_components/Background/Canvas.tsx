@@ -1,12 +1,18 @@
+'use client';
+
 import { useEffect, useRef, useState, useMemo } from 'react';
 
 const Canvas = (props: {
-	fps: number,
-	draw: (args: { ctx: CanvasRenderingContext2D, frame: number, init: any }) => void,
-	initializer: (args: { height: number, width: number }) => {},
-	predraw?: (ctx: CanvasRenderingContext2D) => void,
-	postdraw?: (ctx: CanvasRenderingContext2D) => void,
-	animated: boolean
+	fps: number;
+	draw: (args: {
+		ctx: CanvasRenderingContext2D;
+		frame: number;
+		init: any;
+	}) => void;
+	initializer: (args: { height: number; width: number }) => {};
+	predraw?: (ctx: CanvasRenderingContext2D) => void;
+	postdraw?: (ctx: CanvasRenderingContext2D) => void;
+	animated: boolean;
 }) => {
 	const { draw, predraw, postdraw, animated } = props;
 	const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -17,7 +23,7 @@ const Canvas = (props: {
 	const [error, setError] = useState('');
 
 	const memoizedInit = useMemo(() => {
-		return props.initializer({ height, width })
+		return props.initializer({ height, width });
 	}, [height, width, props.initializer]);
 
 	useEffect(() => {
@@ -47,7 +53,7 @@ const Canvas = (props: {
 					draw({ ctx: context, frame, init: memoizedInit });
 				}
 				animationFrameId = requestAnimationFrame(render);
-			}
+			};
 			render();
 		}
 
@@ -56,10 +62,10 @@ const Canvas = (props: {
 			window.cancelAnimationFrame(animationFrameId);
 			const render = () => {
 				if (predraw) predraw(context);
-				draw({ ctx: context, frame, init: memoizedInit })
-			}
+				draw({ ctx: context, frame, init: memoizedInit });
+			};
 			requestAnimationFrame(render);
-		}
+		};
 	}, [draw, predraw, postdraw, memoizedInit, error, animated]);
 
 	useEffect(() => {
@@ -70,14 +76,17 @@ const Canvas = (props: {
 				return;
 			}
 			const parent = canvas.parentElement;
-			const newWidth = parent !== null ?
-				parent.getBoundingClientRect().width : window.innerWidth;
-			const newHeight = parent !== null ?
-				Math.max(parent.getBoundingClientRect().height, window.innerHeight)
-				: window.innerHeight;
+			const newWidth =
+				parent !== null
+					? parent.getBoundingClientRect().width
+					: window.innerWidth;
+			const newHeight =
+				parent !== null
+					? Math.max(parent.getBoundingClientRect().height, window.innerHeight)
+					: window.innerHeight;
 			setWidth(newWidth);
 			setHeight(newHeight);
-		}
+		};
 		callback();
 		window.addEventListener('resize', callback);
 		return () => window.removeEventListener('resize', callback);
@@ -89,17 +98,24 @@ const Canvas = (props: {
 			setError('There was an error with the canvas');
 			return;
 		}
-		canvas.height = height === 0 ? document.documentElement.clientHeight : height;
+		canvas.height =
+			height === 0 ? document.documentElement.clientHeight : height;
 		canvas.width = width === 0 ? document.documentElement.clientWidth : width;
 	}, [width, height]);
 
-	if (error !== '') return <p style={{
-		backgroundColor: '#121218',
-		position: 'absolute',
-		top: 0,
-		left: 0,
-		zIndex: 0
-	}}>{error}</p>;
+	if (error !== '')
+		return (
+			<p
+				style={{
+					backgroundColor: '#121218',
+					position: 'absolute',
+					top: 0,
+					left: 0,
+					zIndex: 0,
+				}}>
+				{error}
+			</p>
+		);
 
 	return (
 		<canvas
@@ -109,10 +125,11 @@ const Canvas = (props: {
 				position: 'absolute',
 				top: 0,
 				left: 0,
-				zIndex: 0
+				zIndex: 0,
 			}}
-			id='canvas' />
+			id='canvas'
+		/>
 	);
-}
+};
 
 export default Canvas;

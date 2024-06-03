@@ -1,8 +1,11 @@
+'use client';
+
 import { createContext, useState } from 'react';
 
-const MotionContext = createContext(
-	{ animated: true, toggleAnimated: () => { } }
-);
+const MotionContext = createContext({
+	animated: true,
+	toggleAnimated: () => {},
+});
 
 export const MotionContextProvider = (props: { children: React.ReactNode }) => {
 	const [animated, setAnimated] = useState(true);
@@ -12,6 +15,6 @@ export const MotionContextProvider = (props: { children: React.ReactNode }) => {
 			{props.children}
 		</MotionContext.Provider>
 	);
-}
+};
 
 export default MotionContext;
