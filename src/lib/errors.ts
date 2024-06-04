@@ -27,7 +27,7 @@ class ForbiddenError extends Error {
 	constructor(message?: string) {
 		super();
 		this.status = 403;
-		this.message = message? message: "You're not allowed to do that.";
+		this.message = message ?? "You're not allowed to do that.";
 	}
 }
 
@@ -38,7 +38,7 @@ class NotFoundError extends Error {
 	constructor(message?: string) {
 		super();
 		this.status = 404;
-		this.message = message? message: "Couldn't find that.";
+		this.message = message ?? 'Not found';
 	}
 }
 
@@ -67,7 +67,7 @@ class UnprocessableError extends Error {
 class RateError extends Error {
 	status: number;
 	message: string;
-	retryTime: number
+	retryTime: number;
 
 	constructor(retryTime: number) {
 		super();
@@ -81,10 +81,21 @@ class FetchError extends Error {
 	status: number;
 	message: string;
 
-	constructor(message?: string) {
+	constructor(message: string) {
 		super();
 		this.status = 502;
-		this.message = message ? message : 'There was an error reaching spotify';
+		this.message = message;
+	}
+}
+
+class ServerError extends Error {
+	status: number;
+	message: string;
+
+	constructor(message?: string) {
+		super();
+		this.status = 500;
+		this.message = message ?? 'Server error';
 	}
 }
 
@@ -121,4 +132,5 @@ export {
 	FetchError,
 	TimeoutError,
 	CustomError,
-}
+	ServerError,
+};
