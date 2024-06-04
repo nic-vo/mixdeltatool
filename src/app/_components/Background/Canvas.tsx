@@ -120,13 +120,7 @@ const Canvas = (props: {
 	return (
 		<canvas
 			ref={canvasRef}
-			style={{
-				backgroundColor: '#121218',
-				position: 'absolute',
-				top: 0,
-				left: 0,
-				zIndex: 0,
-			}}
+			className='bg-black absolute top-0 left-0 z-0'
 			id='canvas'
 		/>
 	);
