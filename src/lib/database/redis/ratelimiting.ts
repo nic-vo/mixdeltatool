@@ -1,25 +1,4 @@
-import { CustomError } from '@/lib/errors';
 import redisClient from './client';
-import { printTime } from '@/lib/misc';
-
-const createEntry = async (params: {
-	prefix: string;
-	ip: string;
-	rollingLimit: number;
-	rollingDecaySeconds: number;
-}) => {
-	const { prefix, ip, rollingLimit, rollingDecaySeconds } = params;
-	try {
-		await redisClient.set(
-			`${prefix}-${ip}`,
-			`1 ${Math.ceil(Date.now() / 1000)}`,
-			{ ex: rollingLimit * rollingDecaySeconds * 5 }
-		);
-	} catch {
-		throw new CustomError(500, 'Create error');
-	}
-	return null;
-};
 
 /*
 
@@ -39,6 +18,20 @@ TODO: If count hits a hard limit, IP will be added to blacklist
 
 */
 
+const createEntry = async (params: {
+	prefix: string;
+	ip: string;
+	rollingLimit: number;
+	rollingDecaySeconds: number;
+}) => {
+	const { prefix, ip, rollingLimit, rollingDecaySeconds } = params;
+	await redisClient.set(
+		`${prefix}-${ip}`,
+		`1 ${Math.ceil(Date.now() / 1000)}`,
+		{ ex: rollingLimit * rollingDecaySeconds * 5 }
+	);
+};
+
 const checkAndUpdateEntry = async (params: {
 	prefix: string;
 	ip: string;
@@ -46,41 +39,33 @@ const checkAndUpdateEntry = async (params: {
 	rollingDecaySeconds: number;
 }) => {
 	const { prefix, ip, rollingDecaySeconds, rollingLimit } = params;
-	let returner = null;
-	const start = Date.now();
-	try {
-		const current = (await redisClient.get(`${prefix}-${ip}`)) as string | null;
-		printTime('First rate limit get:', start);
-		if (current === null) {
-			await createEntry({
-				prefix,
-				ip,
-				rollingDecaySeconds,
-				rollingLimit,
-			});
-			printTime('Created new rate limit:', start);
-			return returner;
-		} else {
-			const now = Math.floor(Date.now() / 1000);
-			const [history, lastUpdate] = current
-				.split(' ')
-				.map((str) => parseInt(str));
-			const recovered = Math.floor((now - lastUpdate) / rollingDecaySeconds);
-			const newHistory = Math.max(history - recovered + 1, 1);
-			if (newHistory > rollingLimit) {
-				returner = (newHistory - rollingLimit) * rollingDecaySeconds;
-			}
-			await redisClient.set(`${prefix}-${ip}`, `${newHistory} ${now}`, {
-				ex:
-					newHistory * rollingDecaySeconds +
-					2 * rollingDecaySeconds * rollingLimit,
-			});
-			printTime('Awaited new rate limit:', start);
-		}
-	} catch (e: any) {
-		throw new CustomError(500, 'Internal error');
+	const current = (await redisClient.get(`${prefix}-${ip}`)) as string | null;
+	if (current === null) {
+		await createEntry({
+			prefix,
+			ip,
+			rollingDecaySeconds,
+			rollingLimit,
+		});
+		return null;
 	}
-	return returner;
+
+	const now = Math.floor(Date.now() / 1000);
+	const [tokensUsed, lastUpdate] = current
+		.split(' ')
+		.map((str) => parseInt(str));
+	const recoveredTokens = Math.floor((now - lastUpdate) / rollingDecaySeconds);
+	const newTokens = Math.max(tokensUsed - recoveredTokens + 1, 1);
+	await redisClient.set(
+		`${prefix}-${ip}`,
+		`${newTokens} ${Math.floor(Date.now() / 1000)}`,
+		{
+			ex:
+				newTokens * rollingDecaySeconds +
+				2 * rollingDecaySeconds * rollingLimit,
+		}
+	);
+	return (newTokens - rollingLimit) * rollingDecaySeconds;
 };
 
 export { checkAndUpdateEntry };
