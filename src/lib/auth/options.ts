@@ -1,7 +1,5 @@
-import type { NextAuthOptions } from 'next-auth';
-
 import SpotifyProvider from 'next-auth/providers/spotify';
-import { MongoDBAdapter } from '@next-auth/mongodb-adapter';
+import { MongoDBAdapter } from '@auth/mongodb-adapter';
 import clientPromise from '@/lib/database/mongoose/client';
 import { signInUpdater } from './accessKey';
 import { SPOT_LOGIN_WINDOW } from '@/consts/spotify';
@@ -19,7 +17,7 @@ const nParams = new URLSearchParams();
 nParams.append('scope', SPOTIFY_SCOPES.join(' '));
 const SPOT_URL = `https://accounts.spotify.com/authorize?${nParams.toString()}`;
 
-export const authOptions: NextAuthOptions = {
+export const authOptions = {
 	providers: [
 		SpotifyProvider({
 			clientId: process.env.SPOTIFY_ID!,
@@ -35,7 +33,7 @@ export const authOptions: NextAuthOptions = {
 		databaseName: process.env.MONGODB_DB_NAME,
 	}),
 	callbacks: {
-		async signIn({ account }) {
+		async signIn({ account }: { account: any }) {
 			// In this case, account param refers to
 			// New account info returned from Spotify upon successful auth from them
 			// ***CONTAINS NEW ACCESS_TOKEN***
@@ -50,23 +48,8 @@ export const authOptions: NextAuthOptions = {
 			}
 			return true;
 		},
-		async session({ session, user }) {
+		async session({ session, user }: { session: any; user: any }) {
 			session.user = { ...user };
-			// The following is an attempt to keep session
-			// At the same expiry as OAuth provider access key expiry
-			// But I think the session update, specifically cookie manipulation,
-			// Doesn't take into account changes to session token 'expires' here
-
-			// try {
-			// 	const expiry = await enforceSignInExpiry(user.id);
-			// 	if (expiry !== null) {
-			// 		const dater = new Date();
-			// 		dater.setMilliseconds(expiry)
-			// 		session.expires = dater.toISOString();
-			// 	}
-			// } catch {
-
-			// }
 			return session;
 		},
 	},
