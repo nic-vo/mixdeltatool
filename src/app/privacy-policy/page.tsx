@@ -1,23 +1,58 @@
-import { FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa';
+import { PropsWithChildren } from 'react';
+import Link from 'next/link';
 
-import look from '@/styles/privacy.module.scss';
+const LocalSection = (props: PropsWithChildren) => {
+	return (
+		<section className='flex flex-col *:ml-4 first:*:ml-0 first:*:mb-2'>
+			{props.children}
+		</section>
+	);
+};
+
+const LocalLink = (props: PropsWithChildren & { href: string }) => {
+	return (
+		<a
+			href={props.href}
+			target='_blank'
+			className='font-bold underline'>
+			{props.children}
+		</a>
+	);
+};
+
+const LocalList = (props: PropsWithChildren & { ordered?: boolean }) => {
+	const classer = 'flex flex-col gap-2 mt-2 mb-4 ml-8';
+	if (props.ordered) return <ol className={classer}>{props.children}</ol>;
+	return <ul className={classer}>{props.children}</ul>;
+};
+
+const SmallNav = () => {
+	return (
+		<nav className='w-fLocalListl flex justify-between p-4 *'>
+			<Link
+				href='/'
+				prefetch={false}
+				className='border-b-2 border-white p-4 hover:text-black hover:bg-white focus-visible:text-black focus-visible:bg-white *:text-inherit'>
+				&larr; Back home
+			</Link>
+			<Link
+				href='/spotify'
+				prefetch={false}
+				className='border-b-2 border-white p-4 hover:text-black hover:bg-white focus-visible:text-black focus-visible:bg-white *:text-inherit'>
+				To the tool &rarr;
+			</Link>
+		</nav>
+	);
+};
 
 const PrivacyPolicy = () => {
 	return (
 		<>
-			<nav className={look.smallnav}>
-				<a href='/'>
-					<FaAngleDoubleLeft />
-					Back home
-				</a>
-				<a href='/spotify'>
-					To the tool <FaAngleDoubleRight />
-				</a>
-			</nav>
-			<main className={look.main}>
-				<h1 className={look.h1}>MixDelta Privacy Policy</h1>
+			<SmallNav />
+			<main className='flex flex-col gap-8 w-fLocalListl max-w-prose mx-0 my-auto p-4'>
+				<h1 className='text-center text-5xl'>MixDelta Privacy Policy</h1>
 				<p>Effective: January 26, 2024</p>
-				<section className={look.section}>
+				<LocalSection>
 					<h2>Introduction</h2>
 					<p>
 						Welcome to the MixDelta for Spotify! This Privacy Policy outlines
@@ -25,23 +60,23 @@ const PrivacyPolicy = () => {
 						concerning your data. By using MixDelta, you agree to the terms of
 						this Privacy Policy.
 					</p>
-				</section>
-				<section className={look.section}>
+				</LocalSection>
+				<LocalSection>
 					<h2>Information We Collect</h2>
-					<section className={look.section}>
+					<LocalSection>
 						<h3>User Authentication and Authorization</h3>
 						<p>
 							MixDelta uses Spotify&apos;s OAuth flow for user authentication
 							and authorization. We collect and store the following information:
 						</p>
-						<ul className={look.list}>
+						<LocalList>
 							<li>Spotify user ID</li>
 							<li>Link to profile picture associated with Spotify user ID</li>
 							<li>Access and Refresh Tokens</li>
 							<li>Email associated with Spotify ID</li>
-						</ul>
-					</section>
-					<section>
+						</LocalList>
+					</LocalSection>
+					<LocalSection>
 						<h3>IP Address Usage</h3>
 						<p>
 							MixDelta collects and temporarily stores IP addresses for the
@@ -50,49 +85,49 @@ const PrivacyPolicy = () => {
 							addresses are not associated with users&apos; Spotify information
 							in any way.
 						</p>
-					</section>
-					<section className={look.section}>
+					</LocalSection>
+					<LocalSection>
 						<h3>Playlist Information</h3>
 						<p>
 							MixDelta only accesses the following information about the
 							User&apos;s Spotify library:
 						</p>
-						<ul className={look.list}>
+						<LocalList>
 							<li>Playlist names</li>
 							<li>Playlist owners</li>
 							<li>Playlist size</li>
 							<li>Playlist thumbnails</li>
 							<li>Track URIs within playlists</li>
-						</ul>
-					</section>
-					<section className={look.section}>
+						</LocalList>
+					</LocalSection>
+					<LocalSection>
 						<h3>User-Specified Playlists and Albums</h3>
 						<p>
 							For certain functionalities, MixDelta may collect information
 							about randomly specified playlists and albums chosen by the user.
 						</p>
-					</section>
-				</section>
-				<section className={look.section}>
+					</LocalSection>
+				</LocalSection>
+				<LocalSection>
 					<h2>How We Use Information</h2>
 					<p>We use the collected information for the following purposes:</p>
-					<ul className={look.list}>
+					<LocalList>
 						<li>User authentication and authorization against Spotify</li>
 						<li>Displaying playlists from the user&apos;s Spotify library</li>
 						<li>
-							Creating new playlists and populating them with tracks as per user
-							instructions
+							Creating new playlists and popLocalListating them with tracks as
+							per user instructions
 						</li>
 						<li>Ensuring fair usage and preventing misuse of our services</li>
-					</ul>
-				</section>
-				<section className={look.section}>
+					</LocalList>
+				</LocalSection>
+				<LocalSection>
 					<h2>Privacy Practices and Policies</h2>
 					<p>
 						We are committed to protecting your privacy, and we want to be
 						transparent about our practices. Here are key points:
 					</p>
-					<ol className={look.list}>
+					<LocalList ordered>
 						<li>
 							<h3>Notice</h3>
 							<p>
@@ -103,27 +138,25 @@ const PrivacyPolicy = () => {
 						<li>
 							<h3>Information Disclosure</h3>
 							<p>We disclose information to users regarding:</p>
-							<ul className={look.list}>
+							<LocalList>
 								<li>What information we collect</li>
 								<li>How we collect, use, and share that information</li>
-							</ul>
+							</LocalList>
 						</li>
 						<li>
 							<h3>Contact Information</h3>
 							<p>
 								Users can contact us with inquiries regarding their information
 								via either our{' '}
-								<a
+								<Link
 									href='/contact'
-									target='_blank'>
+									prefetch={false}>
 									contact form
-								</a>{' '}
+								</Link>{' '}
 								or emailing{' '}
-								<a
-									href='mailto:mixdeltatool@gmail.com'
-									target='_blank'>
+								<LocalLink href='mailto:mixdeltatool@gmail.com'>
 									mixdeltatool@gmail.com
-								</a>
+								</LocalLink>
 								.
 							</p>
 						</li>
@@ -174,17 +207,13 @@ const PrivacyPolicy = () => {
 								California Consumer Privacy Act (CCPA). For more information
 								about hCaptcha&apos;s privacy policy and terms of use, please
 								visit the following links:{' '}
-								<a
-									href='https://www.hcaptcha.com/privacy'
-									target='_blank'>
+								<LocalLink href='https://www.hcaptcha.com/privacy'>
 									https://www.hcaptcha.com/privacy
-								</a>{' '}
+								</LocalLink>{' '}
 								and{' '}
-								<a
-									href='https://www.hcaptcha.com/terms'
-									target='_blank'>
+								<LocalLink href='https://www.hcaptcha.com/terms'>
 									https://www.hcaptcha.com/terms
-								</a>
+								</LocalLink>
 							</p>
 						</li>
 						<li>
@@ -204,46 +233,30 @@ const PrivacyPolicy = () => {
 								of this app.
 							</p>
 						</li>
-					</ol>
-				</section>
-				<section className={look.section}>
+					</LocalList>
+				</LocalSection>
+				<LocalSection>
 					<h2>Changes to this Privacy Policy</h2>
 					<p>
 						We may update this Privacy Policy to reflect changes in our
-						practices or for other operational, legal, or regulatory reasons. We
-						encourage users to review this policy periodically.
+						practices or for other operational, legal, or regLocalListatory
+						reasons. We encourage users to review this policy periodically.
 					</p>
-				</section>
-				<section className={look.section}>
+				</LocalSection>
+				<LocalSection>
 					<h2>Contact Us</h2>
 					<p>
 						If you have any questions or concerns about this Privacy Policy or
 						MixDelta, please contact us at either at{' '}
-						<a
-							href='mailto:mixdeltatool@gmail.com'
-							target='_blank'>
+						<LocalLink href='mailto:mixdeltatool@gmail.com'>
 							mixdeltatool@gmail.com
-						</a>{' '}
-						or via our{' '}
-						<a
-							href='/contact'
-							target='_blank'>
-							contact form
-						</a>
-						.
+						</LocalLink>{' '}
+						or via our <LocalLink href='/contact'>contact form</LocalLink>.
 					</p>
-				</section>
+				</LocalSection>
 				<p>Thank you for using MixDelta!</p>
 			</main>
-			<nav className={look.smallnav}>
-				<a href='/'>
-					<FaAngleDoubleLeft />
-					Back home
-				</a>
-				<a href='/spotify'>
-					To the tool <FaAngleDoubleRight />
-				</a>
-			</nav>
+			<SmallNav />
 		</>
 	);
 };
