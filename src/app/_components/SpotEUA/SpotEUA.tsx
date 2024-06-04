@@ -1,6 +1,8 @@
-import { FormEventHandler, useEffect, useState, useRef } from 'react';
+'use client';
 
-import local from './SpotEUA.module.scss';
+import { FormEventHandler, useEffect, useState, useRef } from 'react';
+import { EUALIContainer, EUAList } from './server';
+
 import global from '@/styles/globals.module.scss';
 
 const LOCAL_EXPIRY_KEY = 'SUPERUSER_EUA';
@@ -46,12 +48,12 @@ const SpotEUA = (props: { submitter?: () => void }) => {
 		return (
 			<dialog
 				ref={dialogRef}
-				className={local.dialog}>
+				className='bg-black w-11/12 h-[90dvh] max-w-screen-lg max-h-[1024px] m-auto overflow-hidden border-0 rounded-xl backdrop-blur-sm backdrop-brightness-50'>
 				<form
 					onSubmit={formSubmit}
-					className={local.form}>
-					<h2 className={local.h2}>MixDelta End User Agreement</h2>
-					<div className={local.textContainer}>
+					className='flex flex-col gap-8 p-4 w-full h-full m-auto overflow-hidden'>
+					<h2 className='text-center'>MixDelta End User Agreement</h2>
+					<div className='flex flex-col gap p-4 md:p-8 overflow-y-auto bg-transparent backdrop-brightness-150 rounded-xl'>
 						<p>Effective: January 26, 2024</p>
 						<p>
 							This End User Agreement (&quot;Agreement&quot;) is entered into
@@ -61,76 +63,78 @@ const SpotEUA = (props: { submitter?: () => void }) => {
 							This Agreement governs your use of the App and any related
 							services provided by the Developer.
 						</p>
-						<ol className={local.list}>
-							<li>
+						<EUAList ordered>
+							<EUALIContainer>
 								<h3>Acceptance of Terms</h3>
 								<p>
 									By using the App, you agree to be bound by the terms and
 									conditions set forth in this Agreement. If you do not agree to
 									these terms, please refrain from using the App.
 								</p>
-							</li>
-							<li>
+							</EUALIContainer>
+							<EUALIContainer>
 								<h3>Description of Service</h3>
 								<p>
 									The App is a web app that utilizes Spotify&apos;s Web API to
 									provide the User with a quick way to apply non-destructive,
 									bulk actions to existing Spotify playlists.
 								</p>
-							</li>
-							<li>
+							</EUALIContainer>
+							<EUALIContainer>
 								<h3>Spotify Integration</h3>
-								<ol className={local.secondList}>
-									<li>
+								<EUAList ordered>
+									<EUALIContainer>
 										The Developer does not make any warranties or
 										representations on behalf of Spotify and expressly disclaims
 										all implied warranties with respect to the Spotify Platform,
 										Spotify Service, and Spotify Content, including the implied
 										warranties of merchantability, fitness for a particular
 										purpose, and non-infringement.
-									</li>
-									<li>
+									</EUALIContainer>
+									<EUALIContainer>
 										The User is prohibited from modifying or creating derivative
 										works based on the Spotify Platform, Spotify Service, or
 										Spotify Content.
-									</li>
-									<li>
+									</EUALIContainer>
+									<EUALIContainer>
 										The User is prohibited from decompiling,
 										reverse-engineering, disassembling, and otherwise reducing
 										the Spotify Platform, Spotify Service, and Spotify Content
 										to source code or other human-perceivable form, to the full
 										extent allowed by law.
-									</li>
-								</ol>
-							</li>
-							<li>
+									</EUALIContainer>
+								</EUAList>
+							</EUALIContainer>
+							<EUALIContainer>
 								<h3>User Responsibilities</h3>
 								<p>The User is responsible for:</p>
-								<ol className={local.secondList}>
-									<li>
+								<EUAList
+									ordered
+									listStyle='lower-alpha'>
+									<EUALIContainer>
 										<h4>Compliance with Laws</h4>
 										<p>
 											The User is expected to use the App in compliance with all
 											applicable laws and regulations.
 										</p>
-									</li>
-									<li>
+									</EUALIContainer>
+									<EUALIContainer>
 										<h4>Account Security</h4>
 										<p>
 											The User is responsible for maintaining the security of
 											their account credentials and ensuring that unauthorized
 											individuals do not access their accounts.
 										</p>
-									</li>
-									<li>
+									</EUALIContainer>
+									<EUALIContainer>
 										<h4>Lawful Use</h4>
 										<p>
 											The User agrees to use the App for lawful purposes only
 											and shall not engage in any activity that violates local,
 											national, or international laws.
 										</p>
-									</li>
-									<li>
+									</EUALIContainer>
+									<EUALIContainer>
 										<h4>Prohibited Conduct</h4>
 										<p>
 											The User is prohibited from engaging in any conduct that
@@ -139,8 +143,8 @@ const SpotEUA = (props: { submitter?: () => void }) => {
 											distribution of malicious code, or attempts to compromise
 											the security of the App.
 										</p>
-									</li>
-									<li>
+									</EUALIContainer>
+									<EUALIContainer>
 										<h4>Lawful Content</h4>
 										<p>
 											If the App allows the User to generate content, the User
@@ -148,51 +152,55 @@ const SpotEUA = (props: { submitter?: () => void }) => {
 											or create complies with applicable laws and does not
 											infringe on the rights of others.
 										</p>
-									</li>
-									<li>
+									</EUALIContainer>
+									<EUALIContainer>
 										<h4>Termination of Use</h4>
 										<p>
 											The User acknowledges that the Developer reserves the
 											right to terminate their access to the App if they fail to
 											comply with these user responsibilities.
 										</p>
-									</li>
-								</ol>
-							</li>
-							<li>
+									</EUALIContainer>
+								</EUAList>
+							</EUALIContainer>
+							<EUALIContainer>
 								<h3>Developer&apos;s Liability</h3>
 								<p>
 									The Developer is solely responsible for its products, and this
 									Agreement disclaims any liability on the part of third parties
 									(e.g., Spotify).
 								</p>
-							</li>
-							<li>
+							</EUALIContainer>
+							<EUALIContainer>
 								<h3>Termination</h3>
 								<p>
 									The Developer reserves the right to terminate this Agreement
 									and your access to the App for any reason.
 								</p>
-							</li>
-							<li>
+							</EUALIContainer>
+							<EUALIContainer>
 								<h3>Disclaimers</h3>
-								<ol className={local.secondList}>
-									<li>
+								<EUAList
+									ordered
+									listStyle='lower-alpha'>
+									<EUALIContainer>
 										The Application is provided &quot;as is&quot; without
 										warranties.
-									</li>
-									<li>
+									</EUALIContainer>
+									<EUALIContainer>
 										<p>The Developer disclaims any liability for:</p>
-										<ol className={local.thirdList}>
-											<li>
+										<EUAList
+											ordered
+											listStyle='lower-roman'>
+											<EUALIContainer>
 												<h4>Loss of Data</h4>
 												<p>
 													The Developer shall not be held liable for any loss of
 													the User&apos; data or any damages resulting from the
 													loss of data.
 												</p>
-											</li>
-											<li>
+											</EUALIContainer>
+											<EUALIContainer>
 												<h4>Consequential Damages</h4>
 												<p>
 													In no event shall the Developer be liable for any
@@ -201,8 +209,8 @@ const SpotEUA = (props: { submitter?: () => void }) => {
 													profits or business interruption, arising out of or in
 													connection with the use of the App.
 												</p>
-											</li>
-											<li>
+											</EUALIContainer>
+											<EUALIContainer>
 												<h4>Third-Party Actions</h4>
 												<p>
 													The Developer is not responsible for any actions or
@@ -210,8 +218,8 @@ const SpotEUA = (props: { submitter?: () => void }) => {
 													to service providers, partners, or other users of the
 													App.
 												</p>
-											</li>
-											<li>
+											</EUALIContainer>
+											<EUALIContainer>
 												<h4>Interruptions or Downtime</h4>
 												<p>
 													The Developer does not guarantee continuous,
@@ -219,8 +227,8 @@ const SpotEUA = (props: { submitter?: () => void }) => {
 													not be liable for any interruptions or downtime of the
 													App.
 												</p>
-											</li>
-											<li>
+											</EUALIContainer>
+											<EUALIContainer>
 												<h4>Unauthorized Access</h4>
 												<p>
 													The Developer is not responsible for any unauthorized
@@ -228,8 +236,8 @@ const SpotEUA = (props: { submitter?: () => void }) => {
 													personal information, and users are encouraged to take
 													appropriate measures to safeguard their accounts.
 												</p>
-											</li>
-											<li>
+											</EUALIContainer>
+											<EUALIContainer>
 												<h4>Modification of Content</h4>
 												<p>
 													The User acknowledges that the Developer reserves the
@@ -237,8 +245,8 @@ const SpotEUA = (props: { submitter?: () => void }) => {
 													shall not be liable for any modification, suspension,
 													or discontinuation of the App.
 												</p>
-											</li>
-											<li>
+											</EUALIContainer>
+											<EUALIContainer>
 												<h4>Technical Issues</h4>
 												<p>
 													The Developer is not liable for any technical issues,
@@ -246,19 +254,19 @@ const SpotEUA = (props: { submitter?: () => void }) => {
 													compatibility issues, and makes no warranties
 													regarding the performance or reliability of the App.
 												</p>
-											</li>
-										</ol>
-									</li>
-								</ol>
-							</li>
-							<li>
+											</EUALIContainer>
+										</EUAList>
+									</EUALIContainer>
+								</EUAList>
+							</EUALIContainer>
+							<EUALIContainer>
 								<h3>Limitation of Liability</h3>
 								<p>
 									The Developer&pos;s liability is limited to the maximum extent
 									permitted by applicable law.
 								</p>
-							</li>
-							<li>
+							</EUALIContainer>
+							<EUALIContainer>
 								<h3>Indemnification</h3>
 								<p>
 									The User agrees to indemnify and hold the Developer harmless
@@ -266,57 +274,59 @@ const SpotEUA = (props: { submitter?: () => void }) => {
 									losses, costs, expenses, or fees (including reasonable
 									attorneys&apos; fees) arising out of or in connection with:
 								</p>
-								<ol className={local.secondList}>
-									<li>
+								<EUAList
+									ordered
+									listStyle='lower-alpha'>
+									<EUALIContainer>
 										<h4>User Violations</h4>
 										<p>
 											Any violation by the user of this Agreement or any
 											applicable laws or regulations.
 										</p>
-									</li>
-									<li>
+									</EUALIContainer>
+									<EUALIContainer>
 										<h4>Unauthorized Access</h4>
 										<p>
 											Any unauthorized access to or use of the App by the user
 											or any third party using the User&apos;s account.
 										</p>
-									</li>
-									<li>
+									</EUALIContainer>
+									<EUALIContainer>
 										<h4>Third-Party Claims</h4>
 										<p>
 											Any claims or actions brought against the Developer by
 											third parties arising out of or related to the User&apos;s
 											use of the App.
 										</p>
-									</li>
-									<li>
+									</EUALIContainer>
+									<EUALIContainer>
 										<h4>Breach of Agreement</h4>
 										<p>Any breach of this Agreement by the User.</p>
-									</li>
-									<li>
+									</EUALIContainer>
+									<EUALIContainer>
 										<h4>Misuse of MixDelta</h4>
 										<p>
 											Any misuse or abuse of the App by the User that results in
 											harm, damages, or legal consequences.
 										</p>
-									</li>
-									<li>
+									</EUALIContainer>
+									<EUALIContainer>
 										<h4>Violation of Rights</h4>
 										<p>
 											Any violation of the rights of third parties by the User
 											in connection with the use of the App.
 										</p>
-									</li>
-								</ol>
-							</li>
-							<li>
+									</EUALIContainer>
+								</EUAList>
+							</EUALIContainer>
+							<EUALIContainer>
 								<h3>Amendments</h3>
 								<p>
 									The Developer reserves the right to update this Agreement,
 									with users being informed of changes.
 								</p>
-							</li>
-							<li>
+							</EUALIContainer>
+							<EUALIContainer>
 								<h3>Contact Information</h3>
 								<p>
 									For support or inquiries, please email us at{' '}
@@ -332,20 +342,27 @@ const SpotEUA = (props: { submitter?: () => void }) => {
 										our contact form.
 									</a>
 								</p>
-							</li>
-							<li>
+							</EUALIContainer>
+							<EUALIContainer>
 								<h3>Spotify as a Third-Party Beneficiary</h3>
 								<p>
 									Spotify is a third-party beneficiary of this Agreement and is
 									entitled to directly enforce this Agreement.
 								</p>
-							</li>
-						</ol>
+							</EUALIContainer>
+						</EUAList>
 					</div>
-					<p className={local.ppLink}>
-						MixDelta&apos;s <a href='/privacypolicy'>privacy policy.</a>
+					<p className='text-center'>
+						MixDelta&apos;s{' '}
+						<a
+							href='/privacypolicy'
+							className='font-bold underline'>
+							privacy policy.
+						</a>
 					</p>
-					<label htmlFor='check'>
+					<label
+						htmlFor='check'
+						className='cursor-pointer flex gap-4 py-4'>
 						<input
 							type='checkbox'
 							name='check'
@@ -355,7 +372,6 @@ const SpotEUA = (props: { submitter?: () => void }) => {
 						I have read, understood, and agreed to these terms and conditions as
 						well as the terms and conditions set forth by the privacy policy.
 					</label>
-
 					<button
 						className={global.emptyButton}
 						type='submit'>

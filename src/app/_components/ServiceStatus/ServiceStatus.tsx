@@ -12,7 +12,7 @@ const AlertSVG = ({ statusType }: { statusType: string }) => {
 	if (statusType === 'ok') return <IoCheckmarkCircle aria-hidden={true} />;
 	return <IoAlertCircleSharp aria-hidden={true} />;
 };
-const text = '';
+
 export default async function ServiceStatus() {
 	const { status, statusType, active } = await getGlobalStatusProps();
 	const current = new Date(Math.floor(active / 60000) * 60000);
