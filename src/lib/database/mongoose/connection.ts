@@ -1,5 +1,12 @@
 import { connect } from 'mongoose';
 
+declare global {
+	var mongoose: {
+		conn: null | typeof import('mongoose');
+		promise: null | Promise<typeof import('mongoose')>;
+	};
+}
+
 if (!process.env.MONGODB_URI) {
 	throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
 }
