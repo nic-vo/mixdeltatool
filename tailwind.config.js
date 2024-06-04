@@ -4,8 +4,8 @@ module.exports = {
 	theme: {
 		extend: {
 			fontFamily: {
-				overpass: '--font-overpass',
-				notosans: '--font-notosans',
+				overpass: '--font-overpass, sans-serif, ui-sans-serif, system-ui',
+				notosans: '--font-notosans, sans-serif, ui-sans-serif, system-ui',
 			},
 			colors: {
 				black: '#121218',
