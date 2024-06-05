@@ -2,8 +2,7 @@
 
 import { FormEventHandler, useEffect, useState, useRef } from 'react';
 import { EUALIContainer, EUAList } from './server';
-
-import global from '@/styles/globals.module.scss';
+import { GlobalButton } from '@/components/global';
 
 const LOCAL_EXPIRY_KEY = 'SUPERUSER_EUA';
 const LOCAL_EXPIRY_LENGTH = 1000 * 60 * 60 * 24 * 7;
@@ -43,7 +42,7 @@ const SpotEUA = (props: { submitter?: () => void }) => {
 		return null;
 	};
 
-	if (accepted) return null;
+	if (accepted !== false) return null;
 	return (
 		<dialog
 			ref={dialogRef}
@@ -368,11 +367,7 @@ const SpotEUA = (props: { submitter?: () => void }) => {
 					I have read, understood, and agreed to these terms and conditions as
 					well as the terms and conditions set forth by the privacy policy.
 				</label>
-				<button
-					className={global.emptyButton}
-					type='submit'>
-					Submit
-				</button>
+				<GlobalButton type='submit'>Submit</GlobalButton>
 			</form>
 		</dialog>
 	);
