@@ -4,9 +4,13 @@ import { GlobalStatus, GlobalStatusPointer } from './models';
 
 import { NextApiRequest } from 'next';
 
-export async function getGlobalStatusProps() {
+export async function getGlobalStatusProps(): Promise<{
+	status: string;
+	active: number;
+	statusType: 'concern' | 'ok' | 'severe';
+}> {
 	let status = 'There may be an issue with our servers; please stand by.';
-	let statusType = 'concern';
+	let statusType: 'concern' | 'ok' | 'severe' = 'concern';
 	let active = Date.now();
 	try {
 		await mongoosePromise();
