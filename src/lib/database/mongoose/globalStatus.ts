@@ -2,8 +2,6 @@ import { FetchError } from '@/lib/errors';
 import mongoosePromise from './connection';
 import { GlobalStatus, GlobalStatusPointer } from './models';
 
-import { NextApiRequest } from 'next';
-
 export async function getGlobalStatusProps(): Promise<{
 	status: string;
 	active: number;
@@ -59,15 +57,6 @@ export async function getGlobalStatusProps(): Promise<{
 		};
 	}
 	return { status, statusType, active };
-}
-
-export function CORSGet(req: NextApiRequest) {
-	if (process.env.IS_DEV === 'YES' && req.headers.origin) {
-		return req.headers.origin;
-	}
-	if (!req.headers.origin || req.headers.origin !== process.env.SAFE_ORIGIN)
-		return 'https://mixdeltatool.vercel.app';
-	return req.headers.origin;
 }
 
 export async function setNewGlobalStatus(params: {

@@ -1,12 +1,8 @@
-import {
-	User,
-	Account,
-	Session
-} from './models';
+import { User, Account, Session } from './models';
 import {
 	getGlobalStatusProps,
 	setNewGlobalStatus,
-	CORSGet
+	CORSGet,
 } from './globalStatus';
 import mongoosePromise from './connection';
 
@@ -18,5 +14,5 @@ export {
 	Session,
 	getGlobalStatusProps,
 	setNewGlobalStatus,
-	CORSGet
+	CORSGet,
 };
