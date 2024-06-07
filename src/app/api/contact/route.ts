@@ -5,27 +5,23 @@ import {
 } from '@/lib/contact/helpers';
 import { contactBodyParser } from '@/lib/contact/validators';
 import { checkAndUpdateEntry } from '@/lib/database/redis/ratelimiting';
-
 import {
 	CustomError,
 	ForbiddenError,
 	MalformedError,
 	RateError,
 } from '@/lib/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
+
+import { NextRequest, NextResponse } from 'next/server';
 
 const RATE_LIMIT_PREFIX = 'SCF';
 const RATE_LIMIT_ROLLING_LIMIT = 5;
 const RATE_LIMIT_DECAY_SECONDS = 30;
 
-export default async function handler(
-	req: NextApiRequest,
-	res: NextApiResponse
-) {
+export async function POST(req: NextRequest) {
 	try {
-		const forHeader = req.headers['x-real-ip'];
-		if (!forHeader) throw new CustomError(500, 'Internal Error');
-		const ip = Array.isArray(forHeader) ? forHeader[0] : forHeader;
+		const { ip } = req;
+		if (!ip) throw new CustomError(500, 'Internal Error');
 		const rateLimit = await checkAndUpdateEntry({
 			ip,
 			prefix: RATE_LIMIT_PREFIX,
@@ -36,28 +32,38 @@ export default async function handler(
 
 		let body;
 		try {
-			body = contactBodyParser.parse(JSON.parse(req.body));
+			body = contactBodyParser.parse(JSON.parse(await req.json()));
 		} catch (e: any) {
 			throw new MalformedError();
 		}
 
-		if (body === undefined) throw new CustomError(500, 'Internal error.');
+		if (!body) throw new CustomError(500, 'Internal error.');
 		// Rate limit via checking how many msgs from ip exist in database
 		// and hcaptcha
-		const [canAddNew, _] = await Promise.all([
-			checkExistingMessages(ip),
-			hCaptchaPromise(body['h-captcha-response']),
-		]);
+		let canAddNew, _;
+		try {
+			[canAddNew, _] = await Promise.all([
+				checkExistingMessages(ip),
+				hCaptchaPromise(body['h-captcha-response']),
+			]);
+		} catch {
+			throw new CustomError(500, 'Server error');
+		}
 		if (!canAddNew) throw new ForbiddenError(`You're not allowed to do that.`);
 
 		const { name, message } = body;
 		await addNewMessage({ ip, name, message });
 
-		return res.status(201).json({});
+		return NextResponse.json(
+			{ message: 'Your message has been received' },
+			{ status: 201 }
+		);
 	} catch (e: any) {
-		if (e.status === 429) res.setHeader('Retry-After', 5);
-		return res
-			.status(e.status || 500)
-			.json({ message: e.message || 'Unknown Error' });
+		return NextResponse.json(
+			{ message: e.message ?? 'Unknown Error' },
+			e.status && e.status === 429
+				? { status: e.status, headers: { 'Retry-After': '5' } }
+				: { status: e.status ?? 500 }
+		);
 	}
 }
