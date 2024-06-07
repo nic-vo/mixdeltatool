@@ -39,26 +39,11 @@ export const hCaptchaPromise = async (token: string): Promise<null> => {
 };
 
 // Rate limit contact form by having a hard limit on how many messages from a certain ip
-export const checkExistingMessages = async (
-	checkIP: string
-): Promise<boolean> => {
-	return new Promise(async (res, rej) => {
-		try {
-			await mongoosePromise();
-		} catch {
-			return rej(new CustomError(500, 'Internal error'));
-		}
-		let existing;
-		try {
-			existing = await ContactMessage.find({ ip: checkIP }).exec();
-		} catch {
-			return rej(new CustomError(500, 'Internal error'));
-		}
-		return res(
-			existing !== undefined && existing !== null && existing.length < 5
-		);
-	});
-};
+export async function checkExistingMessages(checkIP: string) {
+	await mongoosePromise();
+	let existing = await ContactMessage.find({ ip: checkIP }).exec();
+	return existing !== undefined && existing !== null && existing.length < 5;
+}
 
 // Adds a new message if the ^ passes in parent
 export const addNewMessage = async (params: {
