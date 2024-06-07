@@ -1,7 +1,20 @@
 import mongoosePromise from '@/lib/database/mongoose';
 import { ContactMessage } from '@/lib/database/mongoose/models';
+import { z } from 'zod';
 
 import { CustomError, FetchError, MalformedError } from '@/lib/errors';
+
+export const contactBodyParser = z
+	.object({
+		name: z.string().min(3).max(150),
+		message: z
+			.string()
+			.min(3)
+			.max(280 * 5),
+		'g-recaptcha-response': z.string().min(1),
+		'h-captcha-response': z.string().min(1),
+	})
+	.strict();
 
 // Returns null or causes an instant throw in the parent
 export const hCaptchaPromise = async (token: string): Promise<null> => {

@@ -2,8 +2,8 @@ import {
 	addNewMessage,
 	checkExistingMessages,
 	hCaptchaPromise,
-} from '@/lib/contact/helpers';
-import { contactBodyParser } from '@/lib/contact/validators';
+	contactBodyParser,
+} from './_lib';
 import { checkAndUpdateEntry } from '@/lib/database/redis/ratelimiting';
 import {
 	CustomError,
