@@ -1,6 +1,7 @@
+import Link from 'next/link';
 import { PropsWithChildren } from 'react';
 
-export const EUAList = (
+const EUAList = (
 	props: PropsWithChildren & { ordered: boolean; listStyle?: string }
 ) => {
 	const classer = 'flex flex-col gap-6 pl-6';
@@ -22,11 +23,30 @@ export const EUAList = (
 	);
 };
 
-export const EUALIContainer = (props: PropsWithChildren) => {
+const EUALIContainer = (props: PropsWithChildren) => {
 	return (
 		<li>
 			<section>{props.children}</section>
 		</li>
+	);
+};
+
+export const SmallNav = () => {
+	return (
+		<nav className='w-fLocalListl flex justify-between p-4 *'>
+			<Link
+				href='/'
+				prefetch={false}
+				className='border-b-2 border-white p-4 hover:text-black hover:bg-white focus-visible:text-black focus-visible:bg-white *:text-inherit'>
+				&larr; Back home
+			</Link>
+			<Link
+				href='/spotify'
+				prefetch={false}
+				className='border-b-2 border-white p-4 hover:text-black hover:bg-white focus-visible:text-black focus-visible:bg-white *:text-inherit'>
+				To the tool &rarr;
+			</Link>
+		</nav>
 	);
 };
 
@@ -327,3 +347,5 @@ const EUAContent = () => {
 		</>
 	);
 };
+
+export default EUAContent;

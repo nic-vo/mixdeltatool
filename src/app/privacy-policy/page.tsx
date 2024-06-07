@@ -1,5 +1,6 @@
 import { PropsWithChildren } from 'react';
 import Link from 'next/link';
+import { SmallNav } from '../_components/EUA/server';
 
 const LocalSection = (props: PropsWithChildren) => {
 	return (
@@ -26,30 +27,11 @@ const LocalList = (props: PropsWithChildren & { ordered?: boolean }) => {
 	return <ul className={classer}>{props.children}</ul>;
 };
 
-const SmallNav = () => {
-	return (
-		<nav className='w-fLocalListl flex justify-between p-4 *'>
-			<Link
-				href='/'
-				prefetch={false}
-				className='border-b-2 border-white p-4 hover:text-black hover:bg-white focus-visible:text-black focus-visible:bg-white *:text-inherit'>
-				&larr; Back home
-			</Link>
-			<Link
-				href='/spotify'
-				prefetch={false}
-				className='border-b-2 border-white p-4 hover:text-black hover:bg-white focus-visible:text-black focus-visible:bg-white *:text-inherit'>
-				To the tool &rarr;
-			</Link>
-		</nav>
-	);
-};
-
 const PrivacyPolicy = () => {
 	return (
 		<>
 			<SmallNav />
-			<main className='flex flex-col gap-8 w-fLocalListl max-w-prose mx-0 my-auto p-4'>
+			<main className='flex flex-col gap-8 w-full max-w-prose mx-0 my-auto p-4'>
 				<h1 className='text-center text-5xl'>MixDelta Privacy Policy</h1>
 				<p>Effective: January 26, 2024</p>
 				<LocalSection>
