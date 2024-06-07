@@ -1,4 +1,4 @@
-import mongoosePromise, { CORSGet, Session } from '@/lib/database/mongoose';
+import mongoosePromise, { Session } from '@/lib/database/mongoose';
 import { checkAndUpdateEntry } from '@/lib/database/redis/ratelimiting';
 import { CustomError, NotFoundError, RateError } from '@/lib/errors';
 
