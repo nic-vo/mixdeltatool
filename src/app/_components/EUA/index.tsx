@@ -1,7 +1,7 @@
 'use client';
 
 import { FormEventHandler, useEffect, useState, useRef } from 'react';
-import { EUALIContainer, EUAList } from './server';
+import { EUALIContainer, EUAList } from './content';
 import { GlobalButton } from '@/components/global';
 
 const LOCAL_EXPIRY_KEY = 'SUPERUSER_EUA';
