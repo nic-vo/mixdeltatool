@@ -61,7 +61,7 @@ export async function getGlobalStatusProps(): Promise<{
 
 export async function setNewGlobalStatus(params: {
 	status: string;
-	statusType: 'ok' | 'concern' | 'status';
+	statusType: 'ok' | 'concern' | 'severe';
 }) {
 	const { status, statusType } = params;
 	try {
