@@ -1,7 +1,9 @@
-import { MongoDBAdapter } from '@auth/mongodb-adapter';
-import NextAuth from 'next-auth';
+import NextAuth, { Account, User } from 'next-auth';
 import Spotify from 'next-auth/providers/spotify';
+import { MongoDBAdapter } from '@auth/mongodb-adapter';
 import clientPromise from './mongocfg';
+import { signInUpdater } from './accessKey';
+import { SPOT_LOGIN_WINDOW } from '@/consts/spotify';
 
 if (!process.env.SPOTIFY_SECRET || !process.env.SPOTIFY_ID)
 	throw new Error('Missing Spotify creds');
@@ -30,4 +32,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 	adapter: MongoDBAdapter(clientPromise, {
 		databaseName: process.env.MONGODB_DB_NAME,
 	}),
+	session: {
+		strategy: 'database',
+		maxAge: SPOT_LOGIN_WINDOW,
+	},
+	callbacks: {
+		async signIn({
+			account,
+		}: {
+			user:
+				| User
+				| (User & { id: string; eamil: string; emailVerified: Date | null });
+			account: Account | null;
+		}): Promise<boolean | string> {
+			if (!account) return '/';
+			try {
+				await signInUpdater(account);
+			} catch {
+				return '/';
+			}
+			return true;
+		},
+	},
+	debug: process.env.NODE_ENV !== 'production',
 });
