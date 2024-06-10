@@ -32,12 +32,12 @@ const createEntry = async (params: {
 	);
 };
 
-const checkAndUpdateEntry = async (params: {
+export default async function checkAndUpdateEntry(params: {
 	prefix: string;
 	ip: string;
 	rollingLimit: number;
 	rollingDecaySeconds: number;
-}) => {
+}) {
 	const { prefix, ip, rollingDecaySeconds, rollingLimit } = params;
 	const current = (await redisClient.get(`${prefix}-${ip}`)) as string | null;
 	if (current === null) {
@@ -66,6 +66,4 @@ const checkAndUpdateEntry = async (params: {
 		}
 	);
 	return (newTokens - rollingLimit) * rollingDecaySeconds;
-};
-
-export { checkAndUpdateEntry };
+}
