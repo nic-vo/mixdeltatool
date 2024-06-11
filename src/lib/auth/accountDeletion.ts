@@ -34,13 +34,6 @@ export const userDeleter = async (id: string) => {
 };
 
 export const sessionDeleter = async (id: string) => {
-	try {
-		await mongoosePromise();
-		await Session.deleteMany({ userId: id })
-			.where('provider')
-			.equals('spotify')
-			.exec();
-	} catch {
-		throw { message: `Error deleting sessions for ${id}` };
-	}
+	await mongoosePromise();
+	Session.deleteMany({ userId: id }).where('provider').equals('spotify').exec();
 };
