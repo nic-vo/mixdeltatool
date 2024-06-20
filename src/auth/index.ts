@@ -1,12 +1,15 @@
-import NextAuth, { Account, User } from 'next-auth';
+import NextAuth, { Account as AccountType } from 'next-auth';
 import Spotify from 'next-auth/providers/spotify';
 import { MongoDBAdapter } from '@auth/mongodb-adapter';
 import clientPromise from './mongocfg';
 import { signInUpdater } from './accessKey';
 import { SPOT_LOGIN_WINDOW } from '@/consts/spotify';
+import mongoosePromise, { Account } from '@/lib/database/mongoose';
 
 if (!process.env.SPOTIFY_SECRET || !process.env.SPOTIFY_ID)
 	throw new Error('Missing Spotify creds');
+
+const SPOT_BASE_URL = 'https://accounts.spotify.com';
 
 const SPOTIFY_SCOPES = [
 	'user-read-email',
@@ -19,7 +22,7 @@ const SPOTIFY_SCOPES = [
 ];
 const nParams = new URLSearchParams();
 nParams.append('scope', SPOTIFY_SCOPES.join(' '));
-const SPOT_URL = `https://accounts.spotify.com/authorize?${nParams.toString()}`;
+const SPOT_URL = `${SPOT_BASE_URL}/authorize?${nParams.toString()}`;
 
 const config = {
 	clientId: process.env.SPOTIFY_ID,
@@ -40,10 +43,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 		async signIn({
 			account,
 		}: {
-			user:
-				| User
-				| (User & { id: string; eamil: string; emailVerified: Date | null });
-			account: Account | null;
+			account: AccountType | null;
 		}): Promise<boolean | string> {
 			if (!account) return '/';
 			try {
@@ -52,6 +52,45 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 				return '/';
 			}
 			return true;
+		},
+		async session(args) {
+			let { session } = args;
+			if (!process.env.SPOTIFY_ID) throw new Error('Missing Spotify ID');
+			// Return early if expiry is more than two minutes away
+			if (new Date(session.expires).getTime() - Date.now() > 2 * 60 * 1000)
+				return session;
+
+			try {
+				// Find account based on ID
+				await mongoosePromise();
+				const account = await Account.findOne({ userId: args.user.id }).exec();
+				if (!account) throw new Error();
+				// Take refresh token and post to spotify token refresh URL
+				const response = await fetch(`${SPOT_BASE_URL}/api/token`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+					body: new URLSearchParams({
+						grant_type: 'refresh_token',
+						refresh_token: account.refresh_token,
+						client_id: process.env.SPOTIFY_ID,
+					}),
+				});
+				if (!response.ok) throw new Error();
+				const { access_token, expires_in, refresh_token } =
+					(await response.json()) as {
+						access_token: string;
+						expires_in: number;
+						refresh_token: string;
+					};
+				// Update account document with new access_token, refresh_token, and expires_at
+				account.access_token = access_token;
+				account.refresh_token = refresh_token;
+				account.expires_at = Math.floor(Date.now() / 1000) + expires_in;
+				await account.save();
+			} catch {
+				return session;
+			}
+			return session;
 		},
 	},
 	debug: process.env.NODE_ENV !== 'production',
