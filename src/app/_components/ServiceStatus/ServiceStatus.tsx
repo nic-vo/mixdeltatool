@@ -14,14 +14,20 @@ const AlertSVG = ({
 		return (
 			<IoWarningSharp
 				aria-hidden={true}
-				className='text-red-700'
+				className='text-red-700 text-5xl'
 			/>
 		);
-	if (statusType === 'ok') return <IoCheckmarkCircle aria-hidden={true} />;
+	if (statusType === 'ok')
+		return (
+			<IoCheckmarkCircle
+				aria-hidden={true}
+				className='text-3xl'
+			/>
+		);
 	return (
 		<IoAlertCircleSharp
 			aria-hidden={true}
-			className='text-orange-500'
+			className='text-orange-500 text-5xl'
 		/>
 	);
 };
@@ -32,7 +38,7 @@ export default async function ServiceStatus() {
 
 	return (
 		<div
-			className={`w-full max-w-prose flex items-center self-center gap-4 p-4 rounded-xl border-2 ${
+			className={`w-full max-w-prose flex items-center self-center gap-4 p-4 rounded-xl border-4 ${
 				statusType === 'severe'
 					? 'border-red-700 bg-white'
 					: statusType === 'ok'
