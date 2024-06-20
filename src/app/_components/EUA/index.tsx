@@ -42,7 +42,7 @@ const SpotEUA = (props: { submitter?: () => void }) => {
 		return null;
 	};
 
-	if (accepted !== false) return null;
+	if (accepted !== false) return null; // Only add dialog to DOM if accepted is strictly false
 	return (
 		<dialog
 			ref={dialogRef}
@@ -51,8 +51,8 @@ const SpotEUA = (props: { submitter?: () => void }) => {
 				onSubmit={formSubmit}
 				className='flex flex-col gap-8 p-4 w-full h-full m-auto overflow-hidden'>
 				<h2 className='text-center'>MixDelta End User Agreement</h2>
-				<div className='flex flex-col gap p-4 md:p-8 overflow-y-auto bg-transparent backdrop-brightness-150 rounded-xl'>
-					<EUAContent />
+				<div className='flex flex-col gap p-4 md:p-8 overflow-y-auto bg-transparent backdrop-brightness-150 rounded-xl font-karla'>
+					<EUAContent lower />
 				</div>
 				<p className='text-center'>
 					MixDelta&apos;s{' '}
