@@ -7,10 +7,6 @@ declare global {
 	};
 }
 
-if (!process.env.MONGODB_URI) {
-	throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
-}
-
 // Init a variable from an existing global variable
 let cached = global.mongoose;
 
@@ -24,6 +20,9 @@ const mongoosePromise = async () => {
 	if (cached.conn !== null) {
 		return cached.conn;
 	}
+
+	if (!process.env.MONGODB_URI) throw new Error('Missing MONGODB_URI');
+	console.log(process.env.MONGODB_URI);
 
 	if (cached.promise === null) {
 		cached.promise = connect(process.env.MONGODB_URI!, {
