@@ -1,8 +1,9 @@
+import { unstable_cache } from 'next/cache';
 import mongoosePromise from './connection';
 import { GlobalStatus, GlobalStatusPointer } from './models';
 import badResponse from '@/lib/returners';
 
-export async function getGlobalStatusProps(): Promise<{
+async function internalGetGlobalStatus(): Promise<{
 	status: string;
 	active: number;
 	statusType: 'concern' | 'ok' | 'severe';
@@ -74,6 +75,12 @@ export async function getGlobalStatusProps(): Promise<{
 		};
 	}
 }
+
+export const getGlobalStatusProps = unstable_cache(
+	internalGetGlobalStatus,
+	['internalGlobalStatus'],
+	{ tags: ['internalGlobalStatus'] }
+);
 
 export async function setNewGlobalStatus({
 	status,
