@@ -1,15 +1,22 @@
-import { Overpass, Noto_Sans } from 'next/font/google';
+import { Cabin, Hind, Karla } from 'next/font/google';
 
-export const overpass = Overpass({
+export const cabin = Cabin({
 	weight: 'variable',
 	preload: false,
-	subsets: ['cyrillic', 'latin', 'latin-ext'],
-	variable: '--font-overpass',
+	subsets: ['latin', 'latin-ext'],
+	variable: '--font-cabin',
 });
 
-export const notosans = Noto_Sans({
+export const hind = Hind({
+	weight: ['300', '400', '700'],
+	preload: false,
+	subsets: ['latin', 'latin-ext'],
+	variable: '--font-hind',
+});
+
+export const karla = Karla({
 	weight: 'variable',
 	preload: false,
-	subsets: ['latin', 'latin-ext', 'cyrillic'],
-	variable: '--font-notosans',
+	subsets: ['latin'],
+	variable: '--font-karla',
 });

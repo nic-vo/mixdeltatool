@@ -4,8 +4,9 @@ module.exports = {
 	theme: {
 		extend: {
 			fontFamily: {
-				overpass: '--font-overpass, sans-serif, ui-sans-serif, system-ui',
-				notosans: '--font-notosans, sans-serif, ui-sans-serif, system-ui',
+				cabin: 'var(--font-cabin), sans-serif, ui-sans-serif, system-ui',
+				hind: 'var(--font-hind), sans-serif, ui-sans-serif, system-ui',
+				karla: 'var(--font-karla), serif, ui-serif, system-ui',
 			},
 			colors: {
 				black: '#121218',
