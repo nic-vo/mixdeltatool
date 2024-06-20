@@ -5,3 +5,5 @@ const RootLoading = () => {
 		</div>
 	);
 };
+
+export default RootLoading;
