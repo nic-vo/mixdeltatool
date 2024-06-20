@@ -1,51 +1,35 @@
-export const MalformedResponse = () =>
-	Response.json({ message: 'Check your information' }, { status: 400 });
+export const defaultErrorMessages = {
+	401: 'Please sign in again',
+	400: 'Check your information',
+	403: `You're not allowed to do that`,
+	404: 'Not found',
+	422: 'Check your information',
+	429: 'Busy. Try again in a few minutes',
+	500: 'Server Error',
+	502: `Something happened to Spotify's response`,
+	503: `Something happened to Spotify's servers`,
+	504: 'Server timed out',
+};
 
-export const UnAuthorizedResponse = () =>
-	Response.json({ message: 'Please sign in again' }, { status: 401 });
-
-export const ForbiddenResponse = (message?: string) =>
-	Response.json(
-		{ message: message ?? `You're not allowed to do that` },
-		{ status: 403 }
+const badResponse = (
+	status: keyof typeof defaultErrorMessages,
+	details?: {
+		message?: string;
+		headers?: Record<string, string>;
+	}
+) => {
+	if (!details) {
+		const message = defaultErrorMessages[status];
+		return Response.json({ message }, { status });
+	}
+	const { message, headers } = details;
+	return Response.json(
+		{ message: message ?? defaultErrorMessages[status] },
+		{ status, headers }
 	);
+};
 
-export const NotFoundResponse = (message?: string) =>
-	Response.json({ message: message ?? 'Not found' }, { status: 404 });
-
-export const UnprocessibleResponse = () =>
-	Response.json({ message: 'Check your information' }, { status: 422 });
-
-export const RateLimitResponse = (retryTime: number) =>
-	Response.json(
-		{ message: 'Busy. Try again in a few minutes' },
-		{
-			status: 429,
-			headers: { 'Retry-After': Math.floor(retryTime).toString() },
-		}
-	);
-
-export const FetchErrorResponse = (message: string) =>
-	Response.json({ message }, { status: 502 });
-
-export const ServerErrorResponse = (message?: string) =>
-	Response.json({ message: message ?? 'Server error' }, { status: 500 });
-
-export const TimeoutResponse = () =>
-	Response.json({ message: 'Server timed out' }, { status: 504 });
-
-export const CustomResponse = ({
-	status,
-	message,
-	headers,
-}: {
-	status: number;
-	message: string;
-	headers?: Record<string, string>;
-}) =>
-	headers
-		? Response.json({ message }, { status, headers })
-		: Response.json({ message }, { status });
+export default badResponse;
 
 export const BasicSuccessResponse = (message?: string) =>
 	Response.json({ message: message ?? 'Success' }, { status: 200 });
