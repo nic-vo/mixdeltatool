@@ -1,105 +1,104 @@
 import { NextApiRequest } from 'next';
 
 interface BasicSpotObj {
-	id: string,
-	uri: string,
-	href: string
+	id: string;
+	uri: string;
+	href: string;
 }
 
 export interface SpotPlaylistObject extends BasicSpotObj {
-	collaborative: boolean,
-	description: string | null,
-	images: SpotImageObject[]
-	name: string,
-	owner: SpotUser,
-	public: boolean,
-	snapshot_id: string,
-	tracks: { href: string, total: number },
-	type: 'playlist'
+	collaborative: boolean;
+	description: string | null;
+	images: SpotImageObject[];
+	name: string;
+	owner: SpotUser;
+	public: boolean;
+	snapshot_id: string;
+	tracks: { href: string; total: number };
+	type: 'playlist';
 }
 
 export interface SpotAlbumObject extends BasicSpotObj {
-	album_type: 'album' | 'single' | 'compilation',
-	artists: SpotArtistObject[],
-	total_tracks: number,
-	available_markets: string[],
-	external_urls: { spotify: string },
-	images: SpotImageObject[],
-	name: string,
-	release_date: string,
-	release_date_precision: 'year' | 'month' | 'day',
+	album_type: 'album' | 'single' | 'compilation';
+	artists: SpotArtistObject[];
+	total_tracks: number;
+	available_markets: string[];
+	external_urls: { spotify: string };
+	images: SpotImageObject[];
+	name: string;
+	release_date: string;
+	release_date_precision: 'year' | 'month' | 'day';
 	tracks: {
-		href: string
-	},
-	type: 'album'
+		href: string;
+	};
+	type: 'album';
 }
 
 export interface SpotPlaylistTrackObject {
-	track: Pick<BasicSpotObj, 'uri'>,
-	is_local: boolean
+	track: Pick<BasicSpotObj, 'uri'>;
+	is_local: boolean;
 }
 
 export interface SpotUser extends BasicSpotObj {
-	display_name: string | null
+	display_name: string | null;
 }
 
 export interface SpotArtistObject extends BasicSpotObj {
-	name: string,
+	name: string;
 }
 
 export interface SpotImageObject {
-	url: string,
-	height?: number | null,
-	width?: number | null
+	url: string;
+	height?: number | null;
+	width?: number | null;
 }
 
 export interface BasicSpotApiResponse {
-	href: string,
-	next: string | null
+	href: string;
+	next: string | null;
 }
 
-export interface SpotUserPlaylistsResponse
-	extends BasicSpotApiResponse {
-	items: SpotPlaylistObject[]
+export interface SpotUserPlaylistsResponse extends BasicSpotApiResponse {
+	items: SpotPlaylistObject[];
 }
 
 export interface MyPlaylistObject
 	extends Pick<SpotPlaylistObject, 'id' | 'name'> {
 	owner: {
-		name: string,
-		id: string
-	}[],
-	image?: SpotImageObject,
-	tracks: number,
-	type: 'album' | 'playlist'
+		name: string;
+		id: string;
+	}[];
+	image?: SpotImageObject;
+	tracks: number;
+	type: 'album' | 'playlist';
 }
 
 export interface MyUserAPIRouteResponse {
-	next: number | null,
-	playlists: MyPlaylistObject[]
+	next: number | null;
+	playlists: MyPlaylistObject[];
 }
 
 export interface getUserPlaylistsApiRequest
 	extends Omit<NextApiRequest, 'query'> {
-	query: { page: string }
+	query: { page: string };
 }
 
 export interface getSpecificPlaylistApiRequest
 	extends Omit<NextApiRequest, 'query'> {
 	query: {
-		id: string,
-		type: 'album' | 'playlist'
-	}
+		id: string;
+		type: 'album' | 'playlist';
+	};
 }
 
-export type ActionType = 'adu' | 'odu' | 'otu' | 'bu' | 'stu'
+export type ActionType = 'adu' | 'odu' | 'otu' | 'bu' | 'stu';
 
 export interface createDiffPlaylistApiRequest extends NextApiRequest {
 	body: {
-		target: MyPlaylistObject,
-		differ: MyPlaylistObject,
-		type: 'adu' | 'odu' | 'otu' | 'bu' | 'stu'
-	}
+		target: MyPlaylistObject;
+		differ: MyPlaylistObject;
+		type: 'adu' | 'odu' | 'otu' | 'bu' | 'stu';
+	};
 }
 
 /*
@@ -111,29 +110,29 @@ export interface createDiffPlaylistApiRequest extends NextApiRequest {
 */
 
 export interface SpotPlaylistTracksResponse extends BasicSpotApiResponse {
-	total: number,
-	items: SpotPlaylistTrackObject[]
+	total: number;
+	items: SpotPlaylistTrackObject[];
 }
 
 export interface SpotAlbumTracksResponse extends BasicSpotApiResponse {
-	total: number,
+	total: number;
 	items: {
-		uri: string
-	}[]
+		uri: string;
+	}[];
 }
 
 export interface differInternalPlaylistPromise {
-	total: number,
-	completed: number,
-	items: Set<string>,
+	total: number;
+	completed: number;
+	items: string[];
 }
 
 export interface differRouteResponse {
-	part: string[],
-	playlist: MyPlaylistObject
+	part: string[];
+	playlist: MyPlaylistObject;
 }
 
 export interface differInternalAddPromise {
-	total: number,
-	completed: number
+	total: number;
+	completed: number;
 }
