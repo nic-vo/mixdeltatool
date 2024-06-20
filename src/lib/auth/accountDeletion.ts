@@ -12,13 +12,11 @@ export const userDeleter = async (id: string) => {
 	while (onceFlag) {
 		try {
 			session.startTransaction();
-			await Promise.all([
-				Account.findOneAndDelete({ userId: id })
-					.where('provider')
-					.equals('spotify')
-					.exec(),
-				User.findByIdAndDelete(id).exec(),
-			]);
+			await Account.findOneAndDelete({ userId: id })
+				.where('provider')
+				.equals('spotify')
+				.exec();
+			await User.findByIdAndDelete(id).exec();
 			session.commitTransaction();
 		} catch {
 			session.abortTransaction();
