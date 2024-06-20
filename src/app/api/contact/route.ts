@@ -46,7 +46,9 @@ export const POST = handlerWithTimeout(
 			const { name, message } = body;
 			await addNewMessage({ ip, name, message });
 		} catch {
-			return badResponse(502, { message: `Couldn't process your info` });
+			return badResponse(502, {
+				message: `Couldn't process your information.`,
+			});
 		}
 
 		return CreatedResponse('Your message has been received.');

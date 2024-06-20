@@ -1,5 +1,6 @@
 import mongoosePromise from '@/lib/database/mongoose';
 import { ContactMessage } from '@/lib/database/mongoose/models';
+import { threeRetries } from '@/lib/misc/helpers';
 import { z } from 'zod';
 
 export const contactBodyParser = z
@@ -15,7 +16,7 @@ export const contactBodyParser = z
 	.strict();
 
 // Returns null or causes an instant throw in the parent
-export const hCaptchaPromise = async (token: string): Promise<null> => {
+export const hCaptchaPromise = async (token: string) => {
 	if (!process.env.HCAPTCHA_SECRET || !process.env.NEXT_PUBLIC_HCAPTCHA_SITEKEY)
 		throw new Error();
 
@@ -23,34 +24,26 @@ export const hCaptchaPromise = async (token: string): Promise<null> => {
 	params.append('secret', process.env.HCAPTCHA_SECRET);
 	params.append('response', token);
 	params.append('sitekey', process.env.NEXT_PUBLIC_HCAPTCHA_SITEKEY);
-	let retries = 0;
-	let response;
-	while (!response) {
-		try {
-			response = await fetch('https://api.hcaptcha.com/siteverify', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-				},
-				body: params,
-			});
-			break;
-		} catch {
-			if (retries > 3) throw new Error();
-			retries++;
-			continue;
-		}
-	}
-	const jsoned = await response.json();
-	if (!jsoned.success) throw new Error();
-	return null;
+	const response = await threeRetries(() =>
+		fetch('https://api.hcaptcha.com/siteverify', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded',
+			},
+			body: params,
+		})
+	);
+	if (!response.ok) throw new Error();
+	const { success } = await response.json();
+	if (!success) throw new Error();
+	return;
 };
 
 // Rate limit contact form by having a hard limit on how many messages from a certain ip
 export async function checkExistingMessages(checkIP: string) {
 	await mongoosePromise();
 	let existing = await ContactMessage.find({ ip: checkIP }).exec();
-	return existing !== undefined && existing !== null && existing.length < 5;
+	return existing && existing.length < 5;
 }
 
 // Adds a new message if the ^ passes in parent
