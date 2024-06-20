@@ -25,7 +25,7 @@ const createEntry = async (params: {
 	rollingDecaySeconds: number;
 }) => {
 	const { prefix, ip, rollingLimit, rollingDecaySeconds } = params;
-	await redisClient.set(
+	await redisClient().set(
 		`${prefix}-${ip}`,
 		`1 ${Math.ceil(Date.now() / 1000)}`,
 		{ ex: rollingLimit * rollingDecaySeconds * 5 }
@@ -39,7 +39,7 @@ export default async function checkAndUpdateEntry(params: {
 	rollingDecaySeconds: number;
 }) {
 	const { prefix, ip, rollingDecaySeconds, rollingLimit } = params;
-	const current = (await redisClient.get(`${prefix}-${ip}`)) as string | null;
+	const current = (await redisClient().get(`${prefix}-${ip}`)) as string | null;
 	if (current === null) {
 		await createEntry({
 			prefix,
@@ -56,7 +56,7 @@ export default async function checkAndUpdateEntry(params: {
 		.map((str) => parseInt(str));
 	const recoveredTokens = Math.floor((now - lastUpdate) / rollingDecaySeconds);
 	const newTokens = Math.max(tokensUsed - recoveredTokens + 1, 1);
-	await redisClient.set(
+	await redisClient().set(
 		`${prefix}-${ip}`,
 		`${newTokens} ${Math.floor(Date.now() / 1000)}`,
 		{
