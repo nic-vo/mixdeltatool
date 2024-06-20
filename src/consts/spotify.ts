@@ -14,6 +14,8 @@ export const CLIENT_DIFF_TYPES = {
 	bu: 'Only the differences between the target and the differ; no shared.',
 };
 
+type descArgs = { du?: number; shared?: number; tu?: number };
+
 export function SERVER_DIFF_TYPES(params: {
 	target: {
 		name: string;
@@ -28,32 +30,33 @@ export function SERVER_DIFF_TYPES(params: {
 	const { target, differ, actionType } = params;
 	switch (actionType) {
 		case 'adu':
-			return (
-				`Tracks from ${differ.owner}'s "${differ.name}" were added to ` +
-				`${target.owner} 's "${target.name}".`
-			);
+			return ({ du }: descArgs) =>
+				`Added ${du ?? 'some'} tracks from ${differ.owner}'s "${
+					differ.name
+				}" to ` + `${target.owner} 's "${target.name}".`;
+
 		case 'odu':
-			return (
-				`${target.owner}'s ${target.name} was replaced entirely by ` +
-				`tracks unique to ${differ.owner}'s "${differ.name}".`
-			);
+			return ({ du }: descArgs) =>
+				`Replaced ${target.owner}'s "${target.name}" entirely with ` +
+				`${du} tracks unique to ${differ.owner}'s "${differ.name}".`;
+
 		case 'otu':
-			return (
-				`Any similarities between ${target.owner}'s "${target.name}" and ` +
-				`${differ.owner}'s "${differ.name}" have been removed ` +
-				`from "${target.name}"; only tracks unique to it remain.`
-			);
+			return ({ shared }: descArgs) =>
+				`${shared ?? 'Some'} tracks shared by ${target.owner}'s "${
+					target.name
+				}" and ` + `${differ.owner}'s "${differ.name}" were removed.`;
+
 		case 'bu':
-			return (
+			return ({ du, tu }: descArgs) =>
 				`Any similarities between ${target.owner}'s "${target.name}" ` +
-				`and ${differ.owner}'s "${differ.name}" have been removed from ` +
-				`"${target.name}"; only tracks unique to either playlist remain.`
-			);
+				`and ${differ.owner}'s "${differ.name}" were removed; ` +
+				`now contains ${tu ?? 'some'} tracks from the former ` +
+				`and ${du ?? 'some'} tracks from the latter.`;
+
 		case 'stu':
-			return (
-				`Only tracks that exist in both ${target.owner}'s ` +
-				`"${target.name}" and ${differ.owner}'s "${differ.name}" remain.`
-			);
+			return ({ shared }: descArgs) =>
+				`${shared} tracks that exist in both ${target.owner}'s ` +
+				`"${target.name}" and ${differ.owner}'s "${differ.name}" remain.`;
 	}
 }
 
