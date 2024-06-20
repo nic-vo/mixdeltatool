@@ -9,17 +9,20 @@ export const signInUpdater = async (account: AccountType) => {
 
 	// This shouldn't happen because next-auth should always hit
 	// The Spotify OAuth endpoint
-	if (!account.access_token || !account.expires_at) throw new Error();
+	const { access_token, expires_at, refresh_token, providerAccountId } =
+		account;
+	if (!access_token || !expires_at || !refresh_token) throw new Error();
 	await mongoosePromise();
 	// Use findOneAndUpdate because hopefully it's atomic on MongoDB's side
 	await Account.findOneAndUpdate(
 		{
-			providerAccountId: account.providerAccountId,
+			providerAccountId,
 			provider: 'spotify',
 		},
 		{
-			access_token: account.access_token,
-			expires_at: account.expires_at,
+			access_token,
+			expires_at,
+			refresh_token,
 		}
 	).exec();
 	// The only errors should be at network level hopefully;
