@@ -1,24 +1,27 @@
 import { ServiceStatus } from '@/components/misc';
-import { IoChevronForwardCircleSharp } from 'react-icons/io5';
+import Link from 'next/link';
 
 export default async function Home() {
 	return (
-		<main className='min-h-screen'>
-			<h1 className='font-overpass text-3xl'>
-				Welcome to the MixDelta tool for Spotify!
-			</h1>
-			<a href='/spotify'>
-				To the tool! <IoChevronForwardCircleSharp aria-hidden={true} />
-			</a>
+		<main className='relative min-h-screen z-10 flex flex-col items-center *:max-w-prose *:w-10/12 gap-8'>
+			<hgroup className='gap-0 mt-32'>
+				<h1 className='font-cabin text-8xl sm:text-9xl font-black'>MixDelta</h1>
+				<p className='font-karla text-2xl sm:text-4xl font-extralight'>
+					a playlist tool for Spotify
+				</p>
+			</hgroup>
+			<Link
+				href='/spotify'
+				className='flex gap-2 items-center'>
+				<span>To the tool! &rarr;</span>
+			</Link>
 			<ServiceStatus />
 			<h2>About this tool</h2>
 			<p>
-				Welcome to MixDelta, your ultimate companion for mastering your Spotify
-				playlists with ease. Designed for playlist aficionados who curate an
-				extensive library, MixDelta empowers you to efficiently compare and
-				manage your playlists like never before. Say goodbye to the hassle of
-				manually syncing changes across multiple playlists – MixDelta does the
-				heavy lifting for you.
+				Designed for playlist aficionados who curate an extensive library,
+				MixDelta empowers you to efficiently compare and manage your playlists
+				like never before. Say goodbye to the hassle of manually syncing changes
+				across multiple playlists – MixDelta does the heavy lifting for you.
 			</p>
 			<p>
 				With MixDelta, you can seamlessly compare two Spotify playlists,
