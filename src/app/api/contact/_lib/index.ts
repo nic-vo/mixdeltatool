@@ -2,8 +2,6 @@ import mongoosePromise from '@/lib/database/mongoose';
 import { ContactMessage } from '@/lib/database/mongoose/models';
 import { z } from 'zod';
 
-import { CustomError, FetchError, MalformedError } from '@/lib/errors';
-
 export const contactBodyParser = z
 	.object({
 		name: z.string().min(3).max(150),
@@ -18,37 +16,34 @@ export const contactBodyParser = z
 
 // Returns null or causes an instant throw in the parent
 export const hCaptchaPromise = async (token: string): Promise<null> => {
+	if (!process.env.HCAPTCHA_SECRET || !process.env.NEXT_PUBLIC_HCAPTCHA_SITEKEY)
+		throw new Error();
+
 	const params = new URLSearchParams();
-	params.append('secret', process.env.HCAPTCHA_SECRET!);
+	params.append('secret', process.env.HCAPTCHA_SECRET);
 	params.append('response', token);
-	params.append('sitekey', process.env.NEXT_PUBLIC_HCAPTCHA_SITEKEY!);
-	return new Promise(async (res, rej) => {
-		let retries = 0;
-		let response;
-		while (retries < 3) {
-			try {
-				response = await fetch('https://api.hcaptcha.com/siteverify', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded',
-					},
-					body: params,
-				});
-			} catch {
-				if (retries < 3) {
-					retries++;
-					continue;
-				}
-				return rej(new FetchError('There was an error with our servers.'));
-			}
+	params.append('sitekey', process.env.NEXT_PUBLIC_HCAPTCHA_SITEKEY);
+	let retries = 0;
+	let response;
+	while (!response) {
+		try {
+			response = await fetch('https://api.hcaptcha.com/siteverify', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				body: params,
+			});
 			break;
+		} catch {
+			if (retries > 3) throw new Error();
+			retries++;
+			continue;
 		}
-		if (response === undefined)
-			return rej(new CustomError(500, 'Internal error.'));
-		const jsoned = await response.json();
-		if (!jsoned.success) return rej(new MalformedError());
-		return res(null);
-	});
+	}
+	const jsoned = await response.json();
+	if (!jsoned.success) throw new Error();
+	return null;
 };
 
 // Rate limit contact form by having a hard limit on how many messages from a certain ip
@@ -63,21 +58,9 @@ export const addNewMessage = async (params: {
 	ip: string;
 	name: string;
 	message: string;
-}): Promise<null> => {
+}): Promise<void> => {
 	const { ip, name, message } = params;
-
-	return new Promise(async (res, rej) => {
-		try {
-			await mongoosePromise();
-		} catch {
-			return rej(new CustomError(500, 'Internal error'));
-		}
-		let existing;
-		try {
-			existing = await ContactMessage.create({ ip, name, message });
-		} catch {
-			return rej(new CustomError(500, 'Internal error'));
-		}
-		return res(null);
-	});
+	await mongoosePromise();
+	await ContactMessage.create({ ip, name, message });
+	return;
 };

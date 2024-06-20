@@ -4,16 +4,8 @@ import {
 	hCaptchaPromise,
 	contactBodyParser,
 } from './_lib';
-import checkAndUpdateEntry from '@/lib/database/redis/ratelimiting';
 import { handlerWithTimeout } from '@/lib/misc/helpers';
-import {
-	CreatedResponse,
-	FetchErrorResponse,
-	ForbiddenResponse,
-	MalformedResponse,
-	RateLimitResponse,
-	ServerErrorResponse,
-} from '@/lib/returners';
+import badResponse, { CreatedResponse } from '@/lib/returners';
 
 import { NextRequest } from 'next/server';
 
@@ -24,44 +16,37 @@ const RATE_LIMIT_DECAY_SECONDS = 30;
 export const maxDuration = 30;
 
 export const POST = handlerWithTimeout(
-	maxDuration,
+	{
+		maxDuration,
+		rateLimit: {
+			RATE_LIMIT_PREFIX,
+			RATE_LIMIT_DECAY_SECONDS,
+			RATE_LIMIT_ROLLING_LIMIT,
+		},
+	},
 	async (req: NextRequest) => {
-		const { ip } = req;
-		try {
-			if (!ip) return ServerErrorResponse();
-			const rateLimit = await checkAndUpdateEntry({
-				ip,
-				prefix: RATE_LIMIT_PREFIX,
-				rollingLimit: RATE_LIMIT_ROLLING_LIMIT,
-				rollingDecaySeconds: RATE_LIMIT_DECAY_SECONDS,
-			});
-			if (rateLimit !== null) return RateLimitResponse(rateLimit);
-		} catch {
-			return FetchErrorResponse(
-				'There was an error with our servers. Try again'
-			);
-		}
+		// Validate body first since no database call
 		let body;
 		try {
 			body = contactBodyParser.parse(JSON.parse(await req.json()));
-		} catch (e: any) {
-			return MalformedResponse();
+		} catch {
+			return badResponse(400);
 		}
 
-		// Rate limit via checking how many msgs from ip exist in database
-		// and hcaptcha
+		const { ip } = req;
+		if (!ip) return badResponse(500);
+
 		let canAddNew, _;
 		try {
 			[canAddNew, _] = await Promise.all([
 				checkExistingMessages(ip),
 				hCaptchaPromise(body['h-captcha-response']),
 			]);
-			if (!canAddNew) return ForbiddenResponse();
-
+			if (!canAddNew) return badResponse(403);
 			const { name, message } = body;
 			await addNewMessage({ ip, name, message });
 		} catch {
-			return FetchErrorResponse(`Couldn't process your info`);
+			return badResponse(502, { message: `Couldn't process your info` });
 		}
 
 		return CreatedResponse('Your message has been received.');
