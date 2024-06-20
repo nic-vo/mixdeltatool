@@ -1,6 +1,6 @@
-import { FetchError } from '@/lib/errors';
 import mongoosePromise from './connection';
 import { GlobalStatus, GlobalStatusPointer } from './models';
+import badResponse from '@/lib/returners';
 
 export async function getGlobalStatusProps(): Promise<{
 	status: string;
@@ -8,47 +8,64 @@ export async function getGlobalStatusProps(): Promise<{
 	statusType: 'concern' | 'ok' | 'severe';
 }> {
 	let status = 'There may be an issue with our servers; please stand by.';
-	let statusType: 'concern' | 'ok' | 'severe' = 'concern';
-	let active = Date.now();
+	let statusType: 'concern' | 'severe' | 'ok' = 'concern';
+
 	try {
-		await mongoosePromise();
-	} catch {
-		return {
-			statusType: 'severe',
-			status:
-				"Please be patient, there's an error with our servers. We'll be back ASAP.",
-			active,
-		};
-	}
-	try {
-		let currentPointer = await GlobalStatusPointer.findOne().exec();
-		if (currentPointer === null) {
-			const newStatus = new GlobalStatus({
-				status,
-				statusType,
-				active,
-			});
-			currentPointer = new GlobalStatusPointer({ current: newStatus._id });
-			await Promise.all([newStatus.save(), currentPointer.save()]);
-		} else {
-			const statusData = await GlobalStatus.findById(
-				currentPointer.current
-			).exec();
-			if (statusData !== null) {
-				status = statusData.status ? statusData.status : status;
-				statusType = statusData.statusType ? statusData.statusType : statusType;
-				active = statusData.active ? statusData.active : active;
-				return { status, statusType, active };
+		const db = await mongoosePromise();
+		if (!db) throw 'Error connecting to MongoDB';
+		const session = await db.startSession();
+		let oneFlag = true;
+		while (oneFlag) {
+			try {
+				session.startTransaction();
+				let currentPointer = await GlobalStatusPointer.findOne().exec();
+				// If no pointer document, initiate all
+				if (currentPointer === null) {
+					const newStatus = new GlobalStatus({
+						status,
+						statusType,
+						active: Date.now(),
+					});
+					currentPointer = new GlobalStatusPointer({ current: newStatus._id });
+					await currentPointer.save();
+					await newStatus.save();
+					await session.commitTransaction();
+					break;
+				}
+
+				const statusData = await GlobalStatus.findById(
+					currentPointer.current
+				).exec();
+				// If pointer points at existing, return existing
+				if (statusData !== null) {
+					status = statusData.status;
+					statusType = statusData.statusType;
+					await session.abortTransaction();
+					break;
+				}
+
+				console.log('creating fallback');
+				const newStatus = new GlobalStatus({
+					status,
+					statusType,
+					active: Date.now(),
+				});
+				currentPointer.current = newStatus._id;
+				await currentPointer.save();
+				await newStatus.save();
+				await session.commitTransaction();
+			} catch {
+				await session.abortTransaction();
+				if (!oneFlag) {
+					oneFlag = true;
+					continue;
+				}
+				throw new Error('ACID error');
 			}
-			const newStatus = new GlobalStatus({
-				status,
-				statusType,
-				active,
-			});
-			currentPointer.current = newStatus._id;
-			await Promise.all([newStatus.save(), currentPointer.save()]);
 		}
-	} catch {
+		return { status, statusType, active: Date.now() };
+	} catch (e: any) {
+		console.log(e);
 		return {
 			statusType: 'severe',
 			status:
@@ -56,33 +73,42 @@ export async function getGlobalStatusProps(): Promise<{
 			active: Date.now(),
 		};
 	}
-	return { status, statusType, active };
 }
 
-export async function setNewGlobalStatus(params: {
+export async function setNewGlobalStatus({
+	status,
+	statusType,
+}: {
 	status: string;
 	statusType: 'ok' | 'concern' | 'severe';
 }) {
-	const { status, statusType } = params;
+	let session;
 	try {
-		await mongoosePromise();
+		const db = await mongoosePromise();
+		if (!db) throw new Error();
+		session = await db.startSession();
 	} catch {
-		throw new FetchError('There was an error connecting to MongoDB');
+		return badResponse(502, { message: 'Error connecting to database' });
 	}
-	const newStatus = new GlobalStatus({
-		status,
-		statusType,
-		active: Date.now(),
-	});
+
 	try {
+		session.startTransaction();
+		const newStatus = new GlobalStatus({
+			status,
+			statusType,
+			active: Date.now(),
+		});
 		let currentPointer = await GlobalStatusPointer.findOne().exec();
 		if (currentPointer === null) {
 			currentPointer = new GlobalStatusPointer({ current: newStatus._id });
 		}
 		currentPointer.current = newStatus._id;
-		await Promise.all([newStatus.save(), currentPointer.save()]);
+		await newStatus.save();
+		await currentPointer.save();
+		await session.commitTransaction();
 	} catch {
-		throw new FetchError('There was an error creating a new status');
+		await session.abortTransaction();
+		return badResponse(502, { message: 'There was a database error' });
 	}
-	return null;
+	return Response.json({ message: 'Created' }, { status: 201 });
 }
