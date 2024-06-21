@@ -6,11 +6,12 @@ import {
 	getPlaylistTracks,
 	createEmptyPlaylist,
 	populatePlaylistWithComparison,
+	SERVER_DIFF_TYPES,
 } from './_lib/requests';
 import { concurrentThrowNotReturn, myRace } from './_lib/common';
 import { badResponse } from '@/lib/route_helpers/responses';
 
-import { SERVER_DIFF_TYPES, SPOT_LOGIN_WINDOW } from '@/consts/spotify';
+import { SPOT_LOGIN_WINDOW } from '@/consts/spotify';
 
 import { NextAuthRequest } from 'next-auth/lib';
 import {
