@@ -1,20 +1,10 @@
-import { randomBytes } from 'crypto';
-import { NextRequest } from 'next/server';
 import badResponse, { defaultErrorMessages } from '../route_helpers';
-import { AppRouteHandlerFnContext } from 'next-auth/lib/types';
-import { NextAuthRequest } from 'next-auth/lib';
 import { auth } from '@/auth';
 import checkAndUpdateEntry from '../database/redis/ratelimiting';
 
-export function genUId(length: number) {
-	const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-	const buffer = randomBytes(length * 2);
-	let result = '';
-	for (let i = 0; i < length; i++) {
-		result += chars.charAt(buffer.readUInt8(i) % chars.length);
-	}
-	return result;
-}
+import { AppRouteHandlerFnContext } from 'next-auth/lib/types';
+import { NextRequest } from 'next/server';
+import { NextAuthRequest } from 'next-auth/lib';
 
 type BaseHandler = (
 	req: NextRequest,

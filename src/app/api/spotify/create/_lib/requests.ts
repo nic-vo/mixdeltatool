@@ -4,15 +4,25 @@ import {
 	SpotPlaylistTracksResponse,
 } from '@/components/spotify/types';
 import { SPOT_URL_BASE } from '@/consts/spotify';
-import { genUId, threeRetries } from '@/lib/misc/helpers';
+import { threeRetries } from '@/lib/misc/helpers';
 import badResponse from '@/lib/route_helpers';
 import {
 	spotPlaylistObjectParser,
 	spotUserObjectParser,
 } from '@/lib/spotify/validators';
+import { randomBytes } from 'crypto';
 import fs from 'fs/promises';
-
 import path from 'path';
+
+function genUId(length: number) {
+	const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+	const buffer = randomBytes(length * 2);
+	let result = '';
+	for (let i = 0; i < length; i++) {
+		result += chars.charAt(buffer.readUInt8(i) % chars.length);
+	}
+	return result;
+}
 
 export async function getPlaylistTracks({
 	id,
