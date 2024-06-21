@@ -40,7 +40,7 @@ export const defaultErrorMessages = {
 	504: 'Server timed out',
 };
 
-const badResponse = (
+export const badResponse = (
 	status: keyof typeof defaultErrorMessages,
 	details?: {
 		message?: string;
@@ -57,5 +57,3 @@ const badResponse = (
 		{ status, headers }
 	);
 };
-
-export default badResponse;

@@ -3,7 +3,7 @@ import mongoosePromise, {
 	Session,
 	User,
 } from '@/lib/database/mongoose';
-import badResponse from '../../../../lib/route_helpers';
+import { badResponse } from '@/lib/route_helpers';
 
 export const userDeleter = async (id: string) => {
 	const db = await mongoosePromise();

@@ -1,4 +1,4 @@
-import badResponse, { defaultErrorMessages } from '../route_helpers';
+import { badResponse, defaultErrorMessages } from '../route_helpers';
 import { auth } from '@/auth';
 import checkAndUpdateEntry from '../database/redis/ratelimiting';
 

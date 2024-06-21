@@ -8,7 +8,7 @@ import {
 	populatePlaylistWithComparison,
 } from './_lib/requests';
 import { concurrentThrowNotReturn, myRace } from './_lib/common';
-import badResponse from '@/lib/route_helpers';
+import { badResponse } from '@/lib/route_helpers';
 
 import { SERVER_DIFF_TYPES, SPOT_LOGIN_WINDOW } from '@/consts/spotify';
 

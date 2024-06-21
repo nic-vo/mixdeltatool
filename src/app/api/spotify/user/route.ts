@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { routeKeyRetriever } from '@/auth/accessKey';
 import { handlerWithTimeoutAndAuth, threeRetries } from '@/lib/misc/wrappers';
+import { userPlaylistResponseParser } from '@/lib/spotify/validators';
+import { badResponse } from '@/lib/route_helpers';
 import {
 	SPOT_LOGIN_WINDOW,
 	SPOT_PLAYLIST_PAGE_LIMIT,
@@ -8,8 +10,6 @@ import {
 } from '@/consts/spotify';
 
 import { NextAuthRequest } from 'next-auth/lib';
-import { userPlaylistResponseParser } from '@/lib/spotify/validators';
-import badResponse from '@/lib/route_helpers';
 
 const RATE_LIMIT_PREFIX = 'GUP';
 const RATE_LIMIT_ROLLING_LIMIT = 10;
