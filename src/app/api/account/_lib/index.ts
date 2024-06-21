@@ -3,7 +3,7 @@ import mongoosePromise, {
 	Session,
 	User,
 } from '@/lib/database/mongoose';
-import badResponse from '../returners';
+import badResponse from '../../../../lib/returners';
 
 export const userDeleter = async (id: string) => {
 	const db = await mongoosePromise();

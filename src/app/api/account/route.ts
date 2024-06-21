@@ -1,4 +1,7 @@
-import { sessionDeleter, userDeleter } from '@/lib/auth/accountDeletion';
+import {
+	sessionDeleter,
+	userDeleter,
+} from '@/app/api/account/_lib/accountDeletion';
 import badResponse from '@/lib/returners';
 import { handlerWithTimeoutAndAuth } from '@/lib/misc/helpers';
 
