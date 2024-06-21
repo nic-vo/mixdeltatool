@@ -5,7 +5,7 @@ import {
 	contactBodyParser,
 } from './_lib';
 import { handlerWithTimeout } from '@/lib/misc/helpers';
-import badResponse from '@/lib/returners';
+import badResponse from '@/lib/route_helpers';
 
 import { NextRequest } from 'next/server';
 

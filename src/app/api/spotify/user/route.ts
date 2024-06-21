@@ -9,7 +9,7 @@ import {
 
 import { NextAuthRequest } from 'next-auth/lib';
 import { userPlaylistResponseParser } from '@/lib/spotify/validators';
-import badResponse from '@/lib/returners';
+import badResponse from '@/lib/route_helpers';
 
 const RATE_LIMIT_PREFIX = 'GUP';
 const RATE_LIMIT_ROLLING_LIMIT = 10;

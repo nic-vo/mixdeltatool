@@ -1,7 +1,7 @@
 import { unstable_cache } from 'next/cache';
 import mongoosePromise from './connection';
 import { GlobalStatus, GlobalStatusPointer } from './models';
-import badResponse from '@/lib/returners';
+import badResponse from '@/lib/route_helpers';
 
 async function internalGetGlobalStatus(): Promise<{
 	status: string;

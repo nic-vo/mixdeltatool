@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto';
 import { NextRequest } from 'next/server';
-import badResponse, { defaultErrorMessages } from '../returners';
+import badResponse, { defaultErrorMessages } from '../route_helpers';
 import { AppRouteHandlerFnContext } from 'next-auth/lib/types';
 import { NextAuthRequest } from 'next-auth/lib';
 import { auth } from '@/auth';

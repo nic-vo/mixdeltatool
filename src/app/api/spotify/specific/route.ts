@@ -13,7 +13,7 @@ import {
 	SpotAlbumObject,
 	SpotPlaylistObject,
 } from '@/components/spotify/types';
-import badResponse from '@/lib/returners';
+import badResponse from '@/lib/route_helpers';
 
 const RATE_LIMIT_PREFIX = 'GSP';
 const RATE_LIMIT_ROLLING_LIMIT = 10;
