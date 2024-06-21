@@ -1,4 +1,4 @@
-import { setNewGlobalStatus } from '@/lib/database/mongoose';
+import setNewGlobalStatus from './_lib';
 import { OPTIONS, badResponse } from '@/lib/route_helpers/responses';
 import { handlerWithTimeout } from '@/lib/route_helpers/wrappers';
 import { z } from 'zod';

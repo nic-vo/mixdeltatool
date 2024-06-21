@@ -5,7 +5,7 @@ import {
 } from '@/lib/database/mongoose/models';
 import { badResponse } from '@/lib/route_helpers/responses';
 
-export async function setNewGlobalStatus({
+export default async function setNewGlobalStatus({
 	status,
 	statusType,
 }: {
