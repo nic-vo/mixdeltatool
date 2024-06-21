@@ -1,8 +1,9 @@
 import { sessionDeleter, userDeleter } from '@/lib/auth/accountDeletion';
-import badResponse, { BasicSuccessResponse } from '@/lib/returners';
+import badResponse from '@/lib/returners';
 import { handlerWithTimeoutAndAuth } from '@/lib/misc/helpers';
 
 import { NextAuthRequest } from 'next-auth/lib';
+import { myRace } from '../spotify/create/_lib/common';
 
 const RATE_LIMIT_PREFIX = 'DUA';
 const RATE_LIMIT_ROLLING_LIMIT = 10;
@@ -29,15 +30,13 @@ export const DELETE = handlerWithTimeoutAndAuth(
 		if (!req.auth || !req.auth.user || !req.auth.user.id)
 			return badResponse(401);
 
-		try {
-			await userDeleter(req.auth.user.id);
-		} catch {
-			// Catch network failure
-			return badResponse(502, {
-				message: 'There was an error processing your information',
-			});
-		}
-		sessionDeleter(req.auth.user.id); // TODO: Possibly race this
-		return BasicSuccessResponse('Your account has been deleted');
+		const earlyReturn = await myRace(userDeleter(req.auth.user.id), 30 * 1000);
+		if (!earlyReturn.ok) return earlyReturn;
+
+		await myRace(sessionDeleter(req.auth.user.id), 30 * 1000); // A little unsafe because 30s not guaranteed
+		return Response.json(
+			{ message: 'Your account has been deleted' },
+			{ status: 201 }
+		);
 	}
 );
