@@ -30,9 +30,3 @@ const badResponse = (
 };
 
 export default badResponse;
-
-export const BasicSuccessResponse = (message?: string) =>
-	Response.json({ message: message ?? 'Success' }, { status: 200 });
-
-export const CreatedResponse = (message?: string) =>
-	Response.json({ message: message ?? 'Created' }, { status: 201 });
