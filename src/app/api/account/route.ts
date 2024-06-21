@@ -1,6 +1,6 @@
 import { sessionDeleter, userDeleter } from './_lib';
-import { badResponse } from '@/lib/misc/responses';
-import { handlerWithTimeoutAndAuth } from '@/lib/misc/wrappers';
+import { badResponse } from '@/lib/route_helpers/responses';
+import { handlerWithTimeoutAndAuth } from '@/lib/route_helpers/wrappers';
 
 import { NextAuthRequest } from 'next-auth/lib';
 import { myRace } from '../spotify/create/_lib/common';

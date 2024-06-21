@@ -4,8 +4,8 @@ import {
 	hCaptchaPromise,
 	contactBodyParser,
 } from './_lib';
-import { handlerWithTimeout } from '@/lib/misc/wrappers';
-import { badResponse } from '@/lib/misc/responses';
+import { handlerWithTimeout } from '@/lib/route_helpers/wrappers';
+import { badResponse } from '@/lib/route_helpers/responses';
 
 import { NextRequest } from 'next/server';
 

@@ -1,14 +1,14 @@
 import { routeKeyRetriever } from '@/auth/accessKey';
 import { diffBodyParser } from '@/lib/validators';
 import { sanitize } from 'isomorphic-dompurify';
-import { handlerWithTimeoutAndAuth } from '@/lib/misc/wrappers';
+import { handlerWithTimeoutAndAuth } from '@/lib/route_helpers/wrappers';
 import {
 	getPlaylistTracks,
 	createEmptyPlaylist,
 	populatePlaylistWithComparison,
 } from './_lib/requests';
 import { concurrentThrowNotReturn, myRace } from './_lib/common';
-import { badResponse } from '@/lib/misc/responses';
+import { badResponse } from '@/lib/route_helpers/responses';
 
 import { SERVER_DIFF_TYPES, SPOT_LOGIN_WINDOW } from '@/consts/spotify';
 

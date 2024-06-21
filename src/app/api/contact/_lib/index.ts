@@ -1,6 +1,6 @@
 import mongoosePromise from '@/lib/database/mongoose';
 import { ContactMessage } from '@/lib/database/mongoose/models';
-import { threeRetries } from '@/lib/misc/wrappers';
+import { threeRetries } from '@/lib/route_helpers/wrappers';
 import { z } from 'zod';
 
 export const contactBodyParser = z

@@ -1,4 +1,4 @@
-import { badResponse } from '@/lib/misc/responses';
+import { badResponse } from '@/lib/route_helpers/responses';
 
 export const myRace = async (racer: Promise<Response>, timeoutMS: number) =>
 	await Promise.race([

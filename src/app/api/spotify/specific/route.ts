@@ -4,7 +4,10 @@ import {
 	spotAlbumObjectParser,
 	spotPlaylistObjectParser,
 } from '@/lib/validators';
-import { handlerWithTimeoutAndAuth, threeRetries } from '@/lib/misc/wrappers';
+import {
+	handlerWithTimeoutAndAuth,
+	threeRetries,
+} from '@/lib/route_helpers/wrappers';
 import { SPOT_LOGIN_WINDOW, SPOT_URL_BASE } from '@/consts/spotify';
 
 import { NextAuthRequest } from 'next-auth/lib';
@@ -13,7 +16,7 @@ import {
 	SpotAlbumObject,
 	SpotPlaylistObject,
 } from '@/components/spotify/types';
-import { badResponse } from '@/lib/misc/responses';
+import { badResponse } from '@/lib/route_helpers/responses';
 
 const RATE_LIMIT_PREFIX = 'GSP';
 const RATE_LIMIT_ROLLING_LIMIT = 10;
