@@ -1,5 +1,5 @@
 import { setNewGlobalStatus } from '@/lib/database/mongoose';
-import { OPTIONS } from '../../_lib';
+import { OPTIONS } from '@/lib/route_helpers';
 import { handlerWithTimeout } from '@/lib/misc/helpers';
 import badResponse from '@/lib/route_helpers';
 import { z } from 'zod';
