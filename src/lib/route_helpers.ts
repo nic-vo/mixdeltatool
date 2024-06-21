@@ -27,7 +27,7 @@ export const OPTIONS = (req: NextRequest) => {
 	});
 };
 
-const defaultErrorMessages = {
+export const defaultErrorMessages = {
 	401: 'Please sign in again',
 	400: 'Check your information',
 	403: `You're not allowed to do that`,
