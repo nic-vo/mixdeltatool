@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { routeKeyRetriever } from '@/auth/accessKey';
-import { handlerWithTimeoutAndAuth, threeRetries } from '@/lib/misc/helpers';
+import { handlerWithTimeoutAndAuth, threeRetries } from '@/lib/misc/wrappers';
 import {
 	SPOT_LOGIN_WINDOW,
 	SPOT_PLAYLIST_PAGE_LIMIT,

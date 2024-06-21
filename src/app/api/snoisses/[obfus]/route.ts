@@ -1,5 +1,5 @@
 import mongoosePromise, { Session } from '@/lib/database/mongoose';
-import { handlerWithTimeoutAndAuth } from '@/lib/misc/helpers';
+import { handlerWithTimeoutAndAuth } from '@/lib/misc/wrappers';
 import badResponse from '@/lib/route_helpers';
 import { OPTIONS } from '@/lib/route_helpers';
 

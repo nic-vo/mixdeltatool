@@ -4,7 +4,7 @@ import {
 	SpotPlaylistTracksResponse,
 } from '@/components/spotify/types';
 import { SPOT_URL_BASE } from '@/consts/spotify';
-import { threeRetries } from '@/lib/misc/helpers';
+import { threeRetries } from '@/lib/misc/wrappers';
 import badResponse from '@/lib/route_helpers';
 import {
 	spotPlaylistObjectParser,

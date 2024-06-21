@@ -1,6 +1,6 @@
 import { setNewGlobalStatus } from '@/lib/database/mongoose';
 import { OPTIONS } from '@/lib/route_helpers';
-import { handlerWithTimeout } from '@/lib/misc/helpers';
+import { handlerWithTimeout } from '@/lib/misc/wrappers';
 import badResponse from '@/lib/route_helpers';
 import { z } from 'zod';
 import { revalidateTag } from 'next/cache';
