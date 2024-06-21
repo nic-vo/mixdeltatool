@@ -1,10 +1,9 @@
 import { setNewGlobalStatus } from '@/lib/database/mongoose';
-import checkAndUpdateEntry from '@/lib/database/redis/ratelimiting';
 import { OPTIONS } from '../../_lib';
 import { handlerWithTimeout } from '@/lib/misc/helpers';
-import badResponse, { CreatedResponse } from '@/lib/returners';
+import badResponse from '@/lib/returners';
 import { z } from 'zod';
-import { revalidatePath, revalidateTag } from 'next/cache';
+import { revalidateTag } from 'next/cache';
 
 import { NextRequest } from 'next/server';
 import { AppRouteHandlerFnContext } from 'next-auth/lib/types';
@@ -54,6 +53,6 @@ export const POST = handlerWithTimeout(
 
 		revalidateTag('internalGlobalStatus');
 
-		return CreatedResponse('Status updated');
+		return Response.json({ message: 'Status updated' }, { status: 201 });
 	}
 );
