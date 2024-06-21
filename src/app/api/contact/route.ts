@@ -5,7 +5,7 @@ import {
 	contactBodyParser,
 } from './_lib';
 import { handlerWithTimeout } from '@/lib/misc/helpers';
-import badResponse, { CreatedResponse } from '@/lib/returners';
+import badResponse from '@/lib/returners';
 
 import { NextRequest } from 'next/server';
 
@@ -51,6 +51,9 @@ export const POST = handlerWithTimeout(
 			});
 		}
 
-		return CreatedResponse('Your message has been received.');
+		return Response.json(
+			{ message: 'Your message has been received.' },
+			{ status: 201 }
+		);
 	}
 );
