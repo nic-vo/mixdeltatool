@@ -1,18 +1,19 @@
-import {
-	MyPlaylistObject,
-	SpotAlbumTracksResponse,
-	SpotPlaylistTracksResponse,
-} from '@/components/spotify/types';
 import { SPOT_URL_BASE } from '@/consts/spotify';
 import { threeRetries } from '@/lib/misc/wrappers';
 import { badResponse } from '@/lib/route_helpers';
 import {
 	spotPlaylistObjectParser,
 	spotUserObjectParser,
-} from '@/lib/spotify/validators';
+} from '@/lib/validators';
 import { randomBytes } from 'crypto';
 import fs from 'fs/promises';
 import path from 'path';
+
+import {
+	MyPlaylistObject,
+	SpotAlbumTracksResponse,
+	SpotPlaylistTracksResponse,
+} from '@/components/spotify/types';
 
 function genUId(length: number) {
 	const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';

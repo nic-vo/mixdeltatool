@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { routeKeyRetriever } from '@/auth/accessKey';
 import { handlerWithTimeoutAndAuth, threeRetries } from '@/lib/misc/wrappers';
-import { userPlaylistResponseParser } from '@/lib/spotify/validators';
+import { userPlaylistResponseParser } from '@/lib/validators';
 import { badResponse } from '@/lib/route_helpers';
 import {
 	SPOT_LOGIN_WINDOW,

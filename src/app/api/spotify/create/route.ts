@@ -1,5 +1,5 @@
 import { routeKeyRetriever } from '@/auth/accessKey';
-import { diffBodyParser } from '@/lib/spotify/validators';
+import { diffBodyParser } from '@/lib/validators';
 import { sanitize } from 'isomorphic-dompurify';
 import { handlerWithTimeoutAndAuth } from '@/lib/misc/wrappers';
 import {

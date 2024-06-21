@@ -3,7 +3,7 @@ import {
 	specificQueryParser,
 	spotAlbumObjectParser,
 	spotPlaylistObjectParser,
-} from '@/lib/spotify/validators';
+} from '@/lib/validators';
 import { handlerWithTimeoutAndAuth, threeRetries } from '@/lib/misc/wrappers';
 import { SPOT_LOGIN_WINDOW, SPOT_URL_BASE } from '@/consts/spotify';
 

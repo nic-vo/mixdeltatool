@@ -1,4 +1,4 @@
-import { myPlaylistObjectParser } from '@/lib/spotify/validators';
+import { myPlaylistObjectParser } from '@/lib/validators';
 import { sanitize } from 'isomorphic-dompurify';
 
 import { MyPlaylistObject } from '@/components/spotify/types';
