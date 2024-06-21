@@ -6,12 +6,6 @@ import { NextAuthRequest } from 'next-auth/lib';
 import { auth } from '@/auth';
 import checkAndUpdateEntry from '../database/redis/ratelimiting';
 
-export function printTime(message: string, start: number) {
-	const now = Date.now();
-	console.log(message, now - start, 'ms');
-	return now;
-}
-
 export function genUId(length: number) {
 	const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
 	const buffer = randomBytes(length * 2);
