@@ -1,6 +1,6 @@
 import { SPOT_URL_BASE } from '@/consts/spotify';
 import { threeRetries } from '@/lib/misc/wrappers';
-import { badResponse } from '@/lib/route_helpers';
+import { badResponse } from '@/lib/misc/responses';
 import {
 	spotPlaylistObjectParser,
 	spotUserObjectParser,

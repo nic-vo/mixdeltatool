@@ -1,5 +1,5 @@
 import { sessionDeleter, userDeleter } from './_lib';
-import { badResponse } from '@/lib/route_helpers';
+import { badResponse } from '@/lib/misc/responses';
 import { handlerWithTimeoutAndAuth } from '@/lib/misc/wrappers';
 
 import { NextAuthRequest } from 'next-auth/lib';

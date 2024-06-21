@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { routeKeyRetriever } from '@/auth/accessKey';
 import { handlerWithTimeoutAndAuth, threeRetries } from '@/lib/misc/wrappers';
 import { userPlaylistResponseParser } from '@/lib/validators';
-import { badResponse } from '@/lib/route_helpers';
+import { badResponse } from '@/lib/misc/responses';
 import {
 	SPOT_LOGIN_WINDOW,
 	SPOT_PLAYLIST_PAGE_LIMIT,

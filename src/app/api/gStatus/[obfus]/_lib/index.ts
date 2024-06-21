@@ -3,7 +3,7 @@ import {
 	GlobalStatus,
 	GlobalStatusPointer,
 } from '@/lib/database/mongoose/models';
-import { badResponse } from '@/lib/route_helpers';
+import { badResponse } from '@/lib/misc/responses';
 
 export async function setNewGlobalStatus({
 	status,

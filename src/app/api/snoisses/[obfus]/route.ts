@@ -1,7 +1,7 @@
 import mongoosePromise, { Session } from '@/lib/database/mongoose';
 import { handlerWithTimeoutAndAuth } from '@/lib/misc/wrappers';
-import { badResponse } from '@/lib/route_helpers';
-import { OPTIONS } from '@/lib/route_helpers';
+import { badResponse } from '@/lib/misc/responses';
+import { OPTIONS } from '@/lib/misc/responses';
 
 import { NextAuthRequest } from 'next-auth/lib';
 import { AppRouteHandlerFnContext } from 'next-auth/lib/types';
