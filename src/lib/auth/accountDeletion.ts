@@ -3,10 +3,14 @@ import mongoosePromise, {
 	Session,
 	User,
 } from '@/lib/database/mongoose';
+import badResponse from '../returners';
 
 export const userDeleter = async (id: string) => {
 	const db = await mongoosePromise();
-	if (!db) throw new Error();
+	if (!db)
+		return badResponse(500, {
+			message: 'There was an error with our servers. Try again',
+		});
 	const session = await db.startSession();
 	let onceFlag = true;
 	while (onceFlag) {
@@ -17,21 +21,49 @@ export const userDeleter = async (id: string) => {
 				.equals('spotify')
 				.exec();
 			await User.findByIdAndDelete(id).exec();
-			session.commitTransaction();
+			await session.commitTransaction();
 		} catch {
-			session.abortTransaction();
+			await session.abortTransaction();
 			if (onceFlag) {
 				onceFlag = false;
 				continue;
 			}
-			throw new Error();
+			return badResponse(500, {
+				message: 'There was an error with our servers. Try again.',
+			});
 		}
 	}
 	session.endSession();
-	return;
+	return Response.json({ message: 'Deleted' }, { status: 201 });
 };
 
 export const sessionDeleter = async (id: string) => {
-	await mongoosePromise();
-	Session.deleteMany({ userId: id }).where('provider').equals('spotify').exec();
+	try {
+		await mongoosePromise();
+		let onceFlag = true;
+		while (true) {
+			try {
+				await Session.deleteMany({ userId: id })
+					.where('provider')
+					.equals('spotify')
+					.exec();
+				break;
+			} catch {
+				if (onceFlag) {
+					onceFlag = false;
+					continue;
+				}
+				throw new Error();
+			}
+		}
+	} catch {
+		return badResponse(500, {
+			message: 'There was an error with our servers. Try again',
+		});
+	}
+
+	return Response.json(
+		{ messsage: 'Deleted existing sessions' },
+		{ status: 201 }
+	);
 };
