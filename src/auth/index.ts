@@ -4,7 +4,8 @@ import { MongoDBAdapter } from '@auth/mongodb-adapter';
 import clientPromise from './mongocfg';
 import { signInUpdater } from './accessKey';
 import { SPOT_LOGIN_WINDOW } from '@/consts/spotify';
-import mongoosePromise, { Account } from '@/lib/database/mongoose';
+import mongoosePromise from '@/lib/database/mongoose/connection';
+import { Account } from '@/lib/database/mongoose/models';
 
 if (!process.env.SPOTIFY_SECRET || !process.env.SPOTIFY_ID)
 	throw new Error('Missing Spotify creds');
