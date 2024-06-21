@@ -3,7 +3,7 @@ import {
 	IoAlertCircleSharp,
 	IoCheckmarkCircle,
 } from 'react-icons/io5';
-import { getGlobalStatusProps } from '@/lib/database/mongoose';
+import getGlobalStatusProps from './_lib';
 
 const AlertSVG = ({
 	statusType,
