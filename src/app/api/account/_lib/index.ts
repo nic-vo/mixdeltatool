@@ -1,8 +1,5 @@
-import mongoosePromise, {
-	Account,
-	Session,
-	User,
-} from '@/lib/database/mongoose';
+import mongoosePromise from '@/lib/database/mongoose/connection';
+import { Account, Session, User } from '@/lib/database/mongoose/models';
 import { badResponse } from '@/lib/route_helpers/responses';
 
 export const userDeleter = async (id: string) => {

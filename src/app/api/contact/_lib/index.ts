@@ -1,4 +1,4 @@
-import mongoosePromise from '@/lib/database/mongoose';
+import mongoosePromise from '@/lib/database/mongoose/connection';
 import { ContactMessage } from '@/lib/database/mongoose/models';
 import { threeRetries } from '@/lib/route_helpers/wrappers';
 import { z } from 'zod';
