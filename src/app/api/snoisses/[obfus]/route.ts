@@ -50,7 +50,7 @@ export const DELETE = handlerWithTimeoutAndAuth(
 		}
 		return Response.json(
 			{ message: `Sessions before ${now.toLocaleString()} were deleted` },
-			{ status: 201 }
+			{ status: 200 }
 		);
 	}
 );

@@ -53,7 +53,7 @@ export const POST = handlerWithTimeout(
 
 		return Response.json(
 			{ message: 'Your message has been received.' },
-			{ status: 201 }
+			{ status: 200 }
 		);
 	}
 );

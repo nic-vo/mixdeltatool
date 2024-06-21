@@ -36,7 +36,7 @@ export const DELETE = handlerWithTimeoutAndAuth(
 		await myRace(sessionDeleter(req.auth.user.id), 30 * 1000); // A little unsafe because 30s not guaranteed
 		return Response.json(
 			{ message: 'Your account has been deleted' },
-			{ status: 201 }
+			{ status: 200 }
 		);
 	}
 );

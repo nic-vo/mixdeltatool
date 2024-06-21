@@ -22,7 +22,7 @@ export const maxDuration = 20;
 
 export { OPTIONS };
 
-export const POST = handlerWithTimeout(
+export const PUT = handlerWithTimeout(
 	{
 		maxDuration,
 		rateLimit: {
