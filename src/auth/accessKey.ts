@@ -1,4 +1,5 @@
-import mongoosePromise, { Account } from '@/lib/database/mongoose';
+import mongoosePromise from '@/lib/database/mongoose/connection';
+import { Account } from '@/lib/database/mongoose/models';
 import type { Account as AccountType } from 'next-auth';
 
 export const signInUpdater = async (account: AccountType) => {
