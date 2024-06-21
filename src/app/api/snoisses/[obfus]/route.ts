@@ -1,7 +1,6 @@
 import mongoosePromise, { Session } from '@/lib/database/mongoose';
-import checkAndUpdateEntry from '@/lib/database/redis/ratelimiting';
 import { handlerWithTimeoutAndAuth } from '@/lib/misc/helpers';
-import badResponse, { CreatedResponse } from '@/lib/returners';
+import badResponse from '@/lib/returners';
 import { OPTIONS } from '../../_lib';
 
 import { NextAuthRequest } from 'next-auth/lib';
@@ -15,7 +14,7 @@ export const maxDuration = 30;
 
 export { OPTIONS };
 
-export const POST = handlerWithTimeoutAndAuth(
+export const DELETE = handlerWithTimeoutAndAuth(
 	{
 		maxDuration,
 		rateLimit: {
@@ -34,10 +33,10 @@ export const POST = handlerWithTimeoutAndAuth(
 
 		if (!req.auth) return badResponse(401);
 
+		const now = new Date(Date.now() - 1000 * 60 * 60);
 		try {
 			await mongoosePromise();
-			const now = new Date(Date.now() - 1000 * 60 * 60);
-			Session.deleteMany({
+			await Session.deleteMany({
 				expires: { $lt: now },
 			}).exec();
 			// const deleted = await Session.deleteMany({
@@ -49,6 +48,9 @@ export const POST = handlerWithTimeoutAndAuth(
 				message: 'There was an error with our servers',
 			});
 		}
-		return CreatedResponse('Initialized');
+		return Response.json(
+			{ message: `Sessions before ${now.toLocaleString()} were deleted` },
+			{ status: 201 }
+		);
 	}
 );
