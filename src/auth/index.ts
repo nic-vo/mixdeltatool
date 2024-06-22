@@ -31,7 +31,10 @@ const config = {
 	authorization: SPOT_URL,
 };
 
+export const basePath = '/api/auth';
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
+	basePath,
 	providers: [Spotify(config)],
 	adapter: MongoDBAdapter(clientPromise, {
 		databaseName: process.env.MONGODB_DB_NAME,
