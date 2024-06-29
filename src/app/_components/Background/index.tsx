@@ -3,6 +3,7 @@
 import { useCallback, useContext } from 'react';
 import Canvas from './Canvas';
 import MotionContext from './MotionContext';
+import { GlobalButton } from '@/components/global/serverComponentUI';
 
 type FieldsInitValues = {
 	size: number;
@@ -50,14 +51,14 @@ const Background = (props: { fps?: number }) => {
 			const { height, width } = args;
 			// EVERYTHING is percents
 			let empty: FieldsInitValues[] = [];
-			for (let i = 0; i < 24; i++) {
+			for (let i = 0; i < 20; i++) {
 				const size = Math.floor((0.04 + Math.random() * 0.04) * width);
-				const rawX =
+				const rawX = // X starting position
 					Math.random() >= 0.5
-						? width - Math.random() * 1.4 * size
-						: Math.random() * 1.4 * size - size;
-				const predrawY = Math.floor(Math.random() * (height + size));
-				const totalY = height + size;
+						? width - Math.random() * size
+						: Math.random() * size - size;
+				const predrawY = Math.floor(Math.random() * (height + size)); // Y pre-scroll down the page
+				const totalY = height + size; // Total distance a shape will travel for the loop, starting offscreen
 				const hue =
 					Math.random() < 0.5
 						? 165 + Math.random() * 30
@@ -92,9 +93,15 @@ const Background = (props: { fps?: number }) => {
 			predraw={predraw}
 			initializer={drawInit}
 			draw={draw}
-			animated={animated !== undefined ? animated : false}
+			animated={animated}
 		/>
 	);
 };
 
 export default Background;
+
+export const BackgroundToggler = () => {
+	const { setAnimated } = useContext(MotionContext);
+
+	return <GlobalButton></GlobalButton>;
+};
