@@ -64,7 +64,7 @@ export const persistPlaylists = (
 	sessionStorage.setItem(key, JSON.stringify(playlists));
 };
 
-export const persistPage = (page: number | null, key: string) => {
+export const persistPage = (key: string, page: number | null) => {
 	sessionStorage.setItem(key, page === null ? 'null' : page.toString());
 };
 
