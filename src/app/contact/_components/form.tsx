@@ -1,13 +1,66 @@
 'use client';
 
-import { useState } from 'react';
+import { PropsWithChildren, useEffect, useState } from 'react';
 import { sanitize } from 'isomorphic-dompurify';
-import Script from 'next/script';
-import { GlobalButton } from '@/components/global';
+import { GlobalButton } from '@/components/global/serverComponentUI';
 
-export default function ContactForm() {
-	const [fullDisabled, setFullDisabled] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+export const HCaptchaBlock = () => {
+	const [loaded, setLoaded] = useState(false);
+	const [error, setError] = useState(false);
+	useEffect(() => {
+		if (!process.env.NEXT_PUBLIC_HCAPTCHA_SITEKEY) {
+			setError(true);
+			return;
+		}
+		const timeout = setTimeout(() => {
+			if (window.hcaptcha) return;
+			clearInterval(interval);
+			setError(true);
+		}, 5000);
+		const interval = setInterval(() => {
+			if (!window.hcaptcha) {
+				return;
+			}
+			clearInterval(interval);
+			clearTimeout(timeout);
+			setLoaded(true);
+			return;
+		}, 250);
+		return () => {
+			clearTimeout(timeout);
+			clearInterval(interval);
+		};
+	}, []);
+
+	useEffect(() => {
+		if (!process.env.NEXT_PUBLIC_HCAPTCHA_SITEKEY) {
+			setError(true);
+			return;
+		}
+		if (!loaded) return;
+		window.hcaptcha.render('h-captcha', {
+			sitekey: process.env.NEXT_PUBLIC_HCAPTCHA_SITEKEY,
+		});
+		return;
+	}, [loaded]);
+
+	if (error) return <p>There was an error loading hCaptcha. Please refresh.</p>;
+	if (!loaded) return <p>Loading...</p>;
+	return (
+		<>
+			<div
+				className='h-captcha'
+				data-sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITEKEY}
+				id='h-captcha'
+				data-theme='dark'
+			/>
+			<GlobalButton type='submit'>Submit</GlobalButton>
+		</>
+	);
+};
+
+export default function ContactForm(props: PropsWithChildren) {
+	const [error, setError] = useState<true | string | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState<boolean | null>(null);
 
@@ -31,64 +84,57 @@ export default function ContactForm() {
 				throw { status: raw.status, message };
 			}
 			setSuccess(true);
-			setFullDisabled(true);
 		} catch (e: any) {
 			if (e.status === 403) {
-				setFullDisabled(true);
-			} else window.hcaptcha.reset && window.hcaptcha.reset();
-			setError((e.message as string) || 'Unknown error');
+				setError(true);
+			} else {
+				window.hcaptcha.reset();
+				setError((e.message as string) || 'Unknown error');
+			}
 		}
 		setLoading(false);
 	};
 
 	return (
 		<form
-			className='flex flex-col items-center gap-8 p-4 w-full bg-stone-900 bg-opacity-40 justify-self-center self-center max-w-screen-sm rounded-2xl overflow-y-auto'
+			className='flex flex-col items-center gap-8 p-4 w-full m-auto max-w-prose overflow-y-auto'
 			onSubmit={submitHandler}>
-			<label
-				htmlFor='name'
-				className='flex gap-2 text-2xl w-full font-bold'>
-				Your name:
-				<input
-					id='name'
-					name='name'
-					type='text'
-					required={true}
-					pattern="^(\w|d\|-|'| ){3,30}$"
-					autoComplete='off'
-					minLength={3}
-					maxLength={30}
-					className='resize-none text-black p-2 cursor-text'
-				/>
-			</label>
-			<label
-				htmlFor='message'
-				className='flex gap-2 text-2xl w-full font-bold'>
-				Message:
-				<textarea
-					id='message'
-					name='message'
-					minLength={3}
-					maxLength={280}
-					required={true}
-					className='resize-none text-black p-2 cursor-text h-32'
-				/>
-			</label>
-			{!fullDisabled && success !== true && (
-				<>
-					<div
-						className='h-captcha'
-						data-sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITEKEY}
-						data-theme='dark'
+			<fieldset
+				disabled={loading || success === true || error === true}
+				className='flex flex-col items-center gap-8 p-4 w-full'>
+				<label
+					htmlFor='name'
+					className='flex flex-col sm:grid grid-cols-4 gap-4 w-full items-center'>
+					<span className='block text-2xl font-bold text-right'>
+						Your name:
+					</span>
+					<input
+						id='name'
+						name='name'
+						type='text'
+						required={true}
+						pattern="^(\w|d\|-|'| ){3,30}$"
+						autoComplete='off'
+						minLength={3}
+						maxLength={30}
+						className='w-full font-normal col-span-3 resize-none text-white p-2 cursor-text bg-transparent border-b focus-visible:bg-white focus-visible:text-black transition-colors outline-none border-white'
 					/>
-					<GlobalButton
-						disabled={loading}
-						type='submit'>
-						Submit
-					</GlobalButton>
-				</>
-			)}
-			<Script src='https://js.hcaptcha.com/1/api.js' />
+				</label>
+				<label
+					htmlFor='message'
+					className='flex flex-col sm:grid grid-cols-4 gap-4 w-full items-center'>
+					<span className='block text-2xl font-bold text-right'>Message:</span>
+					<textarea
+						id='message'
+						name='message'
+						minLength={3}
+						maxLength={280}
+						required={true}
+						className='w-full font-normal col-span-3 resize-none text-white p-2 cursor-text h-32 rounded-xl bg-transparent outline-none border transition-all focus-visible:bg-white focus-visible:text-black border-white'
+					/>
+				</label>
+				{props.children}
+			</fieldset>
 			{success === true && <p role='status'>Thank you!</p>}
 			{error && <p role='status'>{error}</p>}
 		</form>
