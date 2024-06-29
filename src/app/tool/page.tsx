@@ -1,26 +1,43 @@
-import { auth } from '@/auth';
-import { GlobalButton } from '@/components/global';
-import { signIn } from 'next-auth/react';
+import { auth, saSignOut } from '@/auth';
+import {
+	GlobalButton,
+	GlobalMain,
+	GlobalBlockLink,
+} from '@/components/global/serverComponentUI';
+import { ToolHeading } from './_components/server';
+import {
+	flippedSlider,
+	hitsSpotify,
+	localNavigation,
+} from '@/consts/buttonStates';
+import { redirect } from 'next/navigation';
 
 const ToolRoot = async () => {
 	const session = await auth();
-
-	if (!session)
-		return (
-			<form
-				action={async () => {
-					'use server';
-					await signIn();
-				}}>
-				<GlobalButton type='submit'>Sign in</GlobalButton>
-			</form>
-		);
+	if (!session) redirect(`/api/auth/signin`);
 
 	return (
-		<main className='relative flex flex-col items-center gap-4 w-full h-svh m-auto'>
-			<h1>Signed in</h1>
-			<p>{session.user?.email ?? 'Signed in but sparse info'}</p>
-		</main>
+		<GlobalMain className='m-auto'>
+			<ToolHeading>
+				Welcome,{' '}
+				{(session.user &&
+					(session.user?.name ?? session.user?.email?.split('@')[0])) ??
+					'Stranger'}
+				!
+			</ToolHeading>
+			<form action={saSignOut}>
+				<GlobalButton
+					type='submit'
+					className={hitsSpotify}>
+					Sign out
+				</GlobalButton>
+			</form>
+			<GlobalBlockLink
+				href='/'
+				className={localNavigation + ' ' + flippedSlider}>
+				&larr; Return Home
+			</GlobalBlockLink>
+		</GlobalMain>
 	);
 };
 
