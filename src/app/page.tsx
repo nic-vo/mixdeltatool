@@ -1,35 +1,43 @@
-import { ServiceStatus } from '@/components/misc';
-import Link from 'next/link';
+import {
+	GlobalBlockLink,
+	GlobalMain,
+} from '@/components/global/serverComponentUI';
+import { localNavigation } from '@/consts/buttonStates';
 
 export default async function Home() {
 	return (
-		<main className='relative min-h-screen z-10 flex flex-col items-center *:max-w-prose *:w-10/12 gap-8'>
-			<hgroup className='gap-0 mt-32'>
-				<h1 className='font-cabin text-8xl sm:text-9xl font-black'>MixDelta</h1>
-				<p className='font-karla text-2xl sm:text-4xl font-extralight'>
+		<GlobalMain className='lg:m-auto lg:grid gap-8 grid-cols-2'>
+			<hgroup className='mt-32 lg:mt-0 w-full lg:text-right'>
+				<h1 className='font-cabin text-8xl sm:text-9xl lg:text-8xl xl:text-9xl font-black'>
+					MixDelta
+				</h1>
+				<p className='font-karla text-2xl sm:text-4xl lg:text-2xl xl:text-4xl font-extralight'>
 					a playlist tool for Spotify
 				</p>
 			</hgroup>
-			<Link
-				href='/spotify'
-				className='flex gap-2 items-center'>
-				<span>To the tool! &rarr;</span>
-			</Link>
-			<ServiceStatus />
-			<h2>About this tool</h2>
-			<p>
-				Designed for playlist aficionados who curate an extensive library,
-				MixDelta empowers you to efficiently compare and manage your playlists
-				like never before. Say goodbye to the hassle of manually syncing changes
-				across multiple playlists – MixDelta does the heavy lifting for you.
-			</p>
-			<p>
-				With MixDelta, you can seamlessly compare two Spotify playlists,
-				identifying shared tracks and unique gems in each. Tailor your new
-				playlists based on your preferences – whether you want a compilation of
-				shared tracks, exclusive additions from each playlist, or any
-				combination in between. The power is in your hands.
-			</p>
-		</main>
+			<GlobalBlockLink
+				href='/tool'
+				className={
+					localNavigation + ' lg:justify-self-end self-start lg:col-start-1'
+				}>
+				To the tool! &rarr;
+			</GlobalBlockLink>
+			<section className='w-full *:max-w-prose col-span-1 lg:row-start-3  col-start-2 row-span-2 flex flex-col gap-4 self-end'>
+				<h2 className='font-bold text-5xl font-hind'>About this tool</h2>
+				<p>
+					It&apos;s simple: a user can use MixDelta to identify all similarities
+					and differences between any two playlists. After scanning, it can
+					quickly generate a new playlist based on what the user specifies, such
+					as retaining only unique tracks or including only those present in
+					both playlists.
+				</p>
+				<p>
+					MixDelta streamlines managing Spotify playlists by providing a
+					seamless way to compare tracklists.
+				</p>
+			</section>
+		</GlobalMain>
 	);
 }
+
+export const dynamic = 'force-static';
