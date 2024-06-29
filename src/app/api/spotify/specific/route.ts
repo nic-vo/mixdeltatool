@@ -40,7 +40,11 @@ export const GET = handlerWithTimeoutAndAuth(
 		// Validate query parameters
 		let id, type;
 		try {
-			let parsed = specificQueryParser.parse(await req.json());
+			const attempt = {
+				id: req.nextUrl.searchParams.get('id'),
+				type: req.nextUrl.searchParams.get('type'),
+			};
+			let parsed = specificQueryParser.parse(attempt);
 			id = parsed.id;
 			type = parsed.type;
 		} catch {
