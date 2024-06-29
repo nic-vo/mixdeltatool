@@ -9,9 +9,10 @@ module.exports = {
 				karla: 'var(--font-karla), serif, ui-serif, system-ui',
 			},
 			colors: {
-				black: '#121218',
 				white: '#ededed',
+				black: '#121218',
 				pinkred: '#d56062',
+				pinkredlight: '#eaaeaf',
 				satorange: '#f79824',
 				lightorange: '#ffc482',
 				whiteorange: '#fffbdb',
