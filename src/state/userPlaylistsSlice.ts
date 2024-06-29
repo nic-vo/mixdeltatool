@@ -32,22 +32,32 @@ const userPlaylistsSlice = createSlice({
 			// This should trigger differ middleware
 			state.playlists = [];
 			state.page = 0;
-			persistPlaylists(PLAYLISTS_KEY, state.playlists);
-			persistPage(0, PAGE_KEY);
+			persistPlaylists(PLAYLISTS_KEY, []);
+			persistPage(PAGE_KEY, 0);
 		},
 	},
 	extraReducers: (builder) => {
 		builder
 			.addCase(retrieveUserListsAsync.fulfilled, (state, action) => {
+				// Sanitize new playlist array an dedupe
+				const sanitizedAndDeduped = Array.from(
+					new Set([
+						...state.playlists,
+						...sanitizePlaylists([...action.payload.playlists]),
+					])
+				);
+				state.playlists = sanitizedAndDeduped;
+				persistPlaylists(PLAYLISTS_KEY, sanitizedAndDeduped);
+
 				state.page = action.payload.next;
-				const sanitized = sanitizePlaylists([...action.payload.playlists]);
-				const setted = Array.from(new Set([...state.playlists, ...sanitized]));
-				state.playlists = setted;
-				persistPlaylists(PLAYLISTS_KEY, setted);
-				persistPage(action.payload.next, PAGE_KEY);
+				persistPage(PAGE_KEY, action.payload.next);
 			})
 			.addCase(differOperationAsync.fulfilled, (state, action) => {
-				state.playlists = [action.payload.playlist].concat(state.playlists);
+				const sanitizedAndAdded = state.playlists.concat(
+					sanitizePlaylists([action.payload.playlist])[0]
+				);
+				state.playlists = sanitizedAndAdded;
+				persistPlaylists(PLAYLISTS_KEY, sanitizedAndAdded);
 			});
 	},
 });
