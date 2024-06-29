@@ -2,9 +2,13 @@
 
 import { FormEventHandler, useEffect, useState, useRef } from 'react';
 import EUAContent from './server';
-import { GlobalButton } from '@/components/global';
+import {
+	GlobalButton,
+	InlineLink,
+} from '@/components/global/serverComponentUI';
+import { hitsSpotify } from '@/consts/buttonStates';
 
-const LOCAL_EXPIRY_KEY = 'SUPERUSER_EUA';
+const LOCAL_EXPIRY_KEY = 'MIXDELTA_EUA';
 const LOCAL_EXPIRY_LENGTH = 1000 * 60 * 60 * 24 * 7;
 // const LOCAL_EXPIRY_LENGTH = 1000 * 5;
 
@@ -46,36 +50,49 @@ const SpotEUA = (props: { submitter?: () => void }) => {
 	return (
 		<dialog
 			ref={dialogRef}
-			className='bg-black w-11/12 h-[90dvh] max-w-screen-lg max-h-[1024px] m-auto overflow-hidden border-0 rounded-xl backdrop-blur-sm backdrop-brightness-50'>
-			<form
-				onSubmit={formSubmit}
-				className='flex flex-col gap-8 p-4 w-full h-full m-auto overflow-hidden'>
-				<h2 className='text-center'>MixDelta End User Agreement</h2>
-				<div className='flex flex-col gap p-4 md:p-8 overflow-y-auto bg-transparent backdrop-brightness-150 rounded-xl font-karla'>
-					<EUAContent lower />
-				</div>
+			className='w-11/12 h-[90dvh] max-w-prose max-h-[800px] m-auto overflow-hidden rounded-xl bg-white text-black backdrop:backdrop-brightness-[0.2] outline-offset-8 focus-visible:outline outline-white font-hind'>
+			<section className='flex flex-col items-center gap-4 p-4 py-8 h-full overflow-hidden '>
+				<h1 className='text-3xl sm:text-5xl text-center font-black'>
+					MixDelta End User Agreement
+				</h1>
+				<EUAContent
+					styling='gap-8 p-4 md:p-8 overflow-y-auto bg-slate-300 rounded-xl outline-black focus:outline'
+					light
+				/>
 				<p className='text-center'>
-					MixDelta&apos;s{' '}
-					<a
+					You must also read and agree to MixDelta&apos;s{' '}
+					<InlineLink
 						href='/privacypolicy'
-						className='font-bold underline'>
+						className='outline-black'>
 						privacy policy.
-					</a>
+					</InlineLink>
 				</p>
-				<label
-					htmlFor='check'
-					className='cursor-pointer flex gap-4 py-4'>
-					<input
-						type='checkbox'
-						name='check'
-						id='check'
-						required
-					/>
-					I have read, understood, and agreed to these terms and conditions as
-					well as the terms and conditions set forth by the privacy policy.
-				</label>
-				<GlobalButton type='submit'>Submit</GlobalButton>
-			</form>
+				<form
+					onSubmit={formSubmit}
+					className='flex flex-col items-center p-4 gap-4 h-full'>
+					<label
+						htmlFor='check'
+						className='cursor-pointer flex gap-4 max-w-prose items-center'>
+						<input
+							type='checkbox'
+							name='check'
+							id='check'
+							required
+							className='block outline-offset-4 h-max w-max outline-black focus-visible:outline'
+						/>
+						<span className='block'>
+							I have read, understood, and agreed to these terms and conditions
+							as well as the terms and conditions set forth by the privacy
+							policy.
+						</span>
+					</label>
+					<GlobalButton
+						type='submit'
+						className={hitsSpotify + ' border-green-400'}>
+						Submit
+					</GlobalButton>
+				</form>
+			</section>
 		</dialog>
 	);
 };
