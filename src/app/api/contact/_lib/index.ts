@@ -10,7 +10,6 @@ export const contactBodyParser = z
 			.string()
 			.min(3)
 			.max(280 * 5),
-		'g-recaptcha-response': z.string().min(1),
 		'h-captcha-response': z.string().min(1),
 	})
 	.strict();
