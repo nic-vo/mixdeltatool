@@ -3,12 +3,21 @@ This component accepts a string[] of class names
 for each segment of the logo for animation purposes
 */
 
-const LogoToAnimate = (props: {
-	main?: string[];
-	left?: string[];
-	middle?: string[];
-	right?: string[];
-}) => {
+import { SVGProps } from 'react';
+
+type loadingSVGParentType = Omit<
+	SVGProps<SVGSVGElement>,
+	'version' | 'xmlns' | 'xmlnsXlink' | 'x' | 'y' | 'viewBox' | 'xmlSpace'
+>;
+
+const LogoToAnimate = (
+	props: {
+		main?: string[];
+		left?: string[];
+		middle?: string[];
+		right?: string[];
+	} & loadingSVGParentType
+) => {
 	const { left, middle, right, main } = props;
 	const mainClasser = `min-h-8 min-w-8 ${
 		main && main.length > 0 ? main.join(' ') : ''
@@ -16,6 +25,14 @@ const LogoToAnimate = (props: {
 	const leftClasser = left && left.length > 0 ? left.join(' ') : '';
 	const middleClasser = middle && middle.length > 0 ? middle.join(' ') : '';
 	const rightClasser = right && right.length > 0 ? right.join(' ') : '';
+
+	const attrs = {
+		...props,
+		main: null,
+		left: null,
+		middle: null,
+		right: null,
+	};
 
 	return (
 		<svg
@@ -26,7 +43,8 @@ const LogoToAnimate = (props: {
 			y='0px'
 			viewBox='0 0 64 64'
 			xmlSpace='preserve'
-			className={mainClasser}>
+			className={mainClasser}
+			{...attrs}>
 			<polygon
 				className={leftClasser}
 				points='23.67,17.52 4.7,47.18 19.4,47.18 31.02,29.02'
