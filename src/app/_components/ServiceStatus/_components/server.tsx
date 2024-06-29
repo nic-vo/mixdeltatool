@@ -4,6 +4,11 @@ import {
 	GlobalStatus,
 	GlobalStatusPointer,
 } from '@/lib/database/mongoose/models';
+import {
+	IoAlertCircleSharp,
+	IoCheckmarkCircle,
+	IoWarningSharp,
+} from 'react-icons/io5';
 
 async function internalGetGlobalStatus(): Promise<{
 	status: string;
@@ -12,6 +17,7 @@ async function internalGetGlobalStatus(): Promise<{
 }> {
 	let status = 'There may be an issue with our servers; please stand by.';
 	let statusType: 'concern' | 'severe' | 'ok' = 'concern';
+	let active = Date.now();
 
 	try {
 		const db = await mongoosePromise();
@@ -43,6 +49,7 @@ async function internalGetGlobalStatus(): Promise<{
 				if (statusData !== null) {
 					status = statusData.status;
 					statusType = statusData.statusType;
+					active = statusData.active;
 					await session.abortTransaction();
 					break;
 				}
@@ -66,14 +73,14 @@ async function internalGetGlobalStatus(): Promise<{
 				throw new Error('ACID error');
 			}
 		}
-		return { status, statusType, active: Date.now() };
+		return { status, statusType, active };
 	} catch (e: any) {
 		console.log(e);
 		return {
 			statusType: 'severe',
 			status:
 				"Please be patient, there's an error with our servers. We'll be back ASAP.",
-			active: Date.now(),
+			active,
 		};
 	}
 }
@@ -84,4 +91,49 @@ const getGlobalStatusProps = unstable_cache(
 	{ tags: ['internalGlobalStatus'] }
 );
 
-export default getGlobalStatusProps;
+const AlertSVG = ({
+	statusType,
+}: {
+	statusType: 'ok' | 'severe' | 'concern';
+}) => {
+	if (statusType === 'severe')
+		return (
+			<IoWarningSharp
+				aria-hidden={true}
+				className='text-red-700 text-3xl stroke-black'
+			/>
+		);
+	if (statusType === 'ok')
+		return (
+			<IoCheckmarkCircle
+				aria-hidden={true}
+				className='text-green-400 text-3xl stroke-black'
+			/>
+		);
+	return (
+		<IoAlertCircleSharp
+			aria-hidden={true}
+			className='text-orange-400 text-3xl stroke-black'
+		/>
+	);
+};
+
+export default async function ServiceStatus() {
+	const { status, statusType, active } = await getGlobalStatusProps();
+	const timeDisplay = new Date(active);
+
+	return (
+		<div className='relative z-0 flex gap-4 items-center'>
+			<AlertSVG statusType={statusType} />
+			<p>
+				<time
+					dateTime={timeDisplay.toISOString()}
+					className='font-black'>
+					{timeDisplay.toLocaleDateString().replace(/\/\d{4}/, '')} @{' '}
+					{timeDisplay.toLocaleTimeString().replace(/:\d{2} /, ' ')}
+				</time>
+				: {status}
+			</p>
+		</div>
+	);
+}
