@@ -2,32 +2,35 @@ import { configureStore } from '@reduxjs/toolkit';
 
 // Slices and initial types
 // User
-import userPlaylistsReducer,
-{ InitialUserPlaylistsState } from './userPlaylistsSlice';
+import userPlaylistsReducer, {
+	InitialUserPlaylistsState,
+} from './userPlaylistsSlice';
 import userFetchStateReducer from './userFetchStateSlice';
 // Specific
-import specificPlaylistsReducer,
-{ InitialSpecificPlaylistsState } from './specificPlaylistsSlice';
+import specificPlaylistsReducer, {
+	InitialSpecificPlaylistsState,
+} from './specificPlaylistsSlice';
 import specificFetchStateReducer from './specificFetchStateSlice';
 // Differ
-import differFormSliceReducer,
-{ InitialDifferFormState } from './differFormSlice';
+import differFormSliceReducer, {
+	InitialDifferFormState,
+} from './differFormSlice';
 import differFetchStateSliceReducer from './differFetchStateSlice';
 
 import listenerMiddleware from './middleware';
 
 export type LoadingState = {
-	loading: boolean,
-	error: string | null
+	loading: boolean;
+	error: string | null;
 };
 
 export type RootState = {
-	userPlaylists: InitialUserPlaylistsState,
-	specificPlaylists: InitialSpecificPlaylistsState,
-	differForm: InitialDifferFormState,
-	userFetchState: LoadingState,
-	specificFetchState: LoadingState,
-	differFetchState: LoadingState
+	userPlaylists: InitialUserPlaylistsState;
+	specificPlaylists: InitialSpecificPlaylistsState;
+	differForm: InitialDifferFormState;
+	userFetchState: LoadingState;
+	specificFetchState: LoadingState;
+	differFetchState: LoadingState;
 };
 
 export const store = configureStore({
@@ -37,15 +40,16 @@ export const store = configureStore({
 		differForm: differFormSliceReducer,
 		specificFetchState: specificFetchStateReducer,
 		userFetchState: userFetchStateReducer,
-		differFetchState: differFetchStateSliceReducer
+		differFetchState: differFetchStateSliceReducer,
 	},
 	middleware: (getDefault) => {
 		return getDefault().concat(listenerMiddleware);
-	}
+	},
 });
 
 export const selectSpecificFetch = (s: RootState) => s.specificFetchState;
-export const selectSpecificPlaylists = (s: RootState) => s.specificPlaylists.playlists;
+export const selectSpecificPlaylists = (s: RootState) =>
+	s.specificPlaylists.playlists;
 
 export const selectUserPlaylists = (s: RootState) => s.userPlaylists.playlists;
 export const selectUserFetch = (s: RootState) => s.userFetchState;
