@@ -2,16 +2,14 @@
 
 import { createContext, useState } from 'react';
 
-const MotionContext = createContext({
-	animated: true,
-	toggleAnimated: () => {},
-});
+const init = { animated: true, setAnimated: (arg: boolean) => {} };
+
+const MotionContext = createContext(init);
 
 export const MotionContextProvider = (props: { children: React.ReactNode }) => {
 	const [animated, setAnimated] = useState(true);
-	const toggleAnimated = () => setAnimated(!animated);
 	return (
-		<MotionContext.Provider value={{ animated, toggleAnimated }}>
+		<MotionContext.Provider value={{ animated, setAnimated }}>
 			{props.children}
 		</MotionContext.Provider>
 	);
