@@ -75,15 +75,10 @@ const Canvas = (props: {
 				setError('There was an error with the canvas');
 				return;
 			}
-			const parent = canvas.parentElement;
-			const newWidth =
-				parent !== null
-					? parent.getBoundingClientRect().width
-					: window.innerWidth;
-			const newHeight =
-				parent !== null
-					? Math.max(parent.getBoundingClientRect().height, window.innerHeight)
-					: window.innerHeight;
+			const viewport = window.visualViewport;
+
+			const newWidth = (viewport && viewport.width) ?? window.innerWidth;
+			const newHeight = (viewport && viewport.height) ?? window.innerHeight;
 			setWidth(newWidth);
 			setHeight(newHeight);
 		};
@@ -120,7 +115,7 @@ const Canvas = (props: {
 	return (
 		<canvas
 			ref={canvasRef}
-			className='bg-black absolute top-0 left-0 z-0'
+			className='bg-black fixed top-0 left-0 z-0 w-full h-svh'
 			id='canvas'
 		/>
 	);
