@@ -14,7 +14,7 @@ const SPOT_BASE_URL = 'https://accounts.spotify.com';
 
 const SPOTIFY_SCOPES = [
 	'user-read-email',
-	'user-library-read',
+	// 'user-library-read',
 	'playlist-read-private',
 	'playlist-read-collaborative',
 	'playlist-modify-public',
@@ -33,7 +33,7 @@ const config = {
 
 export const basePath = '/api/auth';
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+const { handlers, signIn, signOut, auth } = NextAuth({
 	basePath,
 	providers: [Spotify(config)],
 	adapter: MongoDBAdapter(clientPromise, {
@@ -42,16 +42,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 	session: {
 		strategy: 'database',
 		maxAge: SPOT_LOGIN_WINDOW,
+		updateAge: SPOT_LOGIN_WINDOW + 2 * 60,
+		// specify updateAge greater than maxAge to update session and accessToken manually
 	},
 	callbacks: {
-		async signIn({
-			account,
-		}: {
-			account: AccountType | null;
-		}): Promise<boolean | string> {
-			if (!account) return '/';
+		async signIn(args): Promise<boolean | string> {
+			if (!args.account) return '/';
 			try {
-				await signInUpdater(account);
+				await signInUpdater(args.account);
 			} catch {
 				return '/';
 			}
@@ -94,8 +92,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 			} catch {
 				return session;
 			}
+			session.user = { ...user };
 			return session;
 		},
 	},
 	debug: process.env.NODE_ENV !== 'production',
 });
+
+async function saSignIn() {
+	'use server';
+	await signIn();
+}
+
+async function saSignOut() {
+	'use server';
+	await signOut();
+}
+
+export { handlers, auth, signIn, signOut, saSignIn, saSignOut };
