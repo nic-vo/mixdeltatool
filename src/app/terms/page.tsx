@@ -1,18 +1,15 @@
-import local from '@/styles/privacy.module.scss';
 import EUAContent, { SmallNav } from '../_components/EUA/server';
+import { GlobalMain } from '@/components/global/serverComponentUI';
 
-const Terms = () => {
-	return (
-		<>
-			<SmallNav />
-			<main className='flex flex-col gap-8 w-full max-w-prose mx-0 my-auto p-4'>
-				<h1 className='text-center text-5xl'>MixDelta End User Agreement</h1>
-				<EUAContent />
-			</main>
-			<SmallNav />
-		</>
-	);
-};
+const Terms = () => (
+	<GlobalMain className='*:max-w-prose mt-32'>
+		<h1 className='text-center font-cabin font-black text-5xl'>
+			MixDelta End User Agreement
+		</h1>
+		<EUAContent />
+		<SmallNav />
+	</GlobalMain>
+);
 
 export default Terms;
 
