@@ -2,23 +2,31 @@ import { cabin, karla, hind } from '@/styles/fonts';
 import Background from './_components/Background';
 import SpotEUA from './_components/EUA';
 import { MotionContextProvider } from './_components/Background/MotionContext';
+import Footer from './_components/Footer';
+import ServiceStatus from './_components/ServiceStatus';
 
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, Suspense } from 'react';
 
 import '@/styles/globals.css';
-import Footer from './_components/Footer';
 
 const RootLayout = (props: PropsWithChildren) => {
 	return (
 		<html lang='en'>
 			<body
-				className={`${cabin.variable} ${karla.variable} ${hind.variable} font-karla bg-black text-white flex flex-col items-center`}>
+				className={`${cabin.variable} ${karla.variable} ${hind.variable} font-karla bg-black text-white flex flex-col items-center min-h-screen justify-between`}>
+				<div
+					id='beacon'
+					tabIndex={-1}
+					aria-hidden></div>
+				<Suspense fallback={null}>
+					<SpotEUA />
+				</Suspense>
+				<ServiceStatus />
 				<MotionContextProvider>
 					{props.children}
-					<SpotEUA />
-					<Footer />
 					<Background />
 				</MotionContextProvider>
+				<Footer />
 			</body>
 		</html>
 	);
