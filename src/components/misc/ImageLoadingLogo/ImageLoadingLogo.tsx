@@ -1,4 +1,4 @@
-import DynamicLogo from '../LogoToAnimate/LogoToAnimate';
+import DynamicLogo from '../LogoToAnimate';
 
 import local from './ImageLoadingLogo.module.scss';
 
@@ -7,8 +7,9 @@ const ImageLoadingLogo = () => {
 		<DynamicLogo
 			left={[local.left]}
 			middle={[local.middle]}
-			right={[local.right]} />
+			right={[local.right]}
+		/>
 	);
-}
+};
 
 export default ImageLoadingLogo;
