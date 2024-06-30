@@ -1,14 +1,28 @@
 import { Schema, model } from 'mongoose';
 
 const userSchema = new Schema({
+	// Populated by Spotify() provider profile() call
 	_id: {
 		type: Schema.Types.ObjectId,
 		required: true,
 	},
-	name: String,
-	email: String,
-	image: String,
-	emailVerified: Date,
+	name: {
+		type: String,
+		required: true,
+	},
+	email: {
+		type: String,
+		required: true,
+	},
+	image: {
+		type: String,
+		required: true,
+	},
+	emailVerified: {
+		type: String,
+		required: true,
+		default: null,
+	},
 });
 export const User = model('user', userSchema, 'users', {
 	overwriteModels: true,
@@ -36,10 +50,12 @@ export const Session = model('session', sessionSchema, 'sessions', {
 const accountSchema = new Schema({
 	provider: {
 		type: String,
+		enum: ['spotify'],
 		required: true,
 	},
 	type: {
 		type: String,
+		enum: ['oauth'],
 		required: true,
 	},
 	providerAccountId: {
@@ -57,12 +73,15 @@ const accountSchema = new Schema({
 	expires_at: {
 		type: Number,
 		required: true,
-	},
+	}, // Equivalent to Math.floor(Date.now() / 1000) to get seconds
 	refresh_token: {
 		type: String,
 		required: true,
 	},
-	scope: String,
+	scope: {
+		type: String,
+		required: true,
+	},
 	userId: {
 		type: Schema.Types.ObjectId,
 		required: true,

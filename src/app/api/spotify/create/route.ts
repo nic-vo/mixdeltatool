@@ -17,7 +17,7 @@ import { NextAuthRequest } from 'next-auth/lib';
 import {
 	MyPlaylistObject,
 	differInternalPlaylistPromise,
-} from '@/components/spotify/types';
+} from '@/types/spotify';
 
 const RATE_LIMIT_PREFIX = 'CDP';
 const RATE_LIMIT_ROLLING_LIMIT = 5;

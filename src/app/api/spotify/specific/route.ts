@@ -15,7 +15,7 @@ import {
 	MyPlaylistObject,
 	SpotAlbumObject,
 	SpotPlaylistObject,
-} from '@/components/spotify/types';
+} from '@/types/spotify';
 import { badResponse } from '@/lib/route_helpers/responses';
 
 const RATE_LIMIT_PREFIX = 'GSP';

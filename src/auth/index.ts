@@ -46,18 +46,21 @@ const { handlers, signIn, signOut, auth } = NextAuth({
 		// specify updateAge greater than maxAge to update session and accessToken manually
 	},
 	callbacks: {
-		async signIn(args): Promise<boolean | string> {
-			if (!args.account) return '/';
+		async signIn({ account }): Promise<boolean | string> {
+			if (!account) return '/';
 			try {
-				await signInUpdater(args.account);
+				// VERIFIED BEHAVIOR next-auth@5.0.0beta0.19
+				// next-auth still does not update access or refresh tokens upon sign-in
+				await signInUpdater(account);
 			} catch {
 				return '/';
 			}
 			return true;
 		},
-		async session(args) {
-			let { session } = args;
+		async session({ session, user }) {
 			if (!process.env.SPOTIFY_ID) throw new Error('Missing Spotify ID');
+			session.user.email = user.email;
+			session.user.name = user.name;
 			// Return early if expiry is more than two minutes away
 			if (new Date(session.expires).getTime() - Date.now() > 2 * 60 * 1000)
 				return session;
@@ -65,7 +68,7 @@ const { handlers, signIn, signOut, auth } = NextAuth({
 			try {
 				// Find account based on ID
 				await mongoosePromise();
-				const account = await Account.findOne({ userId: args.user.id }).exec();
+				const account = await Account.findOne({ userId: user.id }).exec();
 				if (!account) throw new Error();
 				// Take refresh token and post to spotify token refresh URL
 				const response = await fetch(`${SPOT_BASE_URL}/api/token`, {

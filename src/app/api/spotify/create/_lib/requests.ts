@@ -14,7 +14,7 @@ import {
 	SpotAlbumTracksResponse,
 	SpotPlaylistTracksResponse,
 	ActionType,
-} from '@/components/spotify/types';
+} from '@/types/spotify';
 
 type descArgs = { du?: number; shared?: number; tu?: number };
 

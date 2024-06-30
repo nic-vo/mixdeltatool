@@ -1,4 +1,4 @@
-import { MyPlaylistObject } from '@/components/spotify/types';
+import { MyPlaylistObject } from '@/types/spotify';
 import ImageLoader from '../ImageLoader/ImageLoader';
 import { SpotifyLogo } from '@/consts/spotify';
 import { FaExternalLinkAlt } from 'react-icons/fa';
