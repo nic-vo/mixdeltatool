@@ -34,7 +34,6 @@ export default function SpotifyFrame(props: {
 				style={{ margin: '5dvh' }}>
 				Sign In
 			</button>
-			<ServiceStatus {...props} />
 			<a
 				id='home'
 				href='/'

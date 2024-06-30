@@ -19,7 +19,7 @@ import local from './DifferForm.module.scss';
 import global from '@/styles/globals.module.scss';
 import { FaExclamationCircle } from 'react-icons/fa';
 import { CLIENT_DIFF_TYPES } from '@/consts/spotify';
-import { ActionType } from '@/components/spotify/types';
+import { ActionType } from '@/types/spotify';
 import { ListItem } from '@/components/misc';
 
 export const TargetSelector = (props: {
