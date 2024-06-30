@@ -8,7 +8,7 @@ import {
 } from './helpers';
 import { differOperationAsync, retrieveUserListsAsync } from './thunks';
 
-import type { MyPlaylistObject } from '@/components/spotify/types';
+import type { MyPlaylistObject } from '@/types/spotify';
 
 type userPage = number | null;
 export type InitialUserPlaylistsState = {

@@ -1,7 +1,7 @@
 import { myPlaylistObjectParser } from '@/lib/validators';
 import { sanitize } from 'isomorphic-dompurify';
 
-import { MyPlaylistObject } from '@/components/spotify/types';
+import { MyPlaylistObject } from '@/types/spotify';
 
 export const sanitizePlaylists = (playlists: MyPlaylistObject[]) => {
 	try {

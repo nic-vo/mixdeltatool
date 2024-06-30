@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { initPlaylists, persistPlaylists, sanitizePlaylists } from './helpers';
 import { retrieveSpecificAsync } from './thunks';
 
-import type { MyPlaylistObject } from '@/components/spotify/types';
+import type { MyPlaylistObject } from '@/types/spotify';
 
 const PLAYLISTS_KEY = 'SPEC_PLAYLISTS';
 

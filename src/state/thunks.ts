@@ -5,7 +5,7 @@ import {
 	MyPlaylistObject,
 	MyUserAPIRouteResponse,
 	differRouteResponse,
-} from '@/components/spotify/types';
+} from '@/types/spotify';
 import { RootState } from './state';
 
 /**
