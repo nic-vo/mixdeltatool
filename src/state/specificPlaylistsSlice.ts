@@ -1,26 +1,26 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { initPlaylists, persistPlaylists, sanitizePlaylists } from './helpers';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { sanitizePlaylists } from './helpers';
 import { retrieveSpecificAsync } from './thunks';
 
-import type { MyPlaylistObject } from '@/types/spotify';
-
-const PLAYLISTS_KEY = 'SPEC_PLAYLISTS';
+import type { MyPlaylistObject } from '@/lib/validators';
 
 export type InitialSpecificPlaylistsState = {
 	playlists: MyPlaylistObject[];
 };
 
 const initialState: InitialSpecificPlaylistsState = {
-	playlists: initPlaylists(PLAYLISTS_KEY),
+	playlists: [],
 };
 
 const specificPlaylistsSlice = createSlice({
 	name: 'specificPlaylists',
 	initialState,
 	reducers: {
+		initSpecific: (state, action: PayloadAction<MyPlaylistObject[]>) => {
+			state.playlists = [...action.payload];
+		},
 		clearSpecific: (state) => {
 			state.playlists = [];
-			persistPlaylists(PLAYLISTS_KEY, []);
 		},
 	},
 	extraReducers: (builder) => {
@@ -30,11 +30,10 @@ const specificPlaylistsSlice = createSlice({
 			if (set.has(sanitized[0].id)) return;
 			const deduped = state.playlists.concat(sanitized);
 			state.playlists = deduped;
-			persistPlaylists(PLAYLISTS_KEY, deduped);
 		});
 	},
 });
 
-export const { clearSpecific } = specificPlaylistsSlice.actions;
+export const { initSpecific, clearSpecific } = specificPlaylistsSlice.actions;
 
 export default specificPlaylistsSlice.reducer;
