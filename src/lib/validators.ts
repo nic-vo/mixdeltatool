@@ -1,110 +1,79 @@
-import { SPOT_PLAYLIST_PAGE_LIMIT } from '@/consts/spotify';
 import { z } from 'zod';
 
-const pageQueryParser = z
-	.object({
-		page: z.coerce.number().int().gte(0).lte(SPOT_PLAYLIST_PAGE_LIMIT),
-	})
-	.strict();
+export const pagedResponseParser = z.object({
+	href: z.string().url(),
+	next: z.string().url().nullable(),
+});
 
-const idParamParser = z
+// For get specific playlist
+export const idParamParser = z
 	.string()
 	.length(22)
 	.regex(/^[A-Za-z0-9]{22}$/);
-const typeParamParser = z.enum(['playlist', 'album']);
 
 const basicSpotObjectParser = z.object({
 	id: z.string(),
 	uri: z.string(),
-	href: z.string(),
-});
-
-const specificQueryParser = z
-	.object({
-		id: idParamParser,
-		type: typeParamParser,
-	})
-	.strict();
-
-const spotUserObjectParser = basicSpotObjectParser.extend({
-	display_name: z.nullable(z.string()),
-});
-
-const spotArtistObjectParser = basicSpotObjectParser.extend({
-	name: z.string(),
-});
-
-const playlistIdTypeParser = z
-	.object({
-		id: idParamParser,
-		type: typeParamParser,
-		name: z.string(),
-		owner: z.array(spotArtistObjectParser.pick({ id: true, name: true })),
-		tracks: z.number().int(),
-	})
-	.strict();
-
-const basicSpotAPIResponseParser = z.object({
 	href: z.string().url(),
-	next: z.nullable(z.string().url()),
+});
+
+export const userDetailsParser = basicSpotObjectParser
+	.omit({ uri: true })
+	.extend({
+		display_name: z.string().nullable(),
+	});
+
+const artistObjectParser = basicSpotObjectParser.omit({ uri: true }).extend({
+	name: z.string(),
 });
 
 const spotImageObjectParser = z.object({
 	url: z.string().url(),
-	height: z.nullable(z.number().int()).optional(),
-	width: z.nullable(z.number().int()).optional(),
+	height: z.number().int().nullable(),
+	width: z.number().int().nullable(),
 });
 
-const spotPlaylistObjectParser = basicSpotObjectParser.extend({
-	images: z.array(spotImageObjectParser),
+export const playlistObjectParser = basicSpotObjectParser.extend({
+	images: z.nullable(z.array(spotImageObjectParser)),
 	name: z.string(),
-	owner: spotUserObjectParser,
-	tracks: z.object({ href: z.string().url(), total: z.number().int() }),
+	owner: userDetailsParser,
+	tracks: z.object({ total: z.number().int().gte(0) }),
 	type: z.literal('playlist'),
 });
+export type SpotPlaylistObject = z.infer<typeof playlistObjectParser>;
 
-const myPlaylistObjectParser = basicSpotObjectParser.pick({ id: true }).extend({
+export const spotAlbumObjectParser = basicSpotObjectParser.extend({
+	artists: z.array(artistObjectParser),
+	total_tracks: z.number().int().gte(0),
+	images: z.array(spotImageObjectParser),
 	name: z.string(),
-	owner: z.array(z.object({ name: z.string(), id: z.string() })),
-	image: z.optional(spotImageObjectParser),
-	tracks: z.number().int().gt(0),
-	type: z.enum(['album', 'playlist']),
+	type: z.literal('album'),
 });
+export type SpotAlbumObject = z.infer<typeof spotAlbumObjectParser>;
 
-const diffBodyParser = z
+// The shape expected by the API; everything must be coerced to this
+export const myPlaylistObjectParser = basicSpotObjectParser
+	.pick({ id: true })
+	.extend({
+		name: z.string(),
+		owner: z.array(z.object({ name: z.string().nullable(), id: z.string() })),
+		image: z.nullable(spotImageObjectParser),
+		tracks: z.number().int().gte(0),
+		type: z.enum(['album', 'playlist']),
+	});
+export type MyPlaylistObject = z.infer<typeof myPlaylistObjectParser>;
+
+export const diffBodyParser = z
 	.object({
 		target: myPlaylistObjectParser,
 		differ: myPlaylistObjectParser,
 		type: z.enum(['adu', 'odu', 'otu', 'bu', 'stu']),
-		newName: z.nullable(z.string().max(150)),
-		newDesc: z.nullable(z.string().max(600)),
+		newName: z.string().max(150).nullable(),
+		newDesc: z.string().max(600).nullable(),
 		keepImg: z.boolean(),
 	})
 	.strict();
 
-const spotAlbumObjectParser = basicSpotObjectParser.extend({
-	artists: z.array(spotArtistObjectParser),
-	total_tracks: z.number().int(),
-	external_urls: z.object({ spotify: z.string() }),
-	images: z.array(spotImageObjectParser),
-	name: z.string(),
-	release_date: z.string(),
-	tracks: z.object({ href: z.string().url() }),
-	type: z.literal('album'),
+export const userPlaylistResponseParser = pagedResponseParser.extend({
+	items: z.array(playlistObjectParser),
 });
-
-const userPlaylistResponseParser = basicSpotAPIResponseParser.extend({
-	items: z.array(spotPlaylistObjectParser),
-});
-
-export {
-	pageQueryParser,
-	specificQueryParser,
-	playlistIdTypeParser,
-	diffBodyParser,
-	userPlaylistResponseParser,
-	spotPlaylistObjectParser,
-	spotAlbumObjectParser,
-	spotUserObjectParser,
-	myPlaylistObjectParser,
-};
