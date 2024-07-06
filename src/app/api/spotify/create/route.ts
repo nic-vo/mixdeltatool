@@ -11,13 +11,9 @@ import {
 import { concurrentThrowNotReturn, myRace } from './_lib/common';
 import { badResponse } from '@/lib/route_helpers/responses';
 
-import { SPOT_LOGIN_WINDOW } from '@/consts/spotify';
-
-import { NextAuthRequest } from 'next-auth/lib';
-import {
-	MyPlaylistObject,
-	differInternalPlaylistPromise,
-} from '@/types/spotify';
+import type { NextAuthRequest } from 'next-auth/lib';
+import type { MyPlaylistObject } from '@/lib/validators';
+import type { differInternalPlaylistPromise } from '@/types/spotify';
 
 const RATE_LIMIT_PREFIX = 'CDP';
 const RATE_LIMIT_ROLLING_LIMIT = 5;
@@ -58,13 +54,7 @@ const handler = async (req: NextAuthRequest) => {
 	// No token means that user account somehow unlinked => client redirect
 	if (token === null) return badResponse(401);
 	// Check if session is being accessed when access token might not be live
-	const { expiresAt, accessToken } = token;
-	if (
-		expiresAt === null ||
-		accessToken === null ||
-		Date.now() - expiresAt < 3600 - SPOT_LOGIN_WINDOW
-	)
-		return badResponse(401);
+	const { accessToken } = token;
 
 	newName = newName ? sanitize(newName) : null;
 

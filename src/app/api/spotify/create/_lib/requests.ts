@@ -2,15 +2,15 @@ import { SPOT_URL_BASE } from '@/consts/spotify';
 import { threeRetries } from '@/lib/route_helpers/wrappers';
 import { badResponse } from '@/lib/route_helpers/responses';
 import {
-	spotPlaylistObjectParser,
-	spotUserObjectParser,
+	playlistObjectParser,
+	userDetailsParser,
+	MyPlaylistObject,
 } from '@/lib/validators';
 import { randomBytes } from 'crypto';
 import fs from 'fs/promises';
 import path from 'path';
 
 import {
-	MyPlaylistObject,
 	SpotAlbumTracksResponse,
 	SpotPlaylistTracksResponse,
 	ActionType,
@@ -151,7 +151,7 @@ export async function createEmptyPlaylist({
 	if (!userIDResponse.ok) return userIDResponse;
 	let userID: string;
 	try {
-		const parsed = spotUserObjectParser.parse(await userIDResponse.json());
+		const parsed = userDetailsParser.parse(await userIDResponse.json());
 		userID = parsed.id;
 	} catch {
 		return badResponse(502, {
@@ -179,18 +179,16 @@ export async function createEmptyPlaylist({
 
 	let returner: MyPlaylistObject;
 	try {
-		const parsed = spotPlaylistObjectParser.parse(await createResponse.json());
+		const parsed = playlistObjectParser.parse(await createResponse.json());
 		returner = {
-			id: parsed.id,
-			name: parsed.name,
-			type: parsed.type,
+			...parsed,
 			owner: [
 				{
 					...parsed.owner,
 					name: parsed.owner.display_name || 'Spotify User',
 				},
 			],
-			image: parsed.images[0],
+			image: parsed.images ? parsed.images[0] : null,
 			tracks: 0,
 		};
 	} catch {
@@ -227,7 +225,7 @@ export async function createEmptyPlaylist({
 			{}
 		); // Silent fetch
 	} catch {}
-	returner.image = { url: newIMGURL };
+	returner.image = { url: newIMGURL, height: null, width: null };
 
 	return Response.json(returner, { status: 201 });
 }
