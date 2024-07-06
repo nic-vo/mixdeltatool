@@ -1,20 +1,46 @@
 'use client';
 
-import { useEffect, useRef, useState, useMemo } from 'react';
+import {
+	useEffect,
+	useRef,
+	useState,
+	useMemo,
+	CanvasHTMLAttributes,
+} from 'react';
 
-const Canvas = (props: {
-	fps: number;
-	draw: (args: {
-		ctx: CanvasRenderingContext2D;
-		frame: number;
-		init: any;
-	}) => void;
-	initializer: (args: { height: number; width: number }) => {};
-	predraw?: (ctx: CanvasRenderingContext2D) => void;
-	postdraw?: (ctx: CanvasRenderingContext2D) => void;
-	animated: boolean;
-}) => {
+const omitted = [
+	'draw',
+	'predraw',
+	'postdraw',
+	'animated',
+	'initializer',
+	'fps',
+	'className',
+	'id',
+] as const;
+
+type CanvasProps = CanvasHTMLAttributes<HTMLCanvasElement>;
+
+const Canvas = (
+	props: {
+		fps: number;
+		draw: (args: {
+			ctx: CanvasRenderingContext2D;
+			frame: number;
+			init: any;
+		}) => void;
+		initializer: (args: { height: number; width: number }) => {};
+		predraw?: (ctx: CanvasRenderingContext2D) => void;
+		postdraw?: (ctx: CanvasRenderingContext2D) => void;
+		animated: boolean;
+	} & Omit<CanvasProps, (typeof omitted)[number]>
+) => {
 	const { draw, predraw, postdraw, animated } = props;
+	const attrs: CanvasProps = {};
+	for (const [key, value] of Object.entries(props)) {
+		if ((omitted as readonly string[]).includes(key)) continue;
+		attrs[key as keyof CanvasProps] = value;
+	}
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const elapsedRef = useRef<number>(0);
 
@@ -99,24 +125,16 @@ const Canvas = (props: {
 	}, [width, height]);
 
 	if (error !== '')
-		return (
-			<p
-				style={{
-					backgroundColor: '#121218',
-					position: 'absolute',
-					top: 0,
-					left: 0,
-					zIndex: 0,
-				}}>
-				{error}
-			</p>
-		);
+		return <p className='text-pinkred absolute top-0 left-0 z-50'>{error}</p>;
 
 	return (
 		<canvas
+			{...attrs}
 			ref={canvasRef}
 			className='bg-black fixed top-0 left-0 z-0 w-full h-svh'
 			id='canvas'
+			role='img'
+			aria-label={`Background Animation${animated ? '' : ' (disabled)'}`}
 		/>
 	);
 };
