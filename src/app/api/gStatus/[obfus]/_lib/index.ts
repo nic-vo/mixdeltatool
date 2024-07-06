@@ -33,8 +33,8 @@ export default async function setNewGlobalStatus({
 			currentPointer = new GlobalStatusPointer({ current: newStatus._id });
 		}
 		currentPointer.current = newStatus._id;
-		await newStatus.save();
-		await currentPointer.save();
+		await newStatus.save({ session });
+		await currentPointer.save({ session });
 		await session.commitTransaction();
 	} catch {
 		await session.abortTransaction();
