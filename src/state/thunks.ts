@@ -1,12 +1,12 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { signIn } from 'next-auth/react';
 
-import {
-	MyPlaylistObject,
+import type {
 	MyUserAPIRouteResponse,
 	differRouteResponse,
 } from '@/types/spotify';
-import { RootState } from './state';
+import type { MyPlaylistObject } from '@/lib/validators';
+import type { RootState } from '.';
 
 /**
  * ANY ERRORS THROWN AS { message: string }

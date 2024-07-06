@@ -5,7 +5,7 @@ import {
 	retrieveUserListsAsync,
 } from './thunks';
 
-import { LoadingState } from './state';
+import type { LoadingState } from '.';
 
 const initialFetchState: LoadingState = {
 	loading: false,

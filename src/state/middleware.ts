@@ -3,7 +3,7 @@ import { clearUser } from './userPlaylistsSlice';
 import { clearDiffer, clearTarget } from './differFormSlice';
 import { clearSpecific } from './specificPlaylistsSlice';
 
-import { RootState } from './state';
+import type { RootState } from '.';
 
 const listenerMiddleware = createListenerMiddleware<RootState>();
 

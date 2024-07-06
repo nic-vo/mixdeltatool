@@ -1,7 +1,8 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { differOperationAsync } from './thunks';
 
-import type { ActionType, MyPlaylistObject } from '@/types/spotify';
+import type { MyPlaylistObject } from '@/lib/validators';
+import type { ActionType } from '@/types/spotify';
 
 export type InitialDifferFormState = {
 	target: MyPlaylistObject | '';
