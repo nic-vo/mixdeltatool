@@ -61,7 +61,7 @@ const EUAHeading = (props: PropsWithChildren & { level: 2 | 3 | 4 | 5 }) => {
 
 export const SmallNav = () => {
 	return (
-		<nav className='relative z-10 w-10/12 flex justify-between max-w-screen-lg'>
+		<nav className='relative z-10 w-full flex justify-between max-w-screen-lg'>
 			<GlobalBlockLink
 				href='/'
 				className={localNavigation}>
