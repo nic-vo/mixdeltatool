@@ -2,14 +2,9 @@
 
 import { useState } from 'react';
 import { MixDeltaLogo } from '@/consts/spotify';
+import Image from 'next/image';
 
-import local from './ImageLoader.module.scss';
-import ImageLoadingLogo from '../ImageLoadingLogo/ImageLoadingLogo';
-
-const ImageLoader = (props: {
-	url?: string | null | undefined;
-	alt?: string;
-}) => {
+const ImageLoader = (props: { url: string; alt: string }) => {
 	const [loaded, setLoaded] = useState(false);
 	const [error, setError] = useState(false);
 
@@ -23,34 +18,28 @@ const ImageLoader = (props: {
 		setError(true);
 	};
 
-	const containerClass = `${local.container}${
-		!error && !loaded && props.url ? ` ${local.loading}` : ''
-	}`;
-	const imgClass = `${local.img}${loaded ? ` ${local.loaded}` : ''}`;
-
-	if (props.url === null || props.url === undefined || error)
+	if (error)
 		return (
-			<div className={containerClass}>
-				<img
-					src={MixDeltaLogo.src}
-					alt={`Album art placeholder`}
-					className={imgClass}
-				/>
-			</div>
+			<Image
+				src={MixDeltaLogo.src}
+				alt={`Album art placeholder`}
+				className={`transition-all h-full w-auto opacity-0${
+					loaded ? ` opacity-100` : ''
+				}`}
+			/>
 		);
 
 	return (
-		<div className={containerClass}>
-			{!loaded && <ImageLoadingLogo />}
-			<img
-				src={props.url !== null ? props.url : ''}
-				alt={props.alt ? props.alt : ''}
-				onLoad={loadHandler}
-				onError={errorHandler}
-				loading='lazy'
-				className={imgClass}
-			/>
-		</div>
+		<img
+			src={props.url !== null ? props.url : ''}
+			alt={props.alt ? props.alt : ''}
+			onLoad={loadHandler}
+			onError={errorHandler}
+			loading='lazy'
+			className={`transition-all h-full opacity-0 object-cover${
+				loaded ? ` opacity-100` : ''
+			}`}
+		/>
 	);
 };
 
