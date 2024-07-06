@@ -1,28 +1,31 @@
 import { routeKeyRetriever } from '@/auth/accessKey';
 import {
-	specificQueryParser,
+	idParamParser,
 	spotAlbumObjectParser,
-	spotPlaylistObjectParser,
+	playlistObjectParser,
 } from '@/lib/validators';
 import {
 	handlerWithTimeoutAndAuth,
 	threeRetries,
 } from '@/lib/route_helpers/wrappers';
-import { SPOT_LOGIN_WINDOW, SPOT_URL_BASE } from '@/consts/spotify';
+import { SPOT_URL_BASE } from '@/consts/spotify';
+import { z } from 'zod';
+import { badResponse } from '@/lib/route_helpers/responses';
 
-import { NextAuthRequest } from 'next-auth/lib';
-import {
+import type {
 	MyPlaylistObject,
 	SpotAlbumObject,
 	SpotPlaylistObject,
-} from '@/types/spotify';
-import { badResponse } from '@/lib/route_helpers/responses';
+} from '@/lib/validators';
+import type { NextAuthRequest } from 'next-auth/lib';
 
 const RATE_LIMIT_PREFIX = 'GSP';
 const RATE_LIMIT_ROLLING_LIMIT = 10;
 const RATE_LIMIT_DECAY_SECONDS = 5;
 
 export const maxDuration = 20;
+
+const typeParser = z.enum(['playlist', 'album']);
 
 export const GET = handlerWithTimeoutAndAuth(
 	{
@@ -40,13 +43,8 @@ export const GET = handlerWithTimeoutAndAuth(
 		// Validate query parameters
 		let id, type;
 		try {
-			const attempt = {
-				id: req.nextUrl.searchParams.get('id'),
-				type: req.nextUrl.searchParams.get('type'),
-			};
-			let parsed = specificQueryParser.parse(attempt);
-			id = parsed.id;
-			type = parsed.type;
+			id = idParamParser.parse(req.nextUrl.searchParams.get('id'));
+			type = typeParser.parse(req.nextUrl.searchParams.get('type'));
 		} catch {
 			return badResponse(404);
 		}
@@ -62,11 +60,7 @@ export const GET = handlerWithTimeoutAndAuth(
 		}
 		// No token means that user account somehow unlinked => client redirect
 		if (token === null) return badResponse(401);
-
-		// Check if session is being accessed when access token might not be live
-		const { expiresAt, accessToken } = token;
-		if (Date.now() - expiresAt < 3600 - SPOT_LOGIN_WINDOW)
-			return badResponse(401);
+		const { accessToken } = token;
 
 		// Hit spotify API with retrieved access token
 		const spotifyResponse = await threeRetries(
@@ -113,17 +107,17 @@ export const GET = handlerWithTimeoutAndAuth(
 					images,
 					owner,
 					tracks: { total: tracks },
-				} = spotPlaylistObjectParser.parse(json);
+				} = playlistObjectParser.parse(json);
 				returner = {
 					id,
 					name,
 					type,
 					tracks,
-					image: images[0],
+					image: (images && images[0]) ?? null,
 					owner: [
 						{
 							id: owner.id,
-							name: owner.display_name || 'Spotify User',
+							name: owner.display_name,
 						},
 					],
 				};
