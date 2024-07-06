@@ -6,11 +6,7 @@ import {
 } from '@/lib/route_helpers/wrappers';
 import { userPlaylistResponseParser } from '@/lib/validators';
 import { badResponse } from '@/lib/route_helpers/responses';
-import {
-	SPOT_LOGIN_WINDOW,
-	SPOT_PLAYLIST_PAGE_LIMIT,
-	SPOT_URL_BASE,
-} from '@/consts/spotify';
+import { SPOT_PLAYLIST_PAGE_LIMIT, SPOT_URL_BASE } from '@/consts/spotify';
 
 import { NextAuthRequest } from 'next-auth/lib';
 
@@ -59,11 +55,7 @@ export const GET = handlerWithTimeoutAndAuth(
 		}
 		// No token means that user account somehow unlinked => client redirect
 		if (token === null) return badResponse(401);
-
-		// Check if session is being accessed when access token might not be live
-		const { expiresAt, accessToken } = token;
-		if (Date.now() - expiresAt < 3600 - SPOT_LOGIN_WINDOW)
-			return badResponse(401);
+		const { accessToken } = token;
 
 		// Hit spotify API with retrieved access token and page from query
 		const requestParams = new URLSearchParams({
@@ -92,11 +84,13 @@ export const GET = handlerWithTimeoutAndAuth(
 				{
 					next,
 					playlists: items.map((item) => {
-						const { images, tracks } = item;
+						const { images, tracks, name, owner, type, id } = item;
 						return {
-							...item,
-							owner: [{ ...item.owner, name: item.owner.display_name }],
-							image: images[0],
+							id,
+							type,
+							name,
+							owner: [{ id: owner.id, name: owner.display_name }],
+							image: (images && images[0]) ?? null,
 							tracks: tracks.total,
 						};
 					}),
