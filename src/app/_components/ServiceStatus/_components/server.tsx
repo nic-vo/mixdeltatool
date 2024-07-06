@@ -36,8 +36,8 @@ async function internalGetGlobalStatus(): Promise<{
 						active: Date.now(),
 					});
 					currentPointer = new GlobalStatusPointer({ current: newStatus._id });
-					await currentPointer.save();
-					await newStatus.save();
+					await currentPointer.save({ session });
+					await newStatus.save({ session });
 					await session.commitTransaction();
 					break;
 				}
@@ -61,8 +61,8 @@ async function internalGetGlobalStatus(): Promise<{
 					active: Date.now(),
 				});
 				currentPointer.current = newStatus._id;
-				await currentPointer.save();
-				await newStatus.save();
+				await currentPointer.save({ session });
+				await newStatus.save({ session });
 				await session.commitTransaction();
 			} catch {
 				await session.abortTransaction();
@@ -70,9 +70,11 @@ async function internalGetGlobalStatus(): Promise<{
 					oneFlag = true;
 					continue;
 				}
+				await session.endSession();
 				throw new Error('ACID error');
 			}
 		}
+		await session.endSession();
 		return { status, statusType, active };
 	} catch (e: any) {
 		console.log(e);
