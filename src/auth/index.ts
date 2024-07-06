@@ -74,10 +74,16 @@ const { handlers, signIn, signOut, auth } = NextAuth({
 			// This is kind of a race condition against the session updateAge
 			// i.e. auth is handling session refresh in a separate db transaction
 			// Different Date.now()
+			// Find account based on ID
+			const db = await mongoosePromise();
+			if (!db) throw new Error();
+			const mongooseSession = await db.startSession();
+			mongooseSession.startTransaction();
 			try {
-				// Find account based on ID
-				await mongoosePromise();
-				const account = await Account.findOne({ userId: user.id }).exec();
+				const account = await Account.findOne(
+					{ userId: user.id },
+					{ session: mongooseSession }
+				).exec();
 				if (!account) throw new Error();
 				// Take refresh token and post to spotify token refresh URL
 				const response = await fetch(`${SPOT_BASE_URL}/api/token`, {
@@ -100,8 +106,10 @@ const { handlers, signIn, signOut, auth } = NextAuth({
 				account.access_token = access_token;
 				account.refresh_token = refresh_token;
 				account.expires_at = Math.floor(Date.now() / 1000) + expires_in;
-				await account.save();
+				await account.save({ session: mongooseSession });
+				await mongooseSession.commitTransaction();
 			} catch {
+				mongooseSession.abortTransaction();
 				throw new Error();
 			}
 			return session;
