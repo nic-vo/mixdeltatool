@@ -32,7 +32,7 @@ type myConfigType = { maxDuration: number; rateLimit?: RLArg };
 export function handlerWithTimeout(config: myConfigType, handler: BaseHandler) {
 	return async (req: NextRequest, ctx: AppRouteHandlerFnContext) => {
 		if (process.env.GLOBAL_SAFETY === 'ON') return badResponse(404);
-		if (config.rateLimit) {
+		if (config.rateLimit && process.env.NODE_ENV !== 'development') {
 			const {
 				rateLimit: {
 					RATE_LIMIT_DECAY_SECONDS,
@@ -80,7 +80,7 @@ export function handlerWithTimeoutAndAuth(
 ) {
 	return async (req: NextRequest, ctx: AppRouteHandlerFnContext) => {
 		if (process.env.GLOBAL_SAFETY === 'ON') return badResponse(404);
-		if (config.rateLimit) {
+		if (config.rateLimit && process.env.NODE_ENV !== 'development') {
 			const {
 				rateLimit: {
 					RATE_LIMIT_DECAY_SECONDS,
