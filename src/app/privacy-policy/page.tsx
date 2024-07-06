@@ -19,10 +19,13 @@ const LocalList = (props: PropsWithChildren & { ordered?: boolean }) => {
 
 const PrivacyPolicy = () => {
 	return (
-		<GlobalMain className='mt-32 max-w-prose'>
-			<h1 className='text-center text-5xl font-black'>
-				MixDelta Privacy Policy
-			</h1>
+		<GlobalMain className='max-w-prose mt-16 !overflow-auto px-2 focus-visible:outline-white'>
+			<header className='flex flex-col gap-4'>
+				<h1 className='text-center text-5xl font-black'>
+					MixDelta Privacy Policy
+				</h1>
+				<SmallNav />
+			</header>
 			<LocalSection>
 				<h2>Introduction</h2>
 				<p>
@@ -220,7 +223,9 @@ const PrivacyPolicy = () => {
 			<p>
 				Effective: <time dateTime='2024-01-26'>January 26, 2024</time>
 			</p>
-			<SmallNav />
+			<footer className='w-full'>
+				<SmallNav />
+			</footer>
 		</GlobalMain>
 	);
 };
