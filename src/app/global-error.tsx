@@ -22,9 +22,9 @@ const GlobalError = ({
 			<body
 				className={`${hind.className} bg-black text-white flex flex-col items-center h-screen justify-between overflow-hidden`}>
 				<GlobalMain>
-					<h2 className={cabin.className + ' text-5xl'}>
+					<h1 className={cabin.className + ' text-5xl'}>
 						Something went wrong.
-					</h2>
+					</h1>
 					<GlobalButton onClick={reset}>
 						<GlobalTextWrapper>Click here to reset</GlobalTextWrapper>
 					</GlobalButton>
