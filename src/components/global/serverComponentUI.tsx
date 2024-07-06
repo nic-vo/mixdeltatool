@@ -1,70 +1,97 @@
-import Link, { LinkProps } from 'next/link';
+import Link from 'next/link';
 import {
 	AnchorHTMLAttributes,
+	forwardRef,
 	ButtonHTMLAttributes,
 	PropsWithChildren,
 } from 'react';
 
-type GlobalButtonProps = PropsWithChildren &
+export type GlobalButtonProps = PropsWithChildren &
 	ButtonHTMLAttributes<HTMLButtonElement>;
-type GlobalLinkProps = PropsWithChildren &
-	Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof LinkProps> &
-	Omit<LinkProps, 'href'> & { href: string };
+export type GlobalLinkProps = PropsWithChildren &
+	AnchorHTMLAttributes<HTMLAnchorElement> & { href: string };
 
 const globalClasser = (className?: string) =>
 	`flex items-center justify-center relative py-2 px-8 border-2 rounded-full border-white bg-transparent hover:text-black focus-visible:text-black outline-none transition-colors before:absolute before:h-full before:w-[102%] before:top-0 before:left-0 overflow-hidden before:-translate-x-full before:transition-transform hover:before:translate-x-0 focus-visible:before:translate-x-0 text-center font-hind font-bold disabled:opacity-25 disabled:cursor-not-allowed before:disabled:opacity-0 disabled:text-white hover:disabled:border-white before:bg-white${
 		(className && ` ${className}`) ?? ''
 	}`;
 
-export const GlobalBlockLink = (props: GlobalLinkProps) => {
-	const attrs = { ...props, children: null, prefetch: false };
-	if (/^\//.test(props.href))
-		return (
-			<Link
-				{...attrs}
-				className={globalClasser(props.className)}>
-				<span className='block relative z-10'>{props.children}</span>
-			</Link>
-		);
-	return (
+export const GlobalBlockLink = (props: GlobalLinkProps) =>
+	/^\//.test(props.href) ? (
+		<Link
+			{...props}
+			href={props.href}
+			className={globalClasser(props.className)}
+			prefetch={false}>
+			{props.children}
+		</Link>
+	) : (
 		<a
-			{...attrs}
+			{...props}
 			className={globalClasser(props.className)}>
-			<span className='block relative z-10'>{props.children}</span>
+			{props.children}
 		</a>
 	);
-};
 
-export const GlobalButton = (props: GlobalButtonProps) => {
-	const attrs = { ...props, children: null };
+export const GlobalButton = forwardRef<HTMLButtonElement, GlobalButtonProps>(
+	function GlobalButton(props: GlobalButtonProps, ref) {
+		const attrs = { ...props, children: null };
+		return (
+			<button
+				{...attrs}
+				ref={ref}
+				className={globalClasser(props.className)}>
+				{props.children}
+			</button>
+		);
+	}
+);
+
+export const GlobalTextWrapper = (
+	props: PropsWithChildren & {
+		sr?: boolean;
+		'aria-hidden'?: boolean;
+		className?: string;
+		suppressHydrationWarning?: boolean;
+	}
+) => {
+	const classer = (className?: string) =>
+		`${
+			props.sr
+				? 'sr-only'
+				: `block relative z-10${className ? ` ${className}` : ''}`
+		}`;
 	return (
-		<button
-			{...attrs}
-			className={globalClasser(props.className)}>
-			<span className='relative z-10'>{props.children}</span>
-		</button>
+		<span
+			className={classer(props.className)}
+			aria-hidden={props['aria-hidden']}
+			suppressHydrationWarning={props.suppressHydrationWarning}>
+			{props.children}
+		</span>
 	);
 };
 
+const inlineClasser = (className?: string) =>
+	`font-bold underline underline-offset-4 outline-myteal focus-visible:outline outline-offset-2 rounded-md${
+		(className && ` ${className}`) ?? ''
+	}`;
+
 export const InlineLink = (props: GlobalLinkProps) => {
-	const attrs = { ...props, children: null };
-	const inlineClasser = (className?: string) =>
-		`font-bold underline underline-offset-4 outline-myteal focus-visible:outline outline-offset-2 rounded-md${
-			(className && ` ${className}`) ?? ''
-		}`;
 	if (/^\//.test(props.href))
 		return (
 			<Link
-				{...attrs}
+				{...props}
+				href={props.href}
+				prefetch={false}
 				className={inlineClasser(props.className)}>
-				<span className='relative z-10'>{props.children}</span>
+				{props.children}
 			</Link>
 		);
 	return (
 		<a
-			{...attrs}
+			{...props}
 			className={inlineClasser(props.className)}>
-			<span className='relative z-10'>{props.children}</span>
+			{props.children}
 		</a>
 	);
 };
