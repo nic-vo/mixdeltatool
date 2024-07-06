@@ -1,3 +1,6 @@
+'use client';
+
+import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 
 // Slices and initial types
@@ -18,6 +21,7 @@ import differFormSliceReducer, {
 import differFetchStateSliceReducer from './differFetchStateSlice';
 
 import listenerMiddleware from './middleware';
+import type { PropsWithChildren } from 'react';
 
 export type LoadingState = {
 	loading: boolean;
@@ -60,3 +64,7 @@ export const selectDifferForm = (s: RootState) => s.differForm;
 export const selectDifferFetch = (s: RootState) => s.differFetchState;
 
 export type AppDispatch = typeof store.dispatch;
+
+export const ClientReduxProvider = (props: PropsWithChildren) => (
+	<Provider store={store}>{props.children}</Provider>
+);
