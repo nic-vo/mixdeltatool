@@ -96,14 +96,19 @@ export const InlineLink = (props: GlobalLinkProps) => {
 	);
 };
 
-export const GlobalMain = (
-	props: PropsWithChildren & { className?: string }
-) => (
+const mainClasser = (className?: string) =>
+	`relative flex flex-col items-center gap-4 w-11/12 flex-grow flex-shrink z-10 overflow-hidden${
+		className ? ` ${className}` : ''
+	}`;
+
+export const GlobalMain = ({
+	children,
+	className,
+}: PropsWithChildren & { className?: string }) => (
 	<main
-		className={
-			'relative flex flex-col items-center gap-4 w-10/12 z-10' +
-			((props.className && ` ${props.className}`) ?? '')
-		}>
-		{props.children}
+		className={mainClasser(className)}
+		aria-live='polite'
+		aria-busy={false}>
+		{children}
 	</main>
 );
