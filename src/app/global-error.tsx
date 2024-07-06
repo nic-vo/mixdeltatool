@@ -1,7 +1,14 @@
 'use client';
 
-import { karla, cabin } from '@/styles/fonts';
+import { cabin, hind } from '@/styles/fonts';
 import Link from 'next/link';
+import {
+	GlobalButton,
+	GlobalMain,
+	GlobalTextWrapper,
+} from '@/components/global/serverComponentUI';
+
+import '@/styles/globals.css';
 
 const GlobalError = ({
 	error,
@@ -12,22 +19,21 @@ const GlobalError = ({
 }) => {
 	return (
 		<html lang='en'>
-			<body className='w-full'>
-				<div
-					className={
-						karla.className +
-						' min-h-screen min-w-full flex flex-col items-center gap-8'
-					}>
+			<body
+				className={`${hind.className} bg-black text-white flex flex-col items-center h-screen justify-between overflow-hidden`}>
+				<GlobalMain>
 					<h2 className={cabin.className + ' text-5xl'}>
 						Something went wrong.
 					</h2>
-					<button onClick={reset}>Click here to reset</button>
+					<GlobalButton onClick={reset}>
+						<GlobalTextWrapper>Click here to reset</GlobalTextWrapper>
+					</GlobalButton>
 					<Link
 						href='/'
 						prefetch={false}>
 						Or click here to return home.
 					</Link>
-				</div>
+				</GlobalMain>
 			</body>
 		</html>
 	);
