@@ -38,7 +38,9 @@ export default async function setNewGlobalStatus({
 		await session.commitTransaction();
 	} catch {
 		await session.abortTransaction();
+		await session.endSession();
 		return badResponse(502, { message: 'There was a database error' });
 	}
+	await session.endSession();
 	return Response.json({ message: 'Created' }, { status: 201 });
 }
