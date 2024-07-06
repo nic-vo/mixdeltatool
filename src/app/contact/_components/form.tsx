@@ -2,7 +2,10 @@
 
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { sanitize } from 'isomorphic-dompurify';
-import { GlobalButton } from '@/components/global/serverComponentUI';
+import {
+	GlobalButton,
+	GlobalTextWrapper,
+} from '@/components/global/serverComponentUI';
 
 export const HCaptchaBlock = () => {
 	const [loaded, setLoaded] = useState(false);
@@ -54,7 +57,9 @@ export const HCaptchaBlock = () => {
 				id='h-captcha'
 				data-theme='dark'
 			/>
-			<GlobalButton type='submit'>Submit</GlobalButton>
+			<GlobalButton type='submit'>
+				<GlobalTextWrapper>Submit</GlobalTextWrapper>
+			</GlobalButton>
 		</>
 	);
 };
