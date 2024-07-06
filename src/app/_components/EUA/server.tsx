@@ -1,5 +1,6 @@
 import {
 	GlobalBlockLink,
+	GlobalTextWrapper,
 	InlineLink,
 } from '@/components/global/serverComponentUI';
 import { localNavigation } from '@/consts/buttonStates';
@@ -60,18 +61,16 @@ const EUAHeading = (props: PropsWithChildren & { level: 2 | 3 | 4 | 5 }) => {
 
 export const SmallNav = () => {
 	return (
-		<nav className='relative z-10 w-10/12 flex justify-between py-8 max-w-screen-lg'>
+		<nav className='relative z-10 w-10/12 flex justify-between max-w-screen-lg'>
 			<GlobalBlockLink
 				href='/'
-				prefetch={false}
 				className={localNavigation}>
-				&larr; Home
+				<GlobalTextWrapper>&larr; Home</GlobalTextWrapper>
 			</GlobalBlockLink>
 			<GlobalBlockLink
 				href='/tool'
-				prefetch={false}
 				className={localNavigation}>
-				To the tool &rarr;
+				<GlobalTextWrapper>To the tool &rarr;</GlobalTextWrapper>
 			</GlobalBlockLink>
 		</nav>
 	);
@@ -80,11 +79,17 @@ export const SmallNav = () => {
 const EUAContent = ({
 	styling,
 	light,
+	tabIndex,
 }: {
+	tabIndex?: 0;
 	styling?: string;
 	light?: boolean;
 }) => (
-	<div className={'flex flex-col gap-8' + (styling ? ` ${styling}` : '')}>
+	<div
+		className={'flex flex-col gap-8' + (styling ? ` ${styling}` : '')}
+		tabIndex={tabIndex}
+		role='region'
+		aria-label='Scrollable EUA Content'>
 		<EUASection>
 			<EUAHeading level={2}>Introduction</EUAHeading>
 			<p>
@@ -382,7 +387,6 @@ const EUAContent = ({
 				For support or inquiries, please use{' '}
 				<InlineLink
 					href='/contact'
-					prefetch={false}
 					className={light ? 'outline-black' : ''}>
 					our contact form
 				</InlineLink>{' '}

@@ -4,6 +4,7 @@ import { FormEventHandler, useEffect, useState, useRef } from 'react';
 import EUAContent from './server';
 import {
 	GlobalButton,
+	GlobalTextWrapper,
 	InlineLink,
 } from '@/components/global/serverComponentUI';
 import { hitsSpotify } from '@/consts/buttonStates';
@@ -58,6 +59,7 @@ const SpotEUA = (props: { submitter?: () => void }) => {
 				<EUAContent
 					styling='gap-8 p-4 md:p-8 overflow-y-auto bg-slate-300 rounded-xl outline-black focus:outline'
 					light
+					tabIndex={0}
 				/>
 				<p className='text-center'>
 					You must also read and agree to MixDelta&apos;s{' '}
@@ -88,8 +90,8 @@ const SpotEUA = (props: { submitter?: () => void }) => {
 					</label>
 					<GlobalButton
 						type='submit'
-						className={hitsSpotify + ' border-green-400'}>
-						Submit
+						className={hitsSpotify + ' !border-green-400'}>
+						<GlobalTextWrapper>Submit</GlobalTextWrapper>
 					</GlobalButton>
 				</form>
 			</section>
