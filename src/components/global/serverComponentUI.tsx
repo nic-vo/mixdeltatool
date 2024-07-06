@@ -12,7 +12,7 @@ export type GlobalLinkProps = PropsWithChildren &
 	AnchorHTMLAttributes<HTMLAnchorElement> & { href: string };
 
 const globalClasser = (className?: string) =>
-	`flex items-center justify-center relative py-2 px-8 border-2 rounded-full border-white bg-transparent hover:text-black focus-visible:text-black outline-none transition-colors before:absolute before:h-full before:w-[102%] before:top-0 before:left-0 overflow-hidden before:-translate-x-full before:transition-transform hover:before:translate-x-0 focus-visible:before:translate-x-0 text-center font-hind font-bold disabled:opacity-25 disabled:cursor-not-allowed before:disabled:opacity-0 disabled:text-white hover:disabled:border-white before:bg-white${
+	`flex items-center justify-center relative py-2 px-8 border-2 rounded-full border-white bg-transparent hover:text-black focus-visible:text-black outline-none transition-all before:absolute before:h-full before:w-[102%] before:top-0 before:left-0 overflow-hidden before:-translate-x-full before:transition-all hover:before:translate-x-0 focus-visible:before:translate-x-0 text-center font-karla font-medium disabled:opacity-25 disabled:cursor-not-allowed before:disabled:opacity-0 disabled:text-white hover:disabled:border-white before:bg-white${
 		(className && ` ${className}`) ?? ''
 	}`;
 
