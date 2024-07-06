@@ -1,9 +1,8 @@
-import NextAuth, { Account as AccountType } from 'next-auth';
+import NextAuth from 'next-auth';
 import Spotify from 'next-auth/providers/spotify';
 import { MongoDBAdapter } from '@auth/mongodb-adapter';
 import clientPromise from './mongocfg';
 import { signInUpdater } from './accessKey';
-import { SPOT_LOGIN_WINDOW } from '@/consts/spotify';
 import mongoosePromise from '@/lib/database/mongoose/connection';
 import { Account } from '@/lib/database/mongoose/models';
 
@@ -33,6 +32,8 @@ const config = {
 
 export const basePath = '/api/auth';
 
+const maxAgeSeconds = 60 * 60 * 24 * 3;
+
 const { handlers, signIn, signOut, auth } = NextAuth({
 	basePath,
 	providers: [Spotify(config)],
@@ -41,8 +42,8 @@ const { handlers, signIn, signOut, auth } = NextAuth({
 	}),
 	session: {
 		strategy: 'database',
-		maxAge: SPOT_LOGIN_WINDOW,
-		updateAge: SPOT_LOGIN_WINDOW + 2 * 60,
+		maxAge: maxAgeSeconds,
+		updateAge: 60 * 60,
 		// specify updateAge greater than maxAge to update session and accessToken manually
 	},
 	callbacks: {
@@ -61,10 +62,18 @@ const { handlers, signIn, signOut, auth } = NextAuth({
 			if (!process.env.SPOTIFY_ID) throw new Error('Missing Spotify ID');
 			session.user.email = user.email;
 			session.user.name = user.name;
-			// Return early if expiry is more than two minutes away
-			if (new Date(session.expires).getTime() - Date.now() > 2 * 60 * 1000)
+			// Return early if now is still within 1 hour of signing in
+			if (
+				Date.parse(session.expires) - 1000 * (maxAgeSeconds - 60 * 60) >
+				Date.now()
+			)
 				return session;
 
+			// **Refresh account access token, expiry, and refresh token
+			// if an hour has passed since login;
+			// This is kind of a race condition against the session updateAge
+			// i.e. auth is handling session refresh in a separate db transaction
+			// Different Date.now()
 			try {
 				// Find account based on ID
 				await mongoosePromise();
@@ -93,23 +102,25 @@ const { handlers, signIn, signOut, auth } = NextAuth({
 				account.expires_at = Math.floor(Date.now() / 1000) + expires_in;
 				await account.save();
 			} catch {
-				return session;
+				throw new Error();
 			}
-			session.user = { ...user };
 			return session;
 		},
+	},
+	pages: {
+		signIn: '/login',
 	},
 	debug: process.env.NODE_ENV !== 'production',
 });
 
 async function saSignIn() {
 	'use server';
-	await signIn();
+	await signIn('spotify', { redirectTo: '/tool' });
 }
 
 async function saSignOut() {
 	'use server';
-	await signOut();
+	await signOut({ redirectTo: '/' });
 }
 
 export { handlers, auth, signIn, signOut, saSignIn, saSignOut };
