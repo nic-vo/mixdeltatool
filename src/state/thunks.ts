@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { signIn } from 'next-auth/react';
+import { signOut } from 'next-auth/react';
 
 import type {
 	MyUserAPIRouteResponse,
@@ -11,6 +11,13 @@ import type { RootState } from '.';
 /**
  * ANY ERRORS THROWN AS { message: string }
  */
+
+/*
+
+	For my auth configuration, access key rotation should happen automaticaly
+	So if a response 401s, it's best to restart auth flow completely
+
+*/
 
 export const retrieveSpecificAsync = createAsyncThunk(
 	'specificPlaylists/retrieveSpecificAsync',
@@ -36,9 +43,8 @@ export const retrieveSpecificAsync = createAsyncThunk(
 		} catch {
 			throw { message: 'There was an error reaching our servers' };
 		}
-
 		if (response.ok) return json as MyPlaylistObject;
-		if (response.status === 401) signIn();
+		if (response.status === 401) signOut();
 		throw json as { message: string };
 	}
 );
@@ -58,9 +64,8 @@ export const retrieveUserListsAsync = createAsyncThunk(
 		} catch {
 			throw { message: 'There was an error reaching our servers' };
 		}
-
 		if (response.ok) return json as MyUserAPIRouteResponse;
-		if (response.status === 401) signIn();
+		if (response.status === 401) signOut();
 		throw json as { message: string };
 	}
 );
@@ -89,7 +94,7 @@ export const differOperationAsync = createAsyncThunk(
 		});
 		const jsoned = await response.json();
 		if (response.ok) return jsoned as differRouteResponse;
-		if (response.status === 401) signIn();
+		if (response.status === 401) signOut();
 		throw jsoned as { message: string };
 	}
 );
