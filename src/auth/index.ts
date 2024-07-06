@@ -109,9 +109,11 @@ const { handlers, signIn, signOut, auth } = NextAuth({
 				await account.save({ session: mongooseSession });
 				await mongooseSession.commitTransaction();
 			} catch {
-				mongooseSession.abortTransaction();
+				await mongooseSession.abortTransaction();
+				await mongooseSession.endSession();
 				throw new Error();
 			}
+			await mongooseSession.endSession();
 			return session;
 		},
 	},
