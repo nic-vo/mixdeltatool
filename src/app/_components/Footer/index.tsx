@@ -6,7 +6,7 @@ const FooterNavListItem = (props: PropsWithChildren) => (
 	<li tabIndex={-1}>{props.children}</li>
 );
 const Footer = () => (
-	<footer className='flex flex-col sm:flex-row items-center justify-center w-full min-h-[10svh] py-4 gap-4 bg-gradient-to-t from-black to-transparent z-10 relative font-bold'>
+	<footer className='flex flex-col sm:flex-row items-center justify-center w-full py-2 sm:py-4 sm:gap-4 bg-gradient-to-t from-black to-transparent z-10 relative font-bold shrink-0 font-karla'>
 		<nav
 			className='flex justify-center'
 			aria-label='Footer navigation'>
