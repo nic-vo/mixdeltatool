@@ -1,44 +1,24 @@
-import { auth, saSignOut } from '@/auth';
-import {
-	GlobalButton,
-	GlobalMain,
-	GlobalBlockLink,
-} from '@/components/global/serverComponentUI';
-import { ToolHeading } from './_components/server';
-import {
-	flippedSlider,
-	hitsSpotify,
-	localNavigation,
-} from '@/consts/buttonStates';
+import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
+import Header from './_components/Header';
+import { ClientReduxProvider } from '@/state';
+import { UserPersister } from './user/_components';
+import { SpecificPersister } from './specific/_components';
 
-const ToolRoot = async () => {
+import type { PropsWithChildren } from 'react';
+
+const ToolRoot = async (props: PropsWithChildren) => {
 	const session = await auth();
 	if (!session) redirect(`/api/auth/signin`);
 
 	return (
 		<>
-			<GlobalMain className='m-auto'>
-				<ToolHeading>
-					Welcome,{' '}
-					{(session.user &&
-						(session.user?.name ?? session.user?.email?.split('@')[0])) ??
-						'Stranger'}
-					!
-				</ToolHeading>
-				<form action={saSignOut}>
-					<GlobalButton
-						type='submit'
-						className={hitsSpotify}>
-						Sign out
-					</GlobalButton>
-				</form>
-				<GlobalBlockLink
-					href='/'
-					className={localNavigation + ' ' + flippedSlider}>
-					&larr; Return Home
-				</GlobalBlockLink>
-			</GlobalMain>
+			<Header />
+			<ClientReduxProvider>
+				{props.children}
+				<UserPersister />
+				<SpecificPersister />
+			</ClientReduxProvider>
 		</>
 	);
 };
