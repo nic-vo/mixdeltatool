@@ -1,7 +1,11 @@
+'use client';
+
 import { myPlaylistObjectParser } from '@/lib/validators';
 import { sanitize } from 'isomorphic-dompurify';
 
-import { MyPlaylistObject } from '@/types/spotify';
+import type { MyPlaylistObject } from '@/lib/validators';
+
+const stripper = (input: string) => sanitize(input, { ALLOWED_TAGS: [] });
 
 export const sanitizePlaylists = (playlists: MyPlaylistObject[]) => {
 	try {
@@ -11,20 +15,20 @@ export const sanitizePlaylists = (playlists: MyPlaylistObject[]) => {
 		const sanitized = parsed.map((playlist) => {
 			return {
 				...playlist,
-				name: sanitize(playlist.name, {
-					ALLOWED_TAGS: [],
+				owner: playlist.owner.map((deets) => {
+					return {
+						id: stripper(deets.id),
+						name: deets.name !== null ? stripper(deets.name) : null,
+					};
 				}),
-				id: sanitize(playlist.id, {
-					ALLOWED_TAGS: [],
-				}),
-				image: !playlist.image
-					? undefined
-					: {
+				name: stripper(playlist.name),
+				id: stripper(playlist.id),
+				image: playlist.image
+					? {
 							...playlist.image,
-							url: sanitize(playlist.image.url, {
-								ALLOWED_TAGS: [],
-							}),
-					  },
+							url: stripper(playlist.image.url),
+					  }
+					: null,
 			};
 		});
 		return sanitized;
