@@ -1,8 +1,9 @@
-import { auth, saSignOut } from '@/auth';
+import { auth } from '@/auth';
 import {
 	GlobalButton,
 	GlobalMain,
 	GlobalBlockLink,
+	GlobalTextWrapper,
 } from '@/components/global/serverComponentUI';
 import { ToolHeading } from './_components/server';
 import {
@@ -11,13 +12,14 @@ import {
 	localNavigation,
 } from '@/consts/buttonStates';
 import { redirect } from 'next/navigation';
+import { saSignOut } from '@/auth';
 
 const ToolRoot = async () => {
 	const session = await auth();
 	if (!session) redirect(`/api/auth/signin`);
 
 	return (
-		<GlobalMain className='m-auto'>
+		<GlobalMain className='justify-center'>
 			<ToolHeading>
 				Welcome,{' '}
 				{(session.user &&
@@ -29,13 +31,13 @@ const ToolRoot = async () => {
 				<GlobalButton
 					type='submit'
 					className={hitsSpotify}>
-					Sign out
+					<GlobalTextWrapper>Sign out</GlobalTextWrapper>
 				</GlobalButton>
 			</form>
 			<GlobalBlockLink
 				href='/'
 				className={localNavigation + ' ' + flippedSlider}>
-				&larr; Return Home
+				<GlobalTextWrapper>&larr; Return Home</GlobalTextWrapper>
 			</GlobalBlockLink>
 		</GlobalMain>
 	);
