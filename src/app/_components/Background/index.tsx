@@ -3,7 +3,11 @@
 import { useCallback, useContext } from 'react';
 import Canvas from './Canvas';
 import MotionContext from './MotionContext';
-import { GlobalButton } from '@/components/global/serverComponentUI';
+import {
+	GlobalButton,
+	GlobalTextWrapper,
+} from '@/components/global/serverComponentUI';
+import { IoPause, IoPlay } from 'react-icons/io5';
 
 type FieldsInitValues = {
 	size: number;
@@ -101,7 +105,27 @@ const Background = (props: { fps?: number }) => {
 export default Background;
 
 export const BackgroundToggler = () => {
-	const { setAnimated } = useContext(MotionContext);
+	const { animated, setAnimated } = useContext(MotionContext);
 
-	return <GlobalButton></GlobalButton>;
+	return (
+		<GlobalButton
+			onClick={() => setAnimated(!animated)}
+			className='z-20 !fixed left-4 bottom-4 !p-2 backdrop-brightness-[0.2]'
+			aria-controls='canvas'>
+			{animated ? (
+				<IoPause
+					aria-hidden={true}
+					className='text-lg relative z-10'
+				/>
+			) : (
+				<IoPlay
+					aria-hidden={true}
+					className='text-lg relative z-10'
+				/>
+			)}
+			<GlobalTextWrapper sr>
+				{animated ? 'Pause' : 'Restart'} background animation
+			</GlobalTextWrapper>
+		</GlobalButton>
+	);
 };
