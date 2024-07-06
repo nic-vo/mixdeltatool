@@ -1,6 +1,9 @@
 'use client';
 
-import { GlobalButton } from '@/components/global/serverComponentUI';
+import {
+	GlobalButton,
+	GlobalTextWrapper,
+} from '@/components/global/serverComponentUI';
 import { usePathname } from 'next/navigation';
 import {
 	MouseEventHandler,
@@ -44,13 +47,13 @@ const DialogWrapper = (props: PropsWithChildren) => {
 				</Suspense>
 			</div>
 			<GlobalButton
-				aria-label='Close service status popup'
 				className='!absolute size-max top-2 right-2 !p-1 border-2 rounded-full before:!bg-myteal hover:!border-myteal focus-visible:!border-myteal'
 				onClick={handler}>
 				<IoCloseSharp
 					aria-hidden={true}
-					className='text-sm'
+					className='text-sm relative z-10'
 				/>
+				<GlobalTextWrapper sr>Close service status pop-up</GlobalTextWrapper>
 			</GlobalButton>
 		</dialog>
 	);
