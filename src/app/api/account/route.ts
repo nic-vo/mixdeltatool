@@ -4,7 +4,6 @@ import { handlerWithTimeoutAndAuth } from '@/lib/route_helpers/wrappers';
 
 import { NextAuthRequest } from 'next-auth/lib';
 import { myRace } from '../spotify/create/_lib/common';
-
 const RATE_LIMIT_PREFIX = 'DUA';
 const RATE_LIMIT_ROLLING_LIMIT = 10;
 const RATE_LIMIT_DECAY_SECONDS = 10;
@@ -34,6 +33,7 @@ export const DELETE = handlerWithTimeoutAndAuth(
 		if (!earlyReturn.ok) return earlyReturn;
 
 		await myRace(sessionDeleter(req.auth.user.id), 30 * 1000); // A little unsafe because 30s not guaranteed
+
 		return Response.json(
 			{ message: 'Your account has been deleted' },
 			{ status: 200 }

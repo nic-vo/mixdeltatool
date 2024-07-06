@@ -13,24 +13,26 @@ export const userDeleter = async (id: string) => {
 	while (onceFlag) {
 		try {
 			session.startTransaction();
-			await Account.findOneAndDelete({ userId: id })
+			await Account.findOneAndDelete({ userId: id }, { session })
 				.where('provider')
 				.equals('spotify')
 				.exec();
-			await User.findByIdAndDelete(id).exec();
+			await User.findByIdAndDelete(id, { session }).exec();
 			await session.commitTransaction();
+			break;
 		} catch {
 			await session.abortTransaction();
 			if (onceFlag) {
 				onceFlag = false;
 				continue;
 			}
+			await session.endSession();
 			return badResponse(500, {
 				message: 'There was an error with our servers. Try again.',
 			});
 		}
 	}
-	session.endSession();
+	await session.endSession();
 	return Response.json({ message: 'Deleted' }, { status: 201 });
 };
 
