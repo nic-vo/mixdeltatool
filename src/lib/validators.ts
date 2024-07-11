@@ -67,7 +67,7 @@ export const diffBodyParser = z
 	.object({
 		target: myPlaylistObjectParser,
 		differ: myPlaylistObjectParser,
-		type: z.enum(['adu', 'odu', 'otu', 'bu', 'stu']),
+		action: z.enum(['adu', 'odu', 'otu', 'bu', 'stu']),
 		newName: z.string().max(150).nullable(),
 		newDesc: z.string().max(600).nullable(),
 		keepImg: z.boolean(),
