@@ -46,9 +46,9 @@ const userPlaylistsSlice = createSlice({
 				state.page = action.payload.next;
 			})
 			.addCase(differOperationAsync.fulfilled, (state, action) => {
-				const sanitizedAndAdded = state.playlists.concat(
-					sanitizePlaylists([action.payload.playlist])[0]
-				);
+				const sanitizedAndAdded = sanitizePlaylists([
+					action.payload.playlist,
+				]).concat([...state.playlists]);
 				state.playlists = sanitizedAndAdded;
 			});
 	},
