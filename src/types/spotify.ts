@@ -8,8 +8,7 @@ interface BasicSpotObj {
 }
 
 export interface SpotPlaylistTrackObject {
-	track: Pick<BasicSpotObj, 'uri'>;
-	is_local: boolean;
+	track: null | (Pick<BasicSpotObj, 'uri'> & { is_local: boolean });
 }
 
 export interface BasicSpotApiResponse {
