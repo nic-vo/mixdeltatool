@@ -18,6 +18,9 @@ import specificFetchStateReducer from './specificFetchStateSlice';
 import differFormSliceReducer, {
 	InitialDifferFormState,
 } from './differFormSlice';
+import differOptionalFormSliceReducer, {
+	InitialDifferOptionalFormState,
+} from './differOptionalFormSlice';
 import differFetchStateSliceReducer from './differFetchStateSlice';
 
 import listenerMiddleware from './middleware';
@@ -35,6 +38,7 @@ export type RootState = {
 	userFetchState: LoadingState;
 	specificFetchState: LoadingState;
 	differFetchState: LoadingState;
+	differOptionalForm: InitialDifferOptionalFormState;
 };
 
 export const store = configureStore({
@@ -45,6 +49,7 @@ export const store = configureStore({
 		specificFetchState: specificFetchStateReducer,
 		userFetchState: userFetchStateReducer,
 		differFetchState: differFetchStateSliceReducer,
+		differOptionalForm: differOptionalFormSliceReducer,
 	},
 	middleware: (getDefault) => {
 		return getDefault().concat(listenerMiddleware);
@@ -62,6 +67,7 @@ export const selectPage = (s: RootState) => s.userPlaylists.page;
 export const selectOnForm = (s: RootState) => s.differForm.onForm;
 export const selectDifferForm = (s: RootState) => s.differForm;
 export const selectDifferFetch = (s: RootState) => s.differFetchState;
+export const selectDifferOptionalForm = (s: RootState) => s.differOptionalForm;
 
 export type AppDispatch = typeof store.dispatch;
 

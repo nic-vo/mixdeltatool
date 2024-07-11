@@ -73,19 +73,21 @@ export const retrieveUserListsAsync = createAsyncThunk(
 export const differOperationAsync = createAsyncThunk(
 	'differForm/differOperationAsync',
 	async (_, api) => {
-		const { differForm: df } = api.getState() as RootState;
+		const { differForm: df, differOptionalForm: dfo } =
+			api.getState() as RootState;
 
-		const { target, differ, type, keepImg } = df;
+		const { target, differ, action } = df;
+		const { keepImg } = dfo;
 		if (target === '') throw { message: 'Target missing' };
 		if (differ === '') throw { message: 'Differ missing' };
-		if (type === '') throw { message: 'Type missing' };
+		if (action === '') throw { message: 'Type missing' };
 		const body = {
 			target,
 			differ,
-			type,
+			action,
 			keepImg,
-			newName: df.newName !== '' ? df.newName : null,
-			newDesc: df.newDesc !== '' ? df.newDesc : null,
+			newName: dfo.newName !== '' ? dfo.newName : null,
+			newDesc: dfo.newDesc !== '' ? dfo.newDesc : null,
 		};
 		const response = await fetch('/api/spotify/create', {
 			method: 'POST',

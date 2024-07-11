@@ -7,13 +7,9 @@ import type { ActionType } from '@/types/spotify';
 export type InitialDifferFormState = {
 	target: MyPlaylistObject | '';
 	differ: MyPlaylistObject | '';
-	type: ActionType | '';
+	action: ActionType | '';
 	success: string[] | null;
 	endPlaylist: MyPlaylistObject | null;
-	newName: string | '';
-	newDesc: string | '';
-	keepImg: boolean;
-
 	onForm: boolean;
 };
 
@@ -21,11 +17,8 @@ const initialState: InitialDifferFormState = {
 	onForm: true,
 	target: '',
 	differ: '',
-	type: '',
+	action: '',
 	success: null,
-	newName: '',
-	newDesc: '',
-	keepImg: true,
 	endPlaylist: null,
 };
 
@@ -39,28 +32,25 @@ const differFormSlice = createSlice({
 		clearDiffer: (state) => {
 			state.differ = '';
 		},
+		clearAction: (state) => {
+			state.action = '';
+		},
 		resetToForm: (state) => {
+			state.onForm = true;
+			state.target = '';
+			state.differ = '';
+			state.action = '';
 			state.success = null;
 			state.endPlaylist = null;
-			state.onForm = true;
 		},
-		setTarget: (state, action: PayloadAction<MyPlaylistObject | ''>) => {
+		setTarget: (state, action: PayloadAction<MyPlaylistObject>) => {
 			state.target = action.payload;
 		},
-		setDiffer: (state, action: PayloadAction<MyPlaylistObject | ''>) => {
+		setDiffer: (state, action: PayloadAction<MyPlaylistObject>) => {
 			state.differ = action.payload;
 		},
 		setAction: (state, action: PayloadAction<ActionType | ''>) => {
-			state.type = action.payload;
-		},
-		updateName: (state, action: PayloadAction<string>) => {
-			state.newName = action.payload;
-		},
-		updateDesc: (state, action: PayloadAction<string>) => {
-			state.newDesc = action.payload;
-		},
-		toggleKeepImg: (state) => {
-			state.keepImg = !state.keepImg;
+			state.action = action.payload;
 		},
 	},
 	extraReducers: (builder) => {
@@ -78,13 +68,11 @@ const differFormSlice = createSlice({
 export const {
 	clearTarget,
 	clearDiffer,
+	clearAction,
 	resetToForm,
 	setTarget,
 	setDiffer,
 	setAction,
-	updateDesc,
-	updateName,
-	toggleKeepImg,
 } = differFormSlice.actions;
 
 export default differFormSlice.reducer;
