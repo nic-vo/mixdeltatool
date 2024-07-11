@@ -20,7 +20,7 @@ const ToolRoot = async () => {
 
 	return (
 		<GlobalMain className='justify-center'>
-			<ToolHeading>
+			<ToolHeading className='text-center'>
 				Welcome,{' '}
 				{(session.user &&
 					(session.user?.name ?? session.user?.email?.split('@')[0])) ??
@@ -30,7 +30,7 @@ const ToolRoot = async () => {
 			<form action={saSignOut}>
 				<GlobalButton
 					type='submit'
-					className={hitsSpotify}>
+					className={hitsSpotify + ' ' + flippedSlider}>
 					<GlobalTextWrapper>Sign out</GlobalTextWrapper>
 				</GlobalButton>
 			</form>
