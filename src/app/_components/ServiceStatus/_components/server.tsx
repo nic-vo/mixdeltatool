@@ -54,7 +54,6 @@ async function internalGetGlobalStatus(): Promise<{
 					break;
 				}
 
-				console.log('creating fallback');
 				const newStatus = new GlobalStatus({
 					status,
 					statusType,
@@ -76,8 +75,7 @@ async function internalGetGlobalStatus(): Promise<{
 		}
 		await session.endSession();
 		return { status, statusType, active };
-	} catch (e: any) {
-		console.log(e);
+	} catch {
 		return {
 			statusType: 'severe',
 			status:
