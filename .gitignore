@@ -41,6 +41,7 @@ next-env.d.ts
 /src/lib/dev
 /src/pages/api/dev
 /src/app/dev
+/src/app/api/dev
 
 # yarn
 .pnp.cjs
