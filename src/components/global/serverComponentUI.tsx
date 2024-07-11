@@ -12,7 +12,7 @@ export type GlobalLinkProps = PropsWithChildren &
 	AnchorHTMLAttributes<HTMLAnchorElement> & { href: string };
 
 const globalClasser = (className?: string) =>
-	`flex items-center justify-center relative py-2 px-8 border-2 rounded-full border-white bg-transparent hover:text-black focus-visible:text-black outline-none transition-all before:absolute before:h-full before:w-[102%] before:top-0 before:left-0 overflow-hidden before:-translate-x-full before:transition-all hover:before:translate-x-0 focus-visible:before:translate-x-0 text-center font-karla font-medium disabled:opacity-25 disabled:cursor-not-allowed before:disabled:opacity-0 disabled:text-white hover:disabled:border-white before:bg-white${
+	`flex items-center justify-center relative py-2 px-8 border-2 rounded-full border-white bg-transparent hover:text-black focus-visible:text-black outline-none transition-all after:absolute after:h-full after:w-[102%] after:top-0 after:left-0 overflow-hidden after:-translate-x-full after:transition-all hover:after:translate-x-0 focus-visible:after:translate-x-0 text-center font-karla font-medium disabled:opacity-25 disabled:cursor-not-allowed after:disabled:opacity-0 disabled:text-white hover:disabled:border-white after:bg-white${
 		(className && ` ${className}`) ?? ''
 	}`;
 
@@ -97,7 +97,7 @@ export const InlineLink = (props: GlobalLinkProps) => {
 };
 
 const mainClasser = (className?: string) =>
-	`relative flex flex-col items-center gap-4 w-11/12 flex-grow flex-shrink z-10 overflow-hidden${
+	`relative flex flex-col items-center gap-4 w-10/12 flex-grow flex-shrink z-10 overflow-hidden${
 		className ? ` ${className}` : ''
 	}`;
 
