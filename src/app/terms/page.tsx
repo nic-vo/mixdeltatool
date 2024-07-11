@@ -2,7 +2,7 @@ import EUAContent, { SmallNav } from '../_components/EUA/server';
 import { GlobalMain } from '@/components/global/serverComponentUI';
 
 const Terms = () => (
-	<GlobalMain className='max-w-prose mt-16 !overflow-auto px-2 focus-visible:outline-white'>
+	<GlobalMain className='max-w-prose mt-16 !overflow-auto px-2 outline-white focus-visible:outline'>
 		<header className='flex flex-col gap-4'>
 			<h1 className='text-center font-cabin font-black text-5xl'>
 				MixDelta End User Agreement

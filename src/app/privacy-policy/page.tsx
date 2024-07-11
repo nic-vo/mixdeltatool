@@ -19,7 +19,7 @@ const LocalList = (props: PropsWithChildren & { ordered?: boolean }) => {
 
 const PrivacyPolicy = () => {
 	return (
-		<GlobalMain className='max-w-prose mt-16 !overflow-auto px-2 focus-visible:outline-white'>
+		<GlobalMain className='max-w-prose mt-16 !overflow-auto px-2 outline-white focus-visible:outline'>
 			<header className='flex flex-col gap-4'>
 				<h1 className='text-center text-5xl font-black'>
 					MixDelta Privacy Policy
@@ -29,7 +29,7 @@ const PrivacyPolicy = () => {
 			<LocalSection>
 				<h2>Introduction</h2>
 				<p>
-					Welcome to the MixDelta for Spotify! This Privacy Policy outlines the
+					Welcome to MixDelta for Spotify! This Privacy Policy outlines the
 					information we collect, how we use it, and the choices you have
 					concerning your data. By using MixDelta, you agree to the terms of
 					this Privacy Policy.

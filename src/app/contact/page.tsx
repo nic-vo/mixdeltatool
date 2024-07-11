@@ -4,7 +4,7 @@ import { SmallNav } from '../_components/EUA/server';
 import Script from 'next/script';
 
 const Contact = () => (
-	<GlobalMain className='mt-8 gap-8'>
+	<GlobalMain className='mt-8 gap-4'>
 		<Script src='https://js.hcaptcha.com/1/api.js?render=explicit' />
 		<h1 className='font-cabin text-5xl lg:text-8xl font-black text-center'>
 			Comments? Questions?
