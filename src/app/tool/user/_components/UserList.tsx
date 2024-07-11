@@ -1,12 +1,10 @@
 'use client';
 
-import ListItem from '../../_components/dynamic/ListItem';
+import ListItem from '../../_components/ListItem';
 import { useSelector } from 'react-redux';
 import { selectUserPlaylists } from '@/state';
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import { SpotifyLogo } from '@/consts/spotify';
-import { InlineLink } from '@/components/global/serverComponentUI';
+import { ListContainer, ListUL } from '../../_components/server';
 
 export default function UserList() {
 	const [first, setFirst] = useState(true);
@@ -16,32 +14,16 @@ export default function UserList() {
 	useEffect(() => setFirst(false), []);
 
 	return (
-		<section className='flex flex-col items-center gap-8 flex-shrink overflow-hidden w-full'>
+		<ListContainer>
 			<hgroup className='flex flex-col gap-8 items-center'>
-				<h2 className='font-light text-3xl text-center w-max'>
+				<h2 className='font-karla font-extralight text-3xl text-center w-max'>
 					Stored Playlists
 				</h2>
-				<p className='flex items-center gap-2 flex-wrap justify-center'>
-					<span className='block relative'>
-						All playlist data is provided by{' '}
-					</span>
-					<InlineLink
-						href='https://open.spotify.com'
-						target='_blank'>
-						<Image
-							src={SpotifyLogo}
-							alt='Spotify'
-							className='h-[71px] w-auto shrink-0'
-						/>
-					</InlineLink>
-				</p>
 			</hgroup>
 			{first || playlists.length === 0 ? (
 				<p className='text-slate-600'>Nothing here...</p>
 			) : (
-				<ul
-					className='flex w-full justify-center flex-wrap gap-8 h-full overflow-auto outline-white focus-visible:outline -outline-offset-2 p-2 rounded-xl'
-					tabIndex={0}>
+				<ListUL tabIndex={0}>
 					{playlists.map((playlist) => (
 						<li
 							key={playlist.id}
@@ -49,8 +31,8 @@ export default function UserList() {
 							<ListItem playlist={playlist} />
 						</li>
 					))}
-				</ul>
+				</ListUL>
 			)}
-		</section>
+		</ListContainer>
 	);
 }
