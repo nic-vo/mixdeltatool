@@ -1,4 +1,4 @@
-import MixDeltaLogo from './mdl.svg';
+import MixDeltaLogo from './mdl.jpg';
 import SpotifyLogo from './Spotify_Logo_RGB_White.png';
 
 export const SPOT_URL_BASE = 'https://api.spotify.com/v1/';
