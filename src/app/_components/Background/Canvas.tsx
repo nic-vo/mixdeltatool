@@ -53,6 +53,7 @@ const Canvas = (
 	}, [height, width, props.initializer]);
 
 	useEffect(() => {
+		if (!animated) return;
 		if (error !== '') return;
 		const canvas = canvasRef.current;
 		if (canvas === null) {
@@ -69,26 +70,24 @@ const Canvas = (
 		let animationFrameId: number;
 		let last = Date.now();
 
-		if (animated) {
-			const render = () => {
-				const rn = Date.now();
-				if (rn - last > 1000 / props.fps) {
-					frame += 1;
-					last = rn;
-					if (predraw) predraw(context);
-					draw({ ctx: context, frame, init: memoizedInit });
-				}
-				animationFrameId = requestAnimationFrame(render);
-			};
-			render();
-		}
+		const render = () => {
+			const rn = Date.now();
+			if (rn - last > 1000 / props.fps) {
+				frame += 1;
+				last = rn;
+				if (predraw) predraw(context);
+				draw({ ctx: context, frame, init: memoizedInit });
+			}
+			animationFrameId = requestAnimationFrame(render);
+		};
+		render();
 
 		return () => {
 			elapsedRef.current = frame;
 			window.cancelAnimationFrame(animationFrameId);
 			const render = () => {
 				if (predraw) predraw(context);
-				draw({ ctx: context, frame, init: memoizedInit });
+				if (!animated) draw({ ctx: context, frame, init: memoizedInit });
 			};
 			requestAnimationFrame(render);
 		};
@@ -119,9 +118,13 @@ const Canvas = (
 			setError('There was an error with the canvas');
 			return;
 		}
-		canvas.height =
-			height === 0 ? document.documentElement.clientHeight : height;
-		canvas.width = width === 0 ? document.documentElement.clientWidth : width;
+		canvas.height = document.documentElement.clientHeight;
+		canvas.width = document.documentElement.clientWidth;
+		const context = canvas.getContext('2d');
+		if (context === null) {
+			setError('There was an error with the canvas');
+			return;
+		}
 	}, [width, height]);
 
 	if (error !== '')
