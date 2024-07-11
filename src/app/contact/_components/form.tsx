@@ -102,7 +102,7 @@ export default function ContactForm(props: PropsWithChildren) {
 
 	return (
 		<form
-			className='flex flex-col items-center gap-8 p-4 w-full m-auto max-w-prose overflow-y-auto'
+			className='flex flex-col items-center gap-8 p-4 w-full flex-grow max-w-prose overflow-y-auto'
 			onSubmit={submitHandler}>
 			<fieldset
 				disabled={loading || success === true || error === true}
@@ -122,7 +122,7 @@ export default function ContactForm(props: PropsWithChildren) {
 						autoComplete='off'
 						minLength={3}
 						maxLength={30}
-						className='w-full font-normal col-span-3 resize-none text-white p-2 cursor-text bg-transparent border-b focus-visible:bg-white focus-visible:text-black transition-colors outline-none border-white'
+						className='w-full text-base font-normal col-span-3 resize-none text-white p-2 cursor-text bg-transparent border-b focus-visible:bg-white focus-visible:text-black transition-colors outline-none border-white'
 					/>
 				</label>
 				<label
@@ -135,13 +135,25 @@ export default function ContactForm(props: PropsWithChildren) {
 						minLength={3}
 						maxLength={280}
 						required={true}
-						className='w-full font-normal col-span-3 resize-none text-white p-2 cursor-text h-32 rounded-xl bg-transparent outline-none border transition-all focus-visible:bg-white focus-visible:text-black border-white'
+						className='w-full text-base font-normal col-span-3 resize-none text-white p-2 cursor-text h-32 rounded-xl bg-transparent outline-none border transition-all focus-visible:bg-white focus-visible:text-black border-white'
 					/>
 				</label>
 				{props.children}
 			</fieldset>
-			{success === true && <p role='status'>Thank you!</p>}
-			{error && <p role='status'>{error}</p>}
+			<div
+				role='status'
+				aria-live='assertive'
+				aria-busy={loading}>
+				{loading && (
+					<p aria-label='Contact form status notification'>Loading...</p>
+				)}
+				{success === true && (
+					<p aria-label='Contact form status notification'>
+						Thank you for your feedback!
+					</p>
+				)}
+				{error && <p aria-label='Contact form status notification'>{error}</p>}
+			</div>
 		</form>
 	);
 }
