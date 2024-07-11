@@ -23,7 +23,7 @@ export default async function Home() {
 				}>
 				<GlobalTextWrapper>To the tool! &rarr;</GlobalTextWrapper>
 			</GlobalBlockLink>
-			<section className='w-full *:max-w-prose col-span-1 lg:row-start-2 lg:self-start col-start-2 flex flex-col gap-4 self-end'>
+			<section className='w-full *:max-w-prose lg:row-start-2 lg:self-start col-start-2 flex flex-col gap-4 self-end'>
 				<h2 className='font-bold text-5xl font-hind'>About this tool</h2>
 				<p>
 					It&apos;s simple: a user can use MixDelta to identify all similarities
@@ -40,5 +40,3 @@ export default async function Home() {
 		</GlobalMain>
 	);
 }
-
-export const dynamic = 'force-static';
