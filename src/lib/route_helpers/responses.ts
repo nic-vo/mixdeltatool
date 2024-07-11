@@ -38,17 +38,22 @@ export const defaultErrorMessages = {
 	502: `Something happened to Spotify's response`,
 	503: `Something happened to Spotify's servers`,
 	504: 'Server timed out',
-};
+} as Record<number, string>;
 
 export const badResponse = (
-	status: keyof typeof defaultErrorMessages,
+	status: number,
 	details?: {
 		message?: string;
 		headers?: Record<string, string>;
 	}
 ) => {
+	if (!defaultErrorMessages[status])
+		return Response.json(
+			{ message: defaultErrorMessages[500] },
+			{ status: 500 }
+		);
 	if (!details) {
-		const message = defaultErrorMessages[status];
+		const message = defaultErrorMessages[status] ?? defaultErrorMessages[500];
 		return Response.json({ message }, { status });
 	}
 	const { message, headers } = details;

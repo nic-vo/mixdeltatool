@@ -149,10 +149,12 @@ export async function threeRetries(
 			message: 'There was an error with the server. Try again',
 		});
 
-	if (!response.ok && overrides && overrides[response.status])
-		return badResponse(response.status as keyof typeof defaultErrorMessages, {
+	if (response.ok) return response;
+
+	if (overrides && overrides[response.status])
+		return badResponse(response.status, {
 			message: overrides[response.status],
 		});
 
-	return response;
+	return badResponse(response.status);
 }

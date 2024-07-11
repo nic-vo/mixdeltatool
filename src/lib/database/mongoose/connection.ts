@@ -22,7 +22,6 @@ const mongoosePromise = async () => {
 	}
 
 	if (!process.env.MONGODB_URI) throw new Error('Missing MONGODB_URI');
-	console.log(process.env.MONGODB_URI);
 
 	if (cached.promise === null) {
 		cached.promise = connect(process.env.MONGODB_URI!, {
