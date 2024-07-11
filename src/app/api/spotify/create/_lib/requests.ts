@@ -84,7 +84,7 @@ export async function getPlaylistTracks({
 	const base = SPOT_URL_BASE.concat(type, 's/', id, '/tracks?');
 	const params = new URLSearchParams({ offset: '0', limit: '50' });
 	if (type === 'playlist')
-		params.append('fields', 'next,total,items(track(uri))');
+		params.append('fields', 'next,total,items(track(uri,is_local))');
 	const headers = new Headers();
 	headers.append('Authorization', `Bearer ${accessToken}`);
 	let next: string | null = base.concat(params.toString());
@@ -105,12 +105,9 @@ export async function getPlaylistTracks({
 		let data;
 		if (type === 'playlist') {
 			data = (await spotifyResponse.json()) as SpotPlaylistTracksResponse;
-			for (const {
-				is_local,
-				track: { uri },
-			} of data.items) {
-				if (is_local || set.has(uri)) continue;
-				set.add(uri);
+			for (const { track } of data.items) {
+				if (track === null || track.is_local || set.has(track.uri)) continue;
+				set.add(track.uri);
 				completed += 1;
 			}
 		} else {
@@ -124,7 +121,6 @@ export async function getPlaylistTracks({
 		total = data.total;
 		next = data.next;
 	}
-
 	return Response.json(
 		{ total, completed, items: Array.from(set) },
 		{ status: 200 }
@@ -202,7 +198,7 @@ export async function createEmptyPlaylist({
 	// Fail silently cuz completely unnecessary
 	let newIMGURL = '/mdl.jpg';
 	try {
-		const putURL = SPOT_URL_BASE.concat('playlist/', returner.id, '/images');
+		const putURL = SPOT_URL_BASE.concat('playlists/', returner.id, '/images');
 		const putHeaders = new Headers();
 		putHeaders.append('Authorization', `Bearer ${accessToken}`);
 		putHeaders.append('Content-Type', 'image/jpeg');
@@ -221,12 +217,15 @@ export async function createEmptyPlaylist({
 		}
 		await threeRetries(
 			() =>
-				fetch(putURL, { headers: putHeaders, method: 'PUT', body: imgString }),
+				fetch(putURL, {
+					headers: putHeaders,
+					method: 'PUT',
+					body: imgString,
+				}),
 			{}
 		); // Silent fetch
 	} catch {}
 	returner.image = { url: newIMGURL, height: null, width: null };
-
 	return Response.json(returner, { status: 201 });
 }
 
@@ -245,7 +244,7 @@ export async function populatePlaylistWithComparison({
 }) {
 	const uris = Array.from(items);
 	const fetches: string[][] = [];
-	const remain = uris.length & 100;
+	const remain = uris.length % 100;
 	const hundreds = Math.floor(uris.length / 100);
 	for (let i = 0; i < hundreds; i++) {
 		fetches.push(uris.slice(0 + 100 * i, 100 + 100 * i));
@@ -269,14 +268,14 @@ export async function populatePlaylistWithComparison({
 				body: JSON.stringify({ uris: uriArr }),
 			})
 		);
+
 		if (!spotPostResponse.ok) break;
 		// Add new number to completed, either a hundred or the remainder
 		if (iterations <= hundreds) completed += 100;
 		else if (remain > 0) completed += remain;
 		iterations += 1;
 	}
-
-	if (completed === 0) return badResponse(504);
+	if (completed === 0 && total !== 0) return badResponse(504);
 
 	if (Date.now() + 500 > globalTimeoutMS)
 		return Response.json({ completed, total }, { status: 201 });
