@@ -16,53 +16,62 @@ const MainHeaderLI = (props: PropsWithChildren & { className?: string }) => (
 );
 
 const yourClasser =
-	'before:!translate-x-0 before:!bg-myteal !border-myteal text-black cursor-default border-r-white';
+	'after:!translate-x-0 after:!bg-satorange !border-satorange text-black cursor-default border-r-white';
 const specClasser =
-	'before:translate-x-0 before:!bg-satorange !border-satorange text-black cursor-default border-l-white';
+	'after:!translate-x-0 after:!bg-myteal !border-myteal text-black cursor-default border-l-white';
 const diffClasser =
-	'before:!translate-y-0 before:!bg-pinkredlight !border-pinkredlight text-black cursor-default';
+	'after:!translate-y-0 after:!bg-pinkredlight !border-pinkredlight text-black cursor-default';
 
 const MainNav = () => {
 	const pathname = usePathname();
 	return (
-		<nav>
-			<ul className='relative flex w-full items-center justify-center'>
+		<nav className='flex-shrink'>
+			<ul className='relative flex w-full items-center justify-center divide-x-2'>
 				<MainHeaderLI>
-					<GlobalBlockLink
-						href='/tool/user'
-						aria-label='Add your playlists'
-						className={
-							flippedSlider +
-							' ' +
-							'rounded-r-none border-r px-4' +
-							(pathname === '/tool/user' ? ' ' + yourClasser : '')
-						}
-						tabIndex={pathname === '/tool/user' ? -1 : 0}>
-						<GlobalTextWrapper aria-hidden>Yours</GlobalTextWrapper>
-					</GlobalBlockLink>
+					<section className='flex items-center justify-center gap-2 flex-wrap w-full'>
+						<h2 className='font-karla text-xl font-thin block text-nowrap'>
+							Playlists:
+						</h2>
+						<ul className='relative flex items-center justify-center shrink-0'>
+							<MainHeaderLI>
+								<GlobalBlockLink
+									href='/tool/specific'
+									aria-label='Add specific playlists'
+									className={
+										flippedSlider +
+										' ' +
+										'rounded-r-none border-r !p-2' +
+										(pathname === '/tool/specific' ? ' ' + specClasser : '')
+									}
+									tabIndex={pathname === '/tool/specific' ? -1 : 0}>
+									<GlobalTextWrapper aria-hidden>Specific</GlobalTextWrapper>
+								</GlobalBlockLink>
+							</MainHeaderLI>
+							<MainHeaderLI>
+								<GlobalBlockLink
+									href='/tool/user'
+									aria-label='Add your playlists'
+									className={
+										'rounded-l-none border-l !p-2' +
+										(pathname === '/tool/user' ? ' ' + yourClasser : '')
+									}
+									tabIndex={pathname === '/tool/user' ? -1 : 0}>
+									<GlobalTextWrapper aria-hidden>Yours</GlobalTextWrapper>
+								</GlobalBlockLink>
+							</MainHeaderLI>
+						</ul>
+					</section>
 				</MainHeaderLI>
-				<MainHeaderLI>
+				<MainHeaderLI className='ml-2 pl-2'>
 					<GlobalBlockLink
-						href='/tool/specific'
-						aria-label='Add specific playlists'
+						href='/tool/mixer'
+						aria-label='Go to the playlist mixer'
 						className={
-							'rounded-l-none border-l px-4' +
-							(pathname === '/tool/specific' ? ' ' + specClasser : '')
+							'after:translate-x-0 after:translate-y-full after:hover:translate-y-0 after:focus-visible:translate-y-0 !px-4' +
+							(pathname === '/tool/mixer' ? ' ' + diffClasser : '')
 						}
-						tabIndex={pathname === '/tool/specific' ? -1 : 0}>
-						<GlobalTextWrapper aria-hidden>Specific</GlobalTextWrapper>
-					</GlobalBlockLink>
-				</MainHeaderLI>
-				<MainHeaderLI className='ml-2'>
-					<GlobalBlockLink
-						href='/tool/differ'
-						aria-label='Go to the differ'
-						className={
-							'before:translate-x-0 before:translate-y-full before:hover:translate-y-0 before:focus-visible:translate-y-0 px-2' +
-							(pathname === '/tool/differ' ? ' ' + diffClasser : '')
-						}
-						tabIndex={pathname === '/tool/differ' ? -1 : 0}>
-						<GlobalTextWrapper aria-hidden>Differ</GlobalTextWrapper>
+						tabIndex={pathname === '/tool/mixer' ? -1 : 0}>
+						<GlobalTextWrapper aria-hidden>Mixer</GlobalTextWrapper>
 					</GlobalBlockLink>
 				</MainHeaderLI>
 			</ul>
