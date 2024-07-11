@@ -80,10 +80,9 @@ const { handlers, signIn, signOut, auth } = NextAuth({
 			const mongooseSession = await db.startSession();
 			mongooseSession.startTransaction();
 			try {
-				const account = await Account.findOne(
-					{ userId: user.id },
-					{ session: mongooseSession }
-				).exec();
+				const account = await Account.findOne({ userId: user.id }, null, {
+					session: mongooseSession,
+				}).exec();
 				if (!account) throw new Error();
 				// Take refresh token and post to spotify token refresh URL
 				const response = await fetch(`${SPOT_BASE_URL}/api/token`, {
