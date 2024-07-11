@@ -36,7 +36,7 @@ const ImageLoader = (props: { url: string; alt: string }) => {
 			onLoad={loadHandler}
 			onError={errorHandler}
 			loading='lazy'
-			className={`transition-all h-full opacity-0 object-cover${
+			className={`transition-all h-full max-h-full max-w-full opacity-0 object-contain${
 				loaded ? ` opacity-100` : ''
 			}`}
 		/>
