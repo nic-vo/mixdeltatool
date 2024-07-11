@@ -1,13 +1,14 @@
-import { GlobalMain } from '@/components/global/serverComponentUI';
-import { ToolHeading } from '../_components/server';
+import { AdderMain, ToolHeading } from '../_components/server';
 import { UserAdder, UserList } from './_components';
 
 const UserDialogue = () => (
-	<GlobalMain>
-		<ToolHeading>Add your playlists</ToolHeading>
+	<AdderMain>
+		<ToolHeading className='col-span-full text-center'>
+			Add <span className='text-satorange'>Your</span> Playlists
+		</ToolHeading>
 		<UserAdder />
 		<UserList />
-	</GlobalMain>
+	</AdderMain>
 );
 
 export default UserDialogue;
