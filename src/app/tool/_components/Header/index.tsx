@@ -4,13 +4,15 @@ import ToggleMenu from './client/ToggleMenu';
 
 const ToolHeader = () => {
 	return (
-		<header className='relative w-full flex justify-center items-center gap-2 p-4'>
+		<header className='relative w-full flex justify-center items-center gap-2 p-4 divide-x-2'>
 			<Suspense fallback={null}>
 				<MainNav />
 			</Suspense>
-			<Suspense fallback={null}>
-				<ToggleMenu />
-			</Suspense>
+			<div className='pl-2'>
+				<Suspense fallback={null}>
+					<ToggleMenu />
+				</Suspense>
+			</div>
 		</header>
 	);
 };
