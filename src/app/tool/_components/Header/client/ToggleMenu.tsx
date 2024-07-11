@@ -18,10 +18,8 @@ const ToggleMenu = () => {
 	const containerBlurHandler: FocusEventHandler = (e) => {
 		const { relatedTarget, currentTarget } = e;
 		if (relatedTarget?.tagName === 'dialog') return;
-		if (relatedTarget && !currentTarget.contains(relatedTarget)) {
-			console.log('triggered');
+		if (relatedTarget && !currentTarget.contains(relatedTarget))
 			setToggled(false);
-		}
 	};
 
 	useEffect(() => {
@@ -36,19 +34,19 @@ const ToggleMenu = () => {
 	return (
 		<>
 			<GlobalButton
-				className={`rounded-full !p-2 z-10 ${
-					toggled ? 'text-black !bg-white before:translate-x-0' : ''
+				className={`rounded-full !p-2 z-10 backdrop-brightness-50${
+					toggled ? ' !text-black !bg-white after:!translate-x-0' : ''
 				}`}
 				aria-expanded={toggled}
 				aria-controls='submenu-container'
 				onClick={() => setToggled(!toggled)}
 				tabIndex={toggled ? -1 : 0}
-				ref={unToggleRef}>
+				ref={unToggleRef}
+				aria-label='Open menu'>
 				<IoMenu
 					aria-hidden
 					className='block text-2xl relative z-10'
 				/>
-				<GlobalTextWrapper sr>Open menu</GlobalTextWrapper>
 			</GlobalButton>
 			<div
 				className={`fixed h-screen top-0 right-0 bg-white w-max z-20 transition-all ${
@@ -64,7 +62,7 @@ const ToggleMenu = () => {
 					onClick={() => setToggled(false)}
 					aria-hidden></div>
 				<GlobalButton
-					className='!p-1 w-max m-2 rounded-full text-black hover:text-white focus-visible:text-white before:!bg-black !border-black'
+					className='!p-1 w-max m-2 rounded-full text-black hover:text-white focus-visible:text-white after:!bg-black !border-black'
 					tabIndex={toggled ? 0 : -1}
 					aria-controls='submenu-container'
 					onClick={closerHandler}>
