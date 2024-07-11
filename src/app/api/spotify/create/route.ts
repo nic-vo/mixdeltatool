@@ -34,7 +34,7 @@ const handler = async (req: NextAuthRequest) => {
 		const parsed = diffBodyParser.parse(await req.json());
 		target = parsed.target;
 		differ = parsed.differ;
-		actionType = parsed.type;
+		actionType = parsed.action;
 		newName = parsed.newName;
 		newDesc = parsed.newDesc;
 		keepImg = parsed.keepImg;
@@ -87,7 +87,7 @@ const handler = async (req: NextAuthRequest) => {
 						createEmptyPlaylist({
 							accessToken,
 							newName,
-							target: keepImg && target,
+							target: keepImg ? target : false,
 						}),
 						30 * 1000
 					)
@@ -96,7 +96,7 @@ const handler = async (req: NextAuthRequest) => {
 		);
 	} catch (e: any) {
 		const thing = e as Response;
-		if (!thing.ok === false || thing.status > 399) return thing as Response;
+		if (!thing.ok || thing.status > 399) return thing as Response;
 		return badResponse(502, { message: 'Unknown error reaching Spotify' });
 	}
 
