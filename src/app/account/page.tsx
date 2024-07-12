@@ -9,7 +9,7 @@ export default async function AccountDeletionPage() {
 	if (!session) redirect('/login');
 
 	return (
-		<GlobalMain className='!gap-8'>
+		<GlobalMain className='!gap-8 pt-16'>
 			<h1 className='font-cabin font-black text-5xl lg:text-6xl text-center'>
 				Request Account Deletion
 			</h1>
