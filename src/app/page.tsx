@@ -10,7 +10,8 @@ export default async function Home() {
 		<GlobalMain className='lg:m-auto lg:grid gap-8 grid-cols-2'>
 			<hgroup className='mt-32 lg:mt-0 w-full lg:text-right lg:self-end'>
 				<h1 className='font-cabin text-8xl sm:text-9xl lg:text-8xl xl:text-9xl font-black'>
-					MixDelta
+					<span className='text-myteal'>Mix</span>
+					<span className='text-satorange'>Delta</span>
 				</h1>
 				<p className='font-karla text-2xl sm:text-4xl lg:text-2xl xl:text-4xl font-extralight'>
 					a playlist tool for Spotify
