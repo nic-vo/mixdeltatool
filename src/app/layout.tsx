@@ -13,7 +13,7 @@ const RootLayout = (props: PropsWithChildren) => {
 	return (
 		<html lang='en'>
 			<body
-				className={`${cabin.variable} ${karla.variable} ${hind.variable} font-hind bg-black text-white flex flex-col items-center h-screen justify-between overflow-hidden`}>
+				className={`${cabin.variable} ${karla.variable} ${hind.variable} font-hind bg-black text-white flex flex-col items-center h-screen justify-end overflow-hidden`}>
 				<div
 					id='beacon'
 					tabIndex={-1}
