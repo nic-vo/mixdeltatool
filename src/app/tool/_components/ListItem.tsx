@@ -1,4 +1,4 @@
-import ImageLoader from '@/components/misc/ImageLoader/ImageLoader';
+import ImageLoader from '@/components/global/ImageLoader';
 import { IoExitOutline } from 'react-icons/io5';
 import { InlineLink } from '@/components/global/serverComponentUI';
 import Image from 'next/image';

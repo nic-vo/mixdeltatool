@@ -1,4 +1,4 @@
-import { InProgressLogo } from '../misc';
+import InProgressLogo from './InProgressLogo';
 import { GlobalMain } from './serverComponentUI';
 
 export const GlobalLoading = ({ display }: { display?: string }) => (

@@ -1,5 +1,5 @@
 import { IoCheckmarkCircleSharp, IoWarning } from 'react-icons/io5';
-import { InProgressLogo } from '@/components/misc';
+import InProgressLogo from '@/components/global/InProgressLogo';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, selectDifferFetch, selectDifferForm } from '@/state';
 import { resetToForm } from '@/state/differFormSlice';
