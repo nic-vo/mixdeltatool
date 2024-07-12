@@ -16,13 +16,6 @@ import { GlobalButton } from '@/components/global/serverComponentUI';
 import { flippedSlider } from '@/consts/buttonStates';
 import { resetToForm } from '@/state/differFormSlice';
 
-const buttonTexts = [
-	'Switch to the target selection inputs',
-	'Switch to the differ selection inputs',
-	'Switch to the action selection inputs',
-	'Switch to the final options, review, and submit inputs',
-];
-
 export default function MixerForm(props: { children: React.ReactNode }) {
 	const [stage, setStage] = useState(0);
 	const dispatch = useDispatch<AppDispatch>();
