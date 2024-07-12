@@ -75,7 +75,7 @@ export const TargetSelector = (props: StageProps) => {
 				htmlFor='target'
 				ref={focusRef}>
 				<GlobalTextWrapper className='shrink-0'>
-					Pick a Target playlist:
+					What playlist do you want to change?
 				</GlobalTextWrapper>
 				<MixerSelect
 					autoComplete='off'
@@ -139,7 +139,7 @@ export const DifferSelector = (props: StageProps) => {
 				htmlFor='differ'
 				ref={focusRef}>
 				<GlobalTextWrapper className='shrink-0'>
-					Pick a Differ playlist:
+					What playlist do you want to compare it to?
 				</GlobalTextWrapper>
 				<MixerSelect
 					autoComplete='off'
@@ -369,7 +369,7 @@ const MixerLabel = forwardRef<HTMLLabelElement, LabelProps>(
 			<label
 				{...props}
 				ref={ref}
-				className={`w-full flex flex-col sm:flex-row gap-2 items-center${
+				className={`w-full flex flex-col gap-2 items-center${
 					props.className ? ` ${props.className}` : ''
 				}`}>
 				{props.children}
