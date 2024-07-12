@@ -131,7 +131,7 @@ const handler = async (req: NextAuthRequest) => {
 				else result.add(uri);
 			}
 			part.push(`${du} tracks from the differ added to the target.`);
-
+			break;
 		case 'odu': // Only differ uniques
 			tSet = new Set(targetDetails.items);
 			du = 0;
@@ -141,7 +141,7 @@ const handler = async (req: NextAuthRequest) => {
 					du++;
 				}
 			part.push(`Target replaced by ${du} unique tracks from the differ.`);
-
+			break;
 		case 'otu': // Only target uniques
 			shared = 0;
 			dSet = new Set(differDetails.items);
@@ -152,7 +152,7 @@ const handler = async (req: NextAuthRequest) => {
 				}
 				result.add(uri);
 			}
-
+			break;
 		case 'bu': // Only uniquse from both
 			tu = 0;
 			du = 0;
@@ -175,6 +175,7 @@ const handler = async (req: NextAuthRequest) => {
 				`${du} tracks from the differ were added; ` +
 					`${targetDetails.items.length - tu} tracks were removed.`
 			);
+			break;
 		case 'stu': // Subtract target uniques
 			shared = 0;
 			dSet = new Set(differDetails.items);
@@ -184,6 +185,7 @@ const handler = async (req: NextAuthRequest) => {
 					shared++;
 				}
 			part.push(`The target now only contains ${shared} shared tracks.`);
+			break;
 	}
 
 	const description = newDesc
