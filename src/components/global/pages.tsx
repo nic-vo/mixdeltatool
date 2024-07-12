@@ -5,7 +5,7 @@ export const GlobalLoading = ({ display }: { display?: string }) => (
 	<GlobalMain
 		aria-busy
 		aria-live='polite'
-		className='justify-center'>
+		className='justify-center flex-grow'>
 		<h1 className='font-cabin font-black text-center text-5xl'>
 			Loading<span className='inline-block animate-pulse'>.</span>
 			<span
