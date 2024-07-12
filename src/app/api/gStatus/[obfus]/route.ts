@@ -7,9 +7,11 @@ import { revalidateTag } from 'next/cache';
 import { NextRequest } from 'next/server';
 import { AppRouteHandlerFnContext } from 'next-auth/lib/types';
 
-const RATE_LIMIT_PREFIX = 'GSU';
-const RATE_LIMIT_ROLLING_LIMIT = 5;
-const RATE_LIMIT_DECAY_SECONDS = 30;
+const rateLimit = {
+	RATE_LIMIT_PREFIX: 'GSU',
+	RATE_LIMIT_ROLLING_LIMIT: 5,
+	RATE_LIMIT_DECAY_SECONDS: 30,
+};
 
 const validator = z.object({
 	token: z.string().min(1).max(100),
@@ -24,11 +26,7 @@ export { OPTIONS };
 export const PUT = handlerWithTimeout(
 	{
 		maxDuration,
-		rateLimit: {
-			RATE_LIMIT_DECAY_SECONDS,
-			RATE_LIMIT_PREFIX,
-			RATE_LIMIT_ROLLING_LIMIT,
-		},
+		rateLimit,
 	},
 	async (req: NextRequest, { params }: AppRouteHandlerFnContext) => {
 		if (

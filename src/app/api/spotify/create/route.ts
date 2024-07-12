@@ -15,10 +15,11 @@ import type { NextAuthRequest } from 'next-auth/lib';
 import type { MyPlaylistObject } from '@/lib/validators';
 import type { differInternalPlaylistPromise } from '@/types/spotify';
 
-const RATE_LIMIT_PREFIX = 'CDP';
-const RATE_LIMIT_ROLLING_LIMIT = 5;
-const RATE_LIMIT_DECAY_SECONDS = 30;
-
+const rateLimit = {
+	RATE_LIMIT_PREFIX: 'CDP',
+	RATE_LIMIT_ROLLING_LIMIT: 5,
+	RATE_LIMIT_DECAY_SECONDS: 30,
+};
 export const maxDuration = 55;
 
 const handler = async (req: NextAuthRequest) => {
@@ -234,11 +235,7 @@ const handler = async (req: NextAuthRequest) => {
 export const POST = handlerWithTimeoutAndAuth(
 	{
 		maxDuration,
-		rateLimit: {
-			RATE_LIMIT_DECAY_SECONDS,
-			RATE_LIMIT_PREFIX,
-			RATE_LIMIT_ROLLING_LIMIT,
-		},
+		rateLimit,
 	},
 	handler
 );

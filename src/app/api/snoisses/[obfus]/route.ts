@@ -7,10 +7,11 @@ import { OPTIONS } from '@/lib/route_helpers/responses';
 import { NextAuthRequest } from 'next-auth/lib';
 import { AppRouteHandlerFnContext } from 'next-auth/lib/types';
 
-const RATE_LIMIT_PREFIX = 'DOS';
-const RATE_LIMIT_ROLLING_LIMIT = 3;
-const RATE_LIMIT_DECAY_SECONDS = 60;
-
+const rateLimit = {
+	RATE_LIMIT_PREFIX: 'DOS',
+	RATE_LIMIT_ROLLING_LIMIT: 3,
+	RATE_LIMIT_DECAY_SECONDS: 60,
+};
 export const maxDuration = 30;
 
 export { OPTIONS };
@@ -18,11 +19,7 @@ export { OPTIONS };
 export const DELETE = handlerWithTimeoutAndAuth(
 	{
 		maxDuration,
-		rateLimit: {
-			RATE_LIMIT_DECAY_SECONDS,
-			RATE_LIMIT_PREFIX,
-			RATE_LIMIT_ROLLING_LIMIT,
-		},
+		rateLimit,
 	},
 	async (req: NextAuthRequest, { params }: AppRouteHandlerFnContext) => {
 		if (

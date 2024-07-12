@@ -19,10 +19,11 @@ import type {
 } from '@/lib/validators';
 import type { NextAuthRequest } from 'next-auth/lib';
 
-const RATE_LIMIT_PREFIX = 'GSP';
-const RATE_LIMIT_ROLLING_LIMIT = 10;
-const RATE_LIMIT_DECAY_SECONDS = 5;
-
+const rateLimit = {
+	RATE_LIMIT_PREFIX: 'GSP',
+	RATE_LIMIT_ROLLING_LIMIT: 10,
+	RATE_LIMIT_DECAY_SECONDS: 5,
+};
 export const maxDuration = 20;
 
 const typeParser = z.enum(['playlist', 'album']);
@@ -30,11 +31,7 @@ const typeParser = z.enum(['playlist', 'album']);
 export const GET = handlerWithTimeoutAndAuth(
 	{
 		maxDuration,
-		rateLimit: {
-			RATE_LIMIT_DECAY_SECONDS,
-			RATE_LIMIT_PREFIX,
-			RATE_LIMIT_ROLLING_LIMIT,
-		},
+		rateLimit,
 	},
 	async (req: NextAuthRequest) => {
 		if (!req.auth || !req.auth.user || !req.auth.user.id)

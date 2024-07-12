@@ -10,10 +10,11 @@ import { SPOT_PLAYLIST_PAGE_LIMIT, SPOT_URL_BASE } from '@/consts/spotify';
 
 import { NextAuthRequest } from 'next-auth/lib';
 
-const RATE_LIMIT_PREFIX = 'GUP';
-const RATE_LIMIT_ROLLING_LIMIT = 10;
-const RATE_LIMIT_DECAY_SECONDS = 5;
-
+const rateLimit = {
+	RATE_LIMIT_PREFIX: 'GUP',
+	RATE_LIMIT_ROLLING_LIMIT: 10,
+	RATE_LIMIT_DECAY_SECONDS: 5,
+};
 const queryParamParser = z.coerce
 	.number()
 	.int()
@@ -25,11 +26,7 @@ export const maxDuration = 20;
 export const GET = handlerWithTimeoutAndAuth(
 	{
 		maxDuration,
-		rateLimit: {
-			RATE_LIMIT_DECAY_SECONDS,
-			RATE_LIMIT_PREFIX,
-			RATE_LIMIT_ROLLING_LIMIT,
-		},
+		rateLimit,
 	},
 	async (req: NextAuthRequest) => {
 		if (!req.auth || !req.auth.user || !req.auth.user.id)

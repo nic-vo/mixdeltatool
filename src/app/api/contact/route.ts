@@ -9,20 +9,18 @@ import { badResponse } from '@/lib/route_helpers/responses';
 
 import { NextRequest } from 'next/server';
 
-const RATE_LIMIT_PREFIX = 'SCF';
-const RATE_LIMIT_ROLLING_LIMIT = 5;
-const RATE_LIMIT_DECAY_SECONDS = 30;
+const rateLimit = {
+	RATE_LIMIT_PREFIX: 'SCF',
+	RATE_LIMIT_ROLLING_LIMIT: 5,
+	RATE_LIMIT_DECAY_SECONDS: 30,
+};
 
 export const maxDuration = 30;
 
 export const POST = handlerWithTimeout(
 	{
 		maxDuration,
-		rateLimit: {
-			RATE_LIMIT_PREFIX,
-			RATE_LIMIT_DECAY_SECONDS,
-			RATE_LIMIT_ROLLING_LIMIT,
-		},
+		rateLimit,
 	},
 	async (req: NextRequest) => {
 		// Validate body first since no database call
