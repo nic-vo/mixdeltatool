@@ -7,8 +7,8 @@ export const CLIENT_DIFF_TYPES = {
 	stu: 'Only tracks that are in BOTH the target and differ.',
 	odu: 'Tracks that exist only in the differ.',
 	otu: 'Tracks that exist only in the target.',
-	adu: 'The original target + anything new from the differ.',
-	bu: 'Only the differences between the target and the differ; no shared.',
+	adu: 'All tracks from target + new ones from the differ.',
+	bu: 'Unique tracks from both target and differ; no shared tracks.',
 };
 
 export { MixDeltaLogo, SpotifyLogo };
