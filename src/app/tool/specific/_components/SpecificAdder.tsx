@@ -19,6 +19,7 @@ import { useRef } from 'react';
 export default function SpecificAdder() {
 	const { loading, error } = useSelector(selectSpecificFetch);
 	const dispatch = useDispatch<AppDispatch>();
+	const inputRef = useRef<HTMLInputElement>(null);
 
 	const submitHandler = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -27,6 +28,7 @@ export default function SpecificAdder() {
 				new FormData(e.currentTarget as HTMLFormElement).get('link') as string
 			)
 		);
+		if (inputRef.current) inputRef.current.value = '';
 	};
 
 	const resetHandler = (e: React.FormEvent) => {
@@ -53,6 +55,7 @@ export default function SpecificAdder() {
 						id='link'
 						name='link'
 						required
+						ref={inputRef}
 						pattern='(\d|\w){22}(\?si=(\d|\w)*){0,1)$'
 						className='transition-all outline-none border-white border w-full bg-transparent focus-visible:bg-white focus-visible:text-black p-2 rounded-xl'
 					/>
