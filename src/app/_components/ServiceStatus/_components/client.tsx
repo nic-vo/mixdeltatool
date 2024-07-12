@@ -47,7 +47,7 @@ const DialogWrapper = (props: PropsWithChildren) => {
 				</Suspense>
 			</div>
 			<GlobalButton
-				className='!absolute size-max top-2 right-2 !p-1 border-2 rounded-full before:!bg-myteal hover:!border-myteal focus-visible:!border-myteal'
+				className='!absolute size-max top-2 right-2 !p-1 border-2 rounded-full after:!bg-myteal hover:!border-myteal focus-visible:!border-myteal'
 				onClick={handler}>
 				<IoCloseSharp
 					aria-hidden={true}
