@@ -43,8 +43,7 @@ const { handlers, signIn, signOut, auth } = NextAuth({
 	session: {
 		strategy: 'database',
 		maxAge: maxAgeSeconds,
-		updateAge: 60 * 60,
-		// specify updateAge greater than maxAge to update session and accessToken manually
+		updateAge: 60 * 60 + 1,
 	},
 	callbacks: {
 		async signIn({ account }): Promise<boolean | string> {
@@ -64,16 +63,22 @@ const { handlers, signIn, signOut, auth } = NextAuth({
 			session.user.name = user.name;
 			// Return early if now is still within 1 hour of signing in
 			if (
-				Date.parse(session.expires) - 1000 * (maxAgeSeconds - 60 * 60) >
+				Date.parse(session.expires) - 1000 * (maxAgeSeconds - (60 * 60 + 5)) >
 				Date.now()
 			)
 				return session;
 
-			// **Refresh account access token, expiry, and refresh token
-			// if an hour has passed since login;
-			// This is kind of a race condition against the session updateAge
-			// i.e. auth is handling session refresh in a separate db transaction
-			// Different Date.now()
+			/*
+			**Refresh account access token, expiry, and refresh token
+			if an hour has passed since login;
+			This is kind of a race condition against the session updateAge
+			i.e. auth is handling session refresh in a separate db transaction
+			Access token refresh might retrigger multiple times
+			if window is too small between
+			session refresh thresholdand access token threshold
+			Different Date.now()
+			*/
+
 			// Find account based on ID
 			const db = await mongoosePromise();
 			if (!db) throw new Error();
