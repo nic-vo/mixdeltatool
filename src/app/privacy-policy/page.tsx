@@ -19,7 +19,7 @@ const LocalList = (props: PropsWithChildren & { ordered?: boolean }) => {
 
 const PrivacyPolicy = () => {
 	return (
-		<GlobalMain className='max-w-prose mt-16 !overflow-auto px-2 outline-white focus-visible:outline'>
+		<GlobalMain className='max-w-prose mt-16 mb-8 !overflow-auto px-2 outline-white focus-visible:outline'>
 			<header className='flex flex-col gap-4'>
 				<h1 className='text-center text-5xl font-black'>
 					MixDelta Privacy Policy
