@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { MixDeltaLogo } from '@/consts/spotify';
 import Image from 'next/image';
 
-const ImageLoader = (props: { url: string; alt: string }) => {
+const ImageLoader = ({ url, alt }: { url: string; alt: string }) => {
 	const [loaded, setLoaded] = useState(false);
 	const [error, setError] = useState(false);
 
@@ -31,8 +31,8 @@ const ImageLoader = (props: { url: string; alt: string }) => {
 
 	return (
 		<img
-			src={props.url !== null ? props.url : ''}
-			alt={props.alt ? props.alt : ''}
+			src={url}
+			alt={alt}
 			onLoad={loadHandler}
 			onError={errorHandler}
 			loading='lazy'

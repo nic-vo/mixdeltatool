@@ -1,5 +1,4 @@
 import LogoToAnimate from './LogoToAnimate';
-import ImageLoadingLogo from './ImageLoadingLogo/ImageLoadingLogo';
-import InProgressLogo from './InProgressLogo/InProgressLogo';
+import InProgressLogo from './InProgressLogo';
 
-export { LogoToAnimate, ImageLoadingLogo, InProgressLogo };
+export { LogoToAnimate, InProgressLogo };
