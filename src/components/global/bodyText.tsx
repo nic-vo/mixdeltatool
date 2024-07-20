@@ -6,17 +6,19 @@ import {
 import { localNavigation } from '@/consts/buttonStates';
 import { PropsWithChildren } from 'react';
 
-export const EUAList = (
-	props: PropsWithChildren & {
-		ordered?: boolean;
-		listStyle?: string;
-		root?: boolean;
-	}
-) => {
+export const EUAList = ({
+	root,
+	ordered,
+	listStyle,
+	children,
+}: PropsWithChildren & {
+	ordered?: boolean;
+	listStyle?: string;
+	root?: boolean;
+}) => {
 	const classer = `flex flex-col outline-white ${
-		props.root ? 'gap-12 *:ml-0' : 'gap-8 ml-8'
+		root ? 'gap-12 *:ml-0' : 'gap-8 ml-8'
 	}`;
-	const { children, ordered, listStyle } = props;
 	if (ordered)
 		return (
 			<ol
@@ -38,26 +40,19 @@ export const EUASection = (props: PropsWithChildren) => (
 	<section className='flex flex-col gap-2'>{props.children}</section>
 );
 
-export const EUAHeading = (
-	props: PropsWithChildren & { level: 2 | 3 | 4 | 5 }
-) => {
-	switch (props.level) {
+export const EUAHeading = ({
+	children,
+	level,
+}: PropsWithChildren & { level: 2 | 3 | 4 | 5 }) => {
+	switch (level) {
 		case 2:
-			return (
-				<h2 className='text-xl sm:text-2xl font-bold'>{props.children}</h2>
-			);
+			return <h2 className='text-xl sm:text-2xl font-bold'>{children}</h2>;
 		case 3:
-			return (
-				<h3 className='text-xl sm:text-2xl font-bold'>{props.children}</h3>
-			);
+			return <h3 className='text-xl sm:text-2xl font-bold'>{children}</h3>;
 		case 4:
-			return (
-				<h4 className='text-xl sm:text-2xl font-bold'>{props.children}</h4>
-			);
+			return <h4 className='text-xl sm:text-2xl font-bold'>{children}</h4>;
 		case 5:
-			return (
-				<h5 className='text-xl sm:text-2xl font-bold'>{props.children}</h5>
-			);
+			return <h5 className='text-xl sm:text-2xl font-bold'>{children}</h5>;
 	}
 };
 
