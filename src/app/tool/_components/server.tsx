@@ -7,7 +7,7 @@ export const ToolHeading = ({
 	className,
 }: PropsWithChildren & { className?: string }) => (
 	<h1
-		className={`font-cabin font-black text-4xl md:text-6xl lg:w-full${
+		className={`font-cabin font-black text-5xl sm:text-6xl text-center ${
 			className ? ` ${className}` : ''
 		}`}>
 		{children}
