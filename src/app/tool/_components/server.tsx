@@ -72,7 +72,7 @@ export const AdderForm = (
 	<form
 		onSubmit={props.onSubmit}
 		onReset={props.onReset}
-		className='flex flex-col gap-2'>
+		className='flex flex-col gap-2 max-w-96 w-full'>
 		{props.children}
 	</form>
 );
