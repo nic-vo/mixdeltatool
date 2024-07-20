@@ -241,7 +241,7 @@ export const ActionSelector = (props: StageProps) => {
 					onChange={newNameHandler}
 					autoComplete='off'
 					maxLength={30}
-					className='bg-transparent p-2 text-white focus:text-black focus:bg-white transition-all outline-none border-b-2 border-slate-500 focus:border-white w-full'
+					className='bg-transparent text-white outline-none transition-all w-full border-2 border-transparent border-b-slate-500 p-2 focus-visible:border-white'
 				/>
 			</MixerLabel>
 			<MixerLabel htmlFor='desc'>
@@ -313,21 +313,21 @@ export const ReviewAndSubmit = (props: Pick<StageProps, 'changeStage'>) => {
 			) : (
 				<p className='text-center text-slate-500'>No action...</p>
 			)}
-			<ul className='relative flex gap-x-8 gap-y-4 flex-wrap justify-center items-center list-disc'>
+			<ul className='relative flex gap-x-8 gap-y-4 flex-wrap justify-center items-center list-["+"]'>
 				<li>
-					<p className='block max-w-64 text-nowrap overflow-hidden text-ellipsis'>
+					<p className='block max-w-64 text-nowrap overflow-hidden text-ellipsis ml-1'>
 						<strong className='text-myteal'>New name:</strong>{' '}
 						{newName !== '' ? newName : 'n/a'}
 					</p>
 				</li>
 				<li>
-					<p className='block max-w-64 text-nowrap overflow-hidden text-ellipsis '>
+					<p className='block max-w-64 text-nowrap overflow-hidden text-ellipsis ml-1'>
 						<strong className='text-satorange'>New description:</strong>{' '}
 						{newDesc !== '' ? newDesc.substring(0, 20) : 'n/a'}
 					</p>
 				</li>
 				<li>
-					<p className='block text-nowrap text-ellipsis'>
+					<p className='block text-nowrap text-ellipsis ml-1'>
 						<strong className='text-pinkred'>Keep original thumbnail:</strong>{' '}
 						{keepImg ? 'Yes' : 'No'}
 					</p>
