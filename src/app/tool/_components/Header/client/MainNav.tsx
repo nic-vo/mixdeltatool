@@ -16,11 +16,11 @@ const MainHeaderLI = (props: PropsWithChildren & { className?: string }) => (
 );
 
 const yourClasser =
-	'after:!translate-x-0 after:!bg-satorange !border-satorange text-black cursor-default border-r-white';
+	'after:translate-x-0 after:bg-satorange border-satorange text-black cursor-default hover:border-satorange focus-visible:satorange border-l-slate-500';
 const specClasser =
-	'after:!translate-x-0 after:!bg-myteal !border-myteal text-black cursor-default border-l-white';
+	'after:translate-x-0 after:bg-myteal border-myteal text-black cursor-default hover:border-myteal focus-visible:myteal border-r-slate-500 ';
 const diffClasser =
-	'after:!translate-y-0 after:!bg-pinkredlight !border-pinkredlight text-black cursor-default';
+	'after:translate-y-0 after:bg-pinkredlight border-pinkredlight text-black cursor-default hover:border-pinkredlight focus-visible:pinkredlight';
 
 const MainNav = () => {
 	const pathname = usePathname();
@@ -62,7 +62,7 @@ const MainNav = () => {
 						</ul>
 					</section>
 				</MainHeaderLI>
-				<MainHeaderLI className='ml-2 pl-2'>
+				<MainHeaderLI className='ml-2 pl-2 border-slate-500'>
 					<GlobalBlockLink
 						href='/tool/mixer'
 						aria-label='Go to the playlist mixer'

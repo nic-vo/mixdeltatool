@@ -35,7 +35,7 @@ const ToggleMenu = () => {
 		<>
 			<GlobalButton
 				className={`rounded-full !p-2 z-10 backdrop-brightness-50${
-					toggled ? ' !text-black !bg-white after:!translate-x-0' : ''
+					toggled ? ' text-black bg-white after:translate-x-0' : ''
 				}`}
 				aria-expanded={toggled}
 				aria-controls='submenu-container'
@@ -62,7 +62,7 @@ const ToggleMenu = () => {
 					onClick={() => setToggled(false)}
 					aria-hidden></div>
 				<GlobalButton
-					className='!p-1 w-max m-2 rounded-full text-black hover:text-white focus-visible:text-white after:!bg-black !border-black'
+					className='p-1 w-max m-2 rounded-full text-black hover:text-white focus-visible:text-white after:bg-black border-black'
 					tabIndex={toggled ? 0 : -1}
 					aria-controls='submenu-container'
 					onClick={closerHandler}>
