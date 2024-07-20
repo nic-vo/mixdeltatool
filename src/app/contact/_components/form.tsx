@@ -6,6 +6,7 @@ import {
 	GlobalButton,
 	GlobalTextWrapper,
 } from '@/components/global/serverComponentUI';
+import { hitsSpotify } from '@/consts/buttonStates';
 
 export const HCaptchaBlock = () => {
 	const [loaded, setLoaded] = useState(false);
@@ -57,7 +58,9 @@ export const HCaptchaBlock = () => {
 				id='h-captcha'
 				data-theme='dark'
 			/>
-			<GlobalButton type='submit'>
+			<GlobalButton
+				type='submit'
+				className={hitsSpotify}>
 				<GlobalTextWrapper>Submit</GlobalTextWrapper>
 			</GlobalButton>
 		</>
@@ -102,15 +105,15 @@ export default function ContactForm(props: PropsWithChildren) {
 
 	return (
 		<form
-			className='flex flex-col items-center gap-8 p-4 w-full flex-grow max-w-prose overflow-y-auto'
+			className='flex flex-col items-center gap-8 p-4 w-full max-w-prose overflow-y-auto'
 			onSubmit={submitHandler}>
 			<fieldset
 				disabled={loading || success === true || error === true}
 				className='flex flex-col items-center gap-8 p-4 w-full'>
 				<label
 					htmlFor='name'
-					className='flex flex-col sm:grid grid-cols-4 gap-4 w-full items-center'>
-					<span className='block text-2xl font-bold text-right'>
+					className='flex flex-col sm:flex-row gap-4 w-full items-center'>
+					<span className='block text-xl font-bold text-right shrink-0'>
 						Your name:
 					</span>
 					<input
@@ -122,20 +125,22 @@ export default function ContactForm(props: PropsWithChildren) {
 						autoComplete='off'
 						minLength={3}
 						maxLength={30}
-						className='w-full text-base font-normal col-span-3 resize-none text-white p-2 cursor-text bg-transparent border-b focus-visible:bg-white focus-visible:text-black transition-colors outline-none border-white'
+						className='w-full text-base font-normal col-span-3 resize-none text-white p-2 cursor-text bg-transparent border-2 border-transparent border-b-slate-500 focus-visible:border-white transition-colors outline-none '
 					/>
 				</label>
 				<label
 					htmlFor='message'
-					className='flex flex-col sm:grid grid-cols-4 gap-4 w-full items-center'>
-					<span className='block text-2xl font-bold text-right'>Message:</span>
+					className='flex flex-col sm:flex-row gap-4 w-full items-center'>
+					<span className='block text-xl font-bolds shrink w-max'>
+						Message:
+					</span>
 					<textarea
 						id='message'
 						name='message'
 						minLength={3}
 						maxLength={280}
 						required={true}
-						className='w-full text-base font-normal col-span-3 resize-none text-white p-2 cursor-text h-32 rounded-xl bg-transparent outline-none border transition-all focus-visible:bg-white focus-visible:text-black border-white'
+						className='w-full text-base font-normal col-span-3 resize-none text-white p-2 cursor-text h-32 rounded-xl bg-transparent outline-none border transition-all border-slate-500 focus-visible:border-white grow'
 					/>
 				</label>
 				{props.children}
