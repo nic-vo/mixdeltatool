@@ -6,9 +6,9 @@ import {
 import { localNavigation } from '@/consts/buttonStates';
 import { PropsWithChildren } from 'react';
 
-const EUAList = (
+export const EUAList = (
 	props: PropsWithChildren & {
-		ordered: boolean;
+		ordered?: boolean;
 		listStyle?: string;
 		root?: boolean;
 	}
@@ -34,11 +34,13 @@ const EUAList = (
 	);
 };
 
-const EUASection = (props: PropsWithChildren) => (
+export const EUASection = (props: PropsWithChildren) => (
 	<section className='flex flex-col gap-2'>{props.children}</section>
 );
 
-const EUAHeading = (props: PropsWithChildren & { level: 2 | 3 | 4 | 5 }) => {
+export const EUAHeading = (
+	props: PropsWithChildren & { level: 2 | 3 | 4 | 5 }
+) => {
 	switch (props.level) {
 		case 2:
 			return (

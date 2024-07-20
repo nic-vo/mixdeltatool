@@ -1,7 +1,7 @@
 'use client';
 
 import { FormEventHandler, useEffect, useState, useRef } from 'react';
-import EUAContent from './server';
+import EUAContent from '@/components/global/bodyText';
 import {
 	GlobalButton,
 	GlobalTextWrapper,
@@ -90,7 +90,7 @@ const SpotEUA = (props: { submitter?: () => void }) => {
 					</label>
 					<GlobalButton
 						type='submit'
-						className={hitsSpotify + ' !border-green-400'}>
+						className={hitsSpotify}>
 						<GlobalTextWrapper>Submit</GlobalTextWrapper>
 					</GlobalButton>
 				</form>
