@@ -58,12 +58,12 @@ const { handlers, signIn, signOut, auth } = NextAuth({
 			return true;
 		},
 		async session({ session, user }) {
-			if (!process.env.SPOTIFY_ID) throw new Error('Missing Spotify ID');
+			if (!process.env.SPOTIFY_ID) throw new Error();
 			session.user.email = user.email;
 			session.user.name = user.name;
 			// Return early if now is still within 1 hour of signing in
 			if (
-				Date.parse(session.expires) - 1000 * (maxAgeSeconds - (60 * 60 + 5)) >
+				Date.parse(session.expires) - 1000 * (maxAgeSeconds - 60 * 60) >
 				Date.now()
 			)
 				return session;
