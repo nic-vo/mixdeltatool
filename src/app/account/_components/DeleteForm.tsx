@@ -61,7 +61,9 @@ const DeleteForm = () => {
 						className='p-2 border-b-2 bg-transparent transition-all focus-visible:bg-white border-white text-white focus-visible:text-black outline-none disabled:brightness-50 disabled:cursor-not-allowed'
 					/>
 				</label>
-				<GlobalButton type='submit'>
+				<GlobalButton
+					type='submit'
+					className='text-red-500 border-red-500 after:bg-red-500 hover:text-white focus-visible:text-white hover:border-red-500 focus-visible:border-red-500'>
 					<GlobalTextWrapper>Initate account deletion</GlobalTextWrapper>
 				</GlobalButton>
 			</fieldset>

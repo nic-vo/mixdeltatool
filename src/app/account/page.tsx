@@ -1,7 +1,7 @@
 import { auth } from '@/auth';
 import { GlobalMain, InlineLink } from '@/components/global/serverComponentUI';
 import { redirect } from 'next/navigation';
-import { SmallNav } from '../_components/EUA/server';
+import { SmallNav } from '@/components/global/bodyText';
 import DeleteForm from './_components/DeleteForm';
 
 export default async function AccountDeletionPage() {
