@@ -17,13 +17,14 @@ export default function PlaylistOptions() {
 			{specificPlaylists.length > 0 && (
 				<optgroup
 					label='Specific Playlists'
-					className='text-black'>
+					className='text-black bg-myteal'>
 					{specificPlaylists.map((playlist) => {
 						const { id, name, owner, tracks } = playlist;
 						return (
 							<option
 								value={id}
-								key={id}>
+								key={id}
+								className='bg-lightteal'>
 								{name} /{' '}
 								{owner.map(
 									(user, index) =>
@@ -36,13 +37,16 @@ export default function PlaylistOptions() {
 				</optgroup>
 			)}
 			{userPlaylists.length > 0 && (
-				<optgroup label='Your Playlists'>
+				<optgroup
+					label='Your Playlists'
+					className='text-black bg-satorange'>
 					{userPlaylists.map((playlist) => {
 						const { id, name, owner, tracks } = playlist;
 						return (
 							<option
 								value={id}
-								key={id}>
+								key={id}
+								className='bg-lightorange'>
 								{name} /{' '}
 								{owner.map(
 									(user, index) =>
