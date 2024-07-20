@@ -11,8 +11,8 @@ const ListItem = ({
 }: {
 	playlist: MyPlaylistObject;
 }) => (
-	<section className='grid grid-cols-3 items-center gap-4 p-4 bg-neutral-800 focus-within:bg-neutral-600 transition-all max-w-md overflow-hidden'>
-		<h3 className='relative w-max max-w-full col-start-2 col-span-full text-xl leading-none block font-black font-cabin'>
+	<section className='grid grid-cols-1 sm:grid-cols-3 items-center gap-4 p-4 bg-neutral-800 focus-within:bg-neutral-600 transition-all max-w-md overflow-hidden rounded-xl'>
+		<h3 className='relative w-max max-w-full sm:col-start-2 col-span-full text-xl leading-none block font-black font-cabin'>
 			<InlineLink
 				href={`https://open.spotify.com/playlist/${id}`}
 				target='_blank'
@@ -26,7 +26,7 @@ const ListItem = ({
 				</span>
 			</InlineLink>
 		</h3>
-		<div className='flex items-center aspect-square size-auto max-h-32 col-start-1 col-span-1 row-start-1 row-span-3 justify-self-center sm:self-center overflow-hidden'>
+		<div className='hidden sm:flex items-center aspect-square size-auto max-h-32 col-start-1 col-span-1 row-start-1 row-span-3 justify-self-center sm:self-center overflow-hidden'>
 			{image ? (
 				<ImageLoader
 					url={image.url}
@@ -40,7 +40,7 @@ const ListItem = ({
 				/>
 			)}
 		</div>
-		<ul className='col-start-2 col-span-full font-thin text-zinc-400'>
+		<ul className='sm:col-start-2 col-span-full font-thin text-zinc-400'>
 			<li>
 				<span>
 					{type} - {tracks} tracks
