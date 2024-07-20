@@ -3,31 +3,26 @@ This component accepts a string[] of class names
 for each segment of the logo for animation purposes
 */
 
-import { AriaAttributes, SVGProps } from 'react';
+import { AriaAttributes } from 'react';
 
-const omitted = ['main', 'left', 'middle', 'right'] as const;
-
-const LogoToAnimate = (
-	props: {
-		main?: string[];
-		left?: string[];
-		middle?: string[];
-		right?: string[];
-	} & AriaAttributes
-) => {
-	const { left, middle, right, main } = props;
+const LogoToAnimate = ({
+	main,
+	left,
+	middle,
+	right,
+	...arias
+}: {
+	main?: string[];
+	left?: string[];
+	middle?: string[];
+	right?: string[];
+} & AriaAttributes) => {
 	const mainClasser = `min-h-8 min-w-8 ${
 		main && main.length > 0 ? main.join(' ') : ''
 	}`;
 	const leftClasser = left && left.length > 0 ? left.join(' ') : '';
 	const middleClasser = middle && middle.length > 0 ? middle.join(' ') : '';
 	const rightClasser = right && right.length > 0 ? right.join(' ') : '';
-
-	const arias = Object.entries(props).reduce((re, current) => {
-		if (['main', 'left', 'middle', 'right'].includes(current[0])) return re;
-		re[current[0] as keyof AriaAttributes] = current[1];
-		return re;
-	}, {} as AriaAttributes);
 
 	return (
 		<svg
