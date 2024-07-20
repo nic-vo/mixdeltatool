@@ -15,7 +15,7 @@ export default function SpecificList() {
 	return (
 		<ListContainer>
 			<hgroup className='flex flex-col gap-8 items-center'>
-				<h2 className='font-karla font-extralight text-3xl text-center w-max'>
+				<h2 className='font-bold text-3xl text-center w-max'>
 					Stored Playlists
 				</h2>
 			</hgroup>
