@@ -43,7 +43,7 @@ export default function MixerForm(props: { children: React.ReactNode }) {
 		<form
 			onSubmit={submitHandler}
 			onReset={resetHandler}
-			className='w-full max-w-screen-sm flex flex-col gap-8 p-2'>
+			className='w-full max-w-screen-sm flex flex-col gap-8'>
 			<menu className='flex justify-center items-center gap-4'>
 				<li className='mr-8'>
 					<GlobalButton
@@ -112,7 +112,7 @@ export default function MixerForm(props: { children: React.ReactNode }) {
 				aria-label='Multi-stage form inputs'
 				aria-live='polite'
 				className='flex flex-col gap-8 items-center'>
-				<ActiveComponent changeStage={() => setStage(stage + 1)}>
+				<ActiveComponent changeStage={setStage}>
 					{props.children}
 				</ActiveComponent>
 			</fieldset>
