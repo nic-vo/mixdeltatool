@@ -24,7 +24,6 @@ import {
 	selectUserPlaylists,
 } from '@/state';
 import { useDispatch, useSelector } from 'react-redux';
-import { FaExclamationCircle } from 'react-icons/fa';
 import { CLIENT_DIFF_TYPES } from '@/consts/spotify';
 import ListItem from '../../_components/ListItem';
 import {
@@ -34,13 +33,21 @@ import {
 
 import { ActionType } from '@/types/spotify';
 import type {
+	Dispatch,
 	LabelHTMLAttributes,
 	PropsWithChildren,
 	SelectHTMLAttributes,
+	SetStateAction,
 } from 'react';
-import { hitsSpotify, localNavigation } from '@/consts/buttonStates';
+import {
+	flippedSlider,
+	hitsSpotify,
+	localNavigation,
+} from '@/consts/buttonStates';
 
-type StageProps = PropsWithChildren & { changeStage: () => void };
+type StageProps = PropsWithChildren & {
+	changeStage: Dispatch<SetStateAction<number>>;
+};
 
 export const TargetSelector = (props: StageProps) => {
 	const dispatch = useDispatch<AppDispatch>();
