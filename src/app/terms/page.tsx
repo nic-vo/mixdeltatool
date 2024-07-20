@@ -1,4 +1,4 @@
-import EUAContent, { SmallNav } from '../_components/EUA/server';
+import EUAContent, { SmallNav } from '@/components/global/bodyText';
 import { GlobalMain } from '@/components/global/serverComponentUI';
 
 const Terms = () => (
