@@ -103,10 +103,10 @@ export const TargetSelector = (props: StageProps) => {
 					{target !== '' ? 'You have chosen:' : 'Nothing selected...'}
 				</h2>
 				{target !== '' && (
-					<>
+					<SelectedPreview>
 						<ListItem playlist={target} />
 						<NextButton changeStage={props.changeStage} />
-					</>
+					</SelectedPreview>
 				)}
 			</section>
 		</>
@@ -167,10 +167,11 @@ export const DifferSelector = (props: StageProps) => {
 					{differ !== '' ? 'You have chosen:' : 'Nothing selected...'}
 				</h2>
 				{differ !== '' && (
-					<>
+					<SelectedPreview>
 						<ListItem playlist={differ} />
+						<PrevButton changeStage={props.changeStage} />
 						<NextButton changeStage={props.changeStage} />
-					</>
+					</SelectedPreview>
 				)}
 			</section>
 		</>
@@ -270,16 +271,16 @@ export const ActionSelector = (props: StageProps) => {
 				/>
 			</label>
 			{action !== '' && (
-				<NextButton
-					changeStage={props.changeStage}
-					className='w-max self-center'
-				/>
+				<SelectedPreview empty>
+					<PrevButton changeStage={props.changeStage} />
+					<NextButton changeStage={props.changeStage} />
+				</SelectedPreview>
 			)}
 		</>
 	);
 };
 
-export const ReviewAndSubmit = () => {
+export const ReviewAndSubmit = (props: Pick<StageProps, 'changeStage'>) => {
 	const { target, differ, action } = useSelector(selectDifferForm);
 	const { newName, newDesc, keepImg } = useSelector(selectDifferOptionalForm);
 	const { loading } = useSelector(selectDifferFetch);
@@ -332,30 +333,54 @@ export const ReviewAndSubmit = () => {
 					</p>
 				</li>
 			</ul>
-			<GlobalButton
-				disabled={loading || target === '' || differ === '' || action === ''}
-				type='submit'
-				className={
-					'!border-green-500 text-green-500 ' + hitsSpotify + ' ' + 'w-max'
-				}>
-				<GlobalTextWrapper>Create a new playlist!</GlobalTextWrapper>
-			</GlobalButton>
+			<SelectedPreview empty>
+				<PrevButton changeStage={props.changeStage} />
+				<GlobalButton
+					disabled={loading || target === '' || differ === '' || action === ''}
+					type='submit'
+					className={
+						'!border-green-500 text-green-500 ' +
+						hitsSpotify +
+						' ' +
+						'w-max place-self-end'
+					}>
+					<GlobalTextWrapper>Create a new playlist!</GlobalTextWrapper>
+				</GlobalButton>
+			</SelectedPreview>
 		</>
 	);
 };
 
-const NextButton = (props: { changeStage: () => void; className?: string }) => {
-	return (
-		<GlobalButton
-			onClick={props.changeStage}
-			className={`${localNavigation}${
-				props.className ? ` ${props.className}` : ''
-			}`}
-			type='button'>
-			<GlobalTextWrapper>Next</GlobalTextWrapper>
-		</GlobalButton>
-	);
-};
+const SelectedPreview = (props: PropsWithChildren & { empty?: boolean }) => (
+	<div
+		className={`w-full grid grid-cols-2 gap-y-4${
+			!props.empty ? ' first:*:col-span-full' : ''
+		}`}>
+		{props.children}
+	</div>
+);
+
+const PrevButton = (props: StageProps & { className?: string }) => (
+	<GlobalButton
+		onClick={() => props.changeStage((prev) => prev - 1)}
+		className={`${localNavigation} ${flippedSlider} col-start-1 place-self-start${
+			props.className ? ` ${props.className}` : ''
+		}`}
+		type='button'>
+		<GlobalTextWrapper>Back</GlobalTextWrapper>
+	</GlobalButton>
+);
+
+const NextButton = (props: StageProps & { className?: string }) => (
+	<GlobalButton
+		onClick={() => props.changeStage((prev) => prev + 1)}
+		className={`${localNavigation} col-start-2 place-self-end w-max${
+			props.className ? ` ${props.className}` : ''
+		}`}
+		type='button'>
+		<GlobalTextWrapper>Next</GlobalTextWrapper>
+	</GlobalButton>
+);
 
 const MixerSelect = (
 	props: PropsWithChildren &
@@ -363,7 +388,7 @@ const MixerSelect = (
 ) => (
 	<select
 		{...props}
-		className='p-2 rounded-full w-full bg-transparent border-slate-500 border-2 focus:border-white focus:text-black active:bg-white focus:bg-white outline-none cursor-pointer'>
+		className='p-2 rounded-full w-full bg-transparent border-slate-500 border-2 focus:border-white outline-none cursor-pointer'>
 		{props.children}
 	</select>
 );
