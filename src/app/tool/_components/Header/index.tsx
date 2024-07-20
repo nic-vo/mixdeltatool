@@ -8,7 +8,7 @@ const ToolHeader = () => {
 			<Suspense fallback={null}>
 				<MainNav />
 			</Suspense>
-			<div className='pl-2'>
+			<div className='pl-2 border-slate-500'>
 				<Suspense fallback={null}>
 					<ToggleMenu />
 				</Suspense>
