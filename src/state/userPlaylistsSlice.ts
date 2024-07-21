@@ -1,57 +1,59 @@
-import { createSlice } from '@reduxjs/toolkit';
-import {
-	initPage,
-	initPlaylists,
-	persistPage,
-	persistPlaylists,
-	sanitizePlaylists
-} from './helpers';
+'use client';
+
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { sanitizePlaylists } from './helpers';
 import { differOperationAsync, retrieveUserListsAsync } from './thunks';
 
-import type { MyPlaylistObject } from '@components/spotify/types';
+import type { MyPlaylistObject } from '@/lib/validators';
 
 type userPage = number | null;
 export type InitialUserPlaylistsState = {
-	playlists: MyPlaylistObject[],
-	page: userPage
-}
-
-const PLAYLISTS_KEY = 'USER_PLAYLISTS';
-const PAGE_KEY = 'USER_PLAYLISTS_PAGE';
+	playlists: MyPlaylistObject[];
+	page: userPage;
+};
 
 const initialState: InitialUserPlaylistsState = {
-	playlists: initPlaylists(PLAYLISTS_KEY),
-	page: initPage(PAGE_KEY),
+	playlists: [],
+	page: 0,
 };
 
 const userPlaylistsSlice = createSlice({
 	name: 'userPlaylists',
 	initialState,
 	reducers: {
+		initUser: (
+			state,
+			action: PayloadAction<{
+				playlists: MyPlaylistObject[];
+				page: number | null;
+			}>
+		) => {
+			state.playlists = [...action.payload.playlists];
+			state.page = action.payload.page;
+		},
 		clearUser: (state) => {
-			// This should trigger differ middleware
 			state.playlists = [];
 			state.page = 0;
-			persistPlaylists(PLAYLISTS_KEY, state.playlists);
-			persistPage(0, PAGE_KEY);
-
-		}
+		},
 	},
 	extraReducers: (builder) => {
-		builder.addCase(retrieveUserListsAsync.fulfilled,
-			(state, action) => {
+		builder
+			.addCase(retrieveUserListsAsync.fulfilled, (state, action) => {
+				// Sanitize new playlist array an dedupe
+				state.playlists = state.playlists.concat(
+					sanitizePlaylists(action.payload.playlists)
+				);
 				state.page = action.payload.next;
-				const sanitized = sanitizePlaylists([...action.payload.playlists]);
-				const setted = Array.from(new Set([...state.playlists, ...sanitized]));
-				state.playlists = setted;
-				persistPlaylists(PLAYLISTS_KEY, setted);
-				persistPage(action.payload.next, PAGE_KEY);
-			}).addCase(differOperationAsync.fulfilled, (state, action) => {
-				state.playlists = [action.payload.playlist].concat(state.playlists);
+			})
+			.addCase(differOperationAsync.fulfilled, (state, action) => {
+				const sanitizedAndAdded = sanitizePlaylists([
+					action.payload.playlist,
+				]).concat([...state.playlists]);
+				state.playlists = sanitizedAndAdded;
 			});
-	}
+	},
 });
 
-export const { clearUser } = userPlaylistsSlice.actions;
+export const { clearUser, initUser } = userPlaylistsSlice.actions;
 
 export default userPlaylistsSlice.reducer;

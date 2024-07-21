@@ -28,27 +28,9 @@
 			}
 		],
 		"paths": {
-			"@lib/*": [
-				"./src/lib/*"
+			"@/*": [
+				"./src/*"
 			],
-			"@components/*": [
-				"./src/components/*"
-			],
-			"@types/*": [
-				"./src/types/*"
-			],
-			"@consts/*": [
-				"./src/consts/*"
-			],
-			"@styles/*": [
-				"./src/styles/*"
-			],
-			"@hooks/*": [
-				"./src/hooks/*"
-			],
-			"@state/*": [
-				"./src/state/*"
-			]
 		},
 	},
 	"include": [

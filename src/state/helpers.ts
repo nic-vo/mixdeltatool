@@ -1,36 +1,41 @@
-import { myPlaylistObjectParser } from '@lib/spotify/validators';
+'use client';
+
+import { myPlaylistObjectParser } from '@/lib/validators';
 import { sanitize } from 'isomorphic-dompurify';
 
-import { MyPlaylistObject } from '@components/spotify/types';
+import type { MyPlaylistObject } from '@/lib/validators';
+
+const stripper = (input: string) => sanitize(input, { ALLOWED_TAGS: [] });
 
 export const sanitizePlaylists = (playlists: MyPlaylistObject[]) => {
 	try {
-		const parsed = playlists.map(playlist =>
+		const parsed = playlists.map((playlist) =>
 			myPlaylistObjectParser.parse(playlist)
 		);
-		const sanitized = parsed.map(playlist => {
+		const sanitized = parsed.map((playlist) => {
 			return {
 				...playlist,
-				name: sanitize(playlist.name, {
-					ALLOWED_TAGS: []
+				owner: playlist.owner.map((deets) => {
+					return {
+						id: stripper(deets.id),
+						name: deets.name !== null ? stripper(deets.name) : null,
+					};
 				}),
-				id: sanitize(playlist.id, {
-					ALLOWED_TAGS: []
-				}),
-				image: !playlist.image ? undefined :
-					{
-						...playlist.image,
-						url: sanitize(playlist.image.url, {
-							ALLOWED_TAGS: []
-						})
-					}
+				name: stripper(playlist.name),
+				id: stripper(playlist.id),
+				image: playlist.image
+					? {
+							...playlist.image,
+							url: stripper(playlist.image.url),
+					  }
+					: null,
 			};
 		});
 		return sanitized;
 	} catch {
 		return [];
 	}
-}
+};
 
 export const initPlaylists = (key: string): MyPlaylistObject[] => {
 	const storageData = sessionStorage.getItem(key);
@@ -40,9 +45,9 @@ export const initPlaylists = (key: string): MyPlaylistObject[] => {
 		const parsed = JSON.parse(storageData) as MyPlaylistObject[];
 		const sanitized = sanitizePlaylists(parsed);
 		return sanitized;
-	} catch { }
+	} catch {}
 	return [];
-}
+};
 
 export const initPage = (key: string): number | null => {
 	const storage = sessionStorage.getItem(key);
@@ -54,18 +59,18 @@ export const initPage = (key: string): number | null => {
 	} catch {
 		return 0;
 	}
-}
+};
 
 export const persistPlaylists = (
 	key: string,
-	playlists: MyPlaylistObject[],
+	playlists: MyPlaylistObject[]
 ) => {
 	sessionStorage.setItem(key, JSON.stringify(playlists));
-}
+};
 
-export const persistPage = (page: number | null, key: string) => {
+export const persistPage = (key: string, page: number | null) => {
 	sessionStorage.setItem(key, page === null ? 'null' : page.toString());
-}
+};
 
 /*
 	Unknown action snippet:

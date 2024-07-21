@@ -1,43 +1,39 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { initPlaylists, persistPlaylists, sanitizePlaylists } from './helpers';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { sanitizePlaylists } from './helpers';
 import { retrieveSpecificAsync } from './thunks';
 
-import type { MyPlaylistObject } from '@components/spotify/types';
-
-const PLAYLISTS_KEY = 'SPEC_PLAYLISTS';
+import type { MyPlaylistObject } from '@/lib/validators';
 
 export type InitialSpecificPlaylistsState = {
-	playlists: MyPlaylistObject[]
-}
+	playlists: MyPlaylistObject[];
+};
 
 const initialState: InitialSpecificPlaylistsState = {
-	playlists: initPlaylists(PLAYLISTS_KEY)
+	playlists: [],
 };
 
 const specificPlaylistsSlice = createSlice({
 	name: 'specificPlaylists',
 	initialState,
 	reducers: {
+		initSpecific: (state, action: PayloadAction<MyPlaylistObject[]>) => {
+			state.playlists = [...action.payload];
+		},
 		clearSpecific: (state) => {
 			state.playlists = [];
-			persistPlaylists(PLAYLISTS_KEY, state.playlists);
-		}
+		},
 	},
 	extraReducers: (builder) => {
-		builder.addCase(retrieveSpecificAsync.fulfilled,
-			(state, action) => {
-				const map = new Map();
-				const sanitized = sanitizePlaylists([action.payload])[0];
-				for (const playlist of state.playlists) map.set(playlist.id, playlist);
-				if (!map.has(sanitized.id))
-					map.set(action.payload.id, action.payload);
-				const setted = Array.from(map.values());
-				state.playlists = setted;
-				persistPlaylists(PLAYLISTS_KEY, setted);
-			});
-	}
+		builder.addCase(retrieveSpecificAsync.fulfilled, (state, action) => {
+			const set = new Set(state.playlists.map((playlist) => playlist.id));
+			const sanitized = sanitizePlaylists([action.payload]);
+			if (set.has(sanitized[0].id)) return;
+			const deduped = state.playlists.concat(sanitized);
+			state.playlists = deduped;
+		});
+	},
 });
 
-export const { clearSpecific } = specificPlaylistsSlice.actions;
+export const { initSpecific, clearSpecific } = specificPlaylistsSlice.actions;
 
 export default specificPlaylistsSlice.reducer;

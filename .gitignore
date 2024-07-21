@@ -40,8 +40,14 @@ next-env.d.ts
 /src/pages/dev
 /src/lib/dev
 /src/pages/api/dev
+/src/app/dev
+/src/app/api/dev
 
 # yarn
 .pnp.cjs
 .pnp.loader.mjs
 .yarn
+
+# macOS
+F:\\_yarn\\Berry/
+yarn.lock
