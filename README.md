@@ -10,7 +10,13 @@ You can either use [the live version](https://mixdeltatool.vercel.app) or clone 
 
 ## Changelog
 
-### 0.27.0 - pre-release
+### 1.0.0 -
+
+- Simplify tailwind parsing with tailwind-merge
+- Metadata
+- Final hydration error workaround
+
+### 0.27.0 - Pre-release
 
 - Move from pages to app router
 - Significantly improve code modularity
