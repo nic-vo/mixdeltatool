@@ -38,3 +38,8 @@ export default async function AccountDeletionPage() {
 		</GlobalMain>
 	);
 }
+
+export const metadata = {
+	title: 'Delete your account',
+	description: 'This form will allow you to delete your account.',
+};

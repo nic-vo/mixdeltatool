@@ -10,7 +10,7 @@ import { hitsSpotify, localNavigation } from '@/consts/buttonStates';
 const LoginPage = () => (
 	<GlobalMain className='justify-center'>
 		<h1 className='font-cabin font-black text-6xl text-center'>
-			First, sign in.
+			Sign in to start mixing.
 		</h1>
 		<form action={saSignIn}>
 			<GlobalButton

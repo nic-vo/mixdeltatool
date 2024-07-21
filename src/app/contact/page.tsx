@@ -26,6 +26,6 @@ const Contact = () => (
 export default Contact;
 
 export const metadata = {
-	title: 'Contact Us | MixDelta',
+	title: 'Contact Us',
 	description: 'The MixDelta contact form',
 };

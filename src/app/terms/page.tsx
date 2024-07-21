@@ -19,6 +19,6 @@ const Terms = () => (
 export default Terms;
 
 export const metadata = {
-	title: 'Terms and Conditions | MixDelta',
+	title: 'Terms and Conditions',
 	description: 'The terms and conditions for MixDelta',
 };

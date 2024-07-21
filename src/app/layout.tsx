@@ -37,11 +37,25 @@ const RootLayout = (props: PropsWithChildren) => {
 export default RootLayout;
 
 export const metadata = {
-	title: 'Compare / Trim Spotify playlists | MixDelta',
+	title: {
+		template: 'MixDelta | %s',
+		default: 'MixDelta | Compare and streamline Spotify playlists',
+	},
+
 	description:
-		'MixDelta is a tool for Spotify users to compare playlists and edit them based on the comparisons.',
+		'MixDelta is a tool that Spotify users can use to compare playlists and edit them based on the comparisons.',
 	keywords:
-		'Spotify playlist, Spotify playlist comparison, Spotify playlist tool, compare Spotify playlist, playlist cleanup'.split(
+		'Spotify playlist, Spotify playlist comparison, Spotify playlist tool, compare Spotify playlist, playlist cleanup, '.split(
 			', '
 		),
+	openGraph: {
+		title: 'MixDelta for Spotify',
+		description:
+			'MixDelta is a tool that Spotify users can use to compare playlists and edit them based on the comparisons.',
+		url: 'https://mixdelta.xyz',
+		siteName: 'MixDelta',
+		locale: 'en_US',
+		type: 'website',
+	},
+	category: 'technology',
 };

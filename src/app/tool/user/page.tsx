@@ -27,3 +27,8 @@ const UserDialogue = () => (
 );
 
 export default UserDialogue;
+
+export const metadata = {
+	title: 'Add Your Playlists',
+	description: 'Add your playlists locally to the tool from here',
+};

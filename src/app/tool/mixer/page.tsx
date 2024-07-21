@@ -12,3 +12,8 @@ const DifferDialogue = () => (
 );
 
 export default DifferDialogue;
+
+export const metadata = {
+	title: 'Mix Playlists',
+	description: 'Compare and mix locally cached playlists here',
+};

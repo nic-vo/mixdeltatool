@@ -44,3 +44,8 @@ const ToolRoot = async () => {
 };
 
 export default ToolRoot;
+
+export const metadata = {
+	title: 'Start Mixing Here',
+	description: 'The MixDelta tool landing page',
+};

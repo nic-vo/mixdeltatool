@@ -3,7 +3,7 @@ import {
 	GlobalMain,
 	GlobalTextWrapper,
 } from '@/components/global/serverComponentUI';
-import { localNavigation } from '@/consts/buttonStates';
+import { hitsSpotify, localNavigation } from '@/consts/buttonStates';
 
 export default async function Home() {
 	return (
@@ -17,13 +17,25 @@ export default async function Home() {
 					a playlist tool for Spotify
 				</p>
 			</hgroup>
-			<GlobalBlockLink
-				href='/tool'
-				className={
-					localNavigation + ' lg:justify-self-end self-start lg:col-start-1'
-				}>
-				<GlobalTextWrapper>To the tool! &rarr;</GlobalTextWrapper>
-			</GlobalBlockLink>
+			<nav className='lg:justify-self-end self-start lg:col-start-1'>
+				<ul className='flex flex-col gap-4'>
+					<li>
+						<GlobalBlockLink
+							href='/login'
+							className={localNavigation}>
+							<GlobalTextWrapper>Sign In &rarr;</GlobalTextWrapper>
+						</GlobalBlockLink>
+					</li>
+					<li>
+						<GlobalBlockLink
+							href='/tool'
+							className={hitsSpotify}>
+							<GlobalTextWrapper>To the tool! &rarr;</GlobalTextWrapper>
+						</GlobalBlockLink>
+					</li>
+				</ul>
+			</nav>
+
 			<section className='w-full *:max-w-prose lg:row-start-2 lg:self-start col-start-2 flex flex-col gap-4 self-end'>
 				<h2 className='font-bold text-5xl font-hind'>About this tool</h2>
 				<p>

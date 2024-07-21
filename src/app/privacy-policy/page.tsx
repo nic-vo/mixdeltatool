@@ -258,3 +258,8 @@ const PrivacyPolicy = () => {
 };
 
 export default PrivacyPolicy;
+
+export const metadata = {
+	title: 'Privacy Policy',
+	description: 'The privacy policy for MixDelta',
+};
