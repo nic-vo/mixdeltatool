@@ -2,11 +2,23 @@
 
 import { useSelector } from 'react-redux';
 import { selectSpecificPlaylists, selectUserPlaylists } from '@/state';
+import { useEffect, useState } from 'react';
 
 export default function PlaylistOptions() {
+	const [first, setFirst] = useState(true);
 	const userPlaylists = useSelector(selectUserPlaylists);
 	const specificPlaylists = useSelector(selectSpecificPlaylists);
 
+	useEffect(() => setFirst(false), []);
+
+	if (first)
+		return (
+			<option
+				value=''
+				className='text-black'>
+				Choose one...
+			</option>
+		);
 	return (
 		<>
 			<option
