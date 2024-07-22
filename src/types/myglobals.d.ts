@@ -1,7 +1,7 @@
 import '@hcaptcha/types';
 
 declare global {
-	var _mongoClientPromise: Promise<MongoClient>;
+	var _mongoClient: MongoClient;
 }
 
 export {};

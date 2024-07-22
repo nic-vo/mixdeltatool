@@ -7,18 +7,15 @@ if (!process.env.MONGODB_URI) {
 const uri = process.env.MONGODB_URI;
 const options = {};
 
-let client;
-let clientPromise: Promise<MongoClient>;
+let SharedClient: MongoClient;
 
 if (process.env.NODE_ENV === 'development') {
-	if (global._mongoClientPromise === undefined) {
-		client = new MongoClient(uri, options);
-		global._mongoClientPromise = client.connect();
+	if (global._mongoClient === undefined) {
+		global._mongoClient = new MongoClient(uri, options);
 	}
-	clientPromise = global._mongoClientPromise;
+	SharedClient = global._mongoClient;
 } else {
-	client = new MongoClient(uri, options);
-	clientPromise = client.connect();
+	SharedClient = new MongoClient(uri, options);
 }
 
-export default clientPromise;
+export default SharedClient;

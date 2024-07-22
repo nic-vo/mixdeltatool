@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth';
 import Spotify from 'next-auth/providers/spotify';
 import { MongoDBAdapter } from '@auth/mongodb-adapter';
-import clientPromise from './mongocfg';
+import SharedClient from './mongocfg';
 import { signInUpdater } from './accessKey';
 import mongoosePromise from '@/lib/database/mongoose/connection';
 import { Account } from '@/lib/database/mongoose/models';
@@ -33,6 +33,14 @@ const config = {
 export const basePath = '/api/auth';
 
 const maxAgeSeconds = 60 * 60 * 24 * 3;
+
+const clientPromise = async () => {
+	try {
+		return await SharedClient.connect();
+	} catch {
+		throw new Error();
+	}
+};
 
 const { handlers, signIn, signOut, auth } = NextAuth({
 	basePath,
