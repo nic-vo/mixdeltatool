@@ -41,6 +41,7 @@ export function handlerWithTimeout(config: myConfigType, handler: BaseHandler) {
 				},
 			} = config;
 			const { ip } = req;
+			console.log(ip);
 			if (!ip) return badResponse(500);
 			try {
 				const rateLimitValue = await checkAndUpdateEntry({
