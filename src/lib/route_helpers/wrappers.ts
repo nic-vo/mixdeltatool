@@ -90,6 +90,7 @@ export function handlerWithTimeoutAndAuth(
 				},
 			} = config;
 			const { ip } = req;
+			console.log(ip);
 			if (!ip) return badResponse(500);
 			try {
 				const rateLimitValue = await checkAndUpdateEntry({
