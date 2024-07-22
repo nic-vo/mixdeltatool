@@ -58,7 +58,7 @@ export const EUAHeading = ({
 
 export const SmallNav = () => {
 	return (
-		<nav className='relative z-10 w-full flex justify-between max-w-screen-lg'>
+		<nav className='relative z-10 w-full flex justify-between max-w-screen-md'>
 			<GlobalBlockLink
 				href='/'
 				className={localNavigation}>
