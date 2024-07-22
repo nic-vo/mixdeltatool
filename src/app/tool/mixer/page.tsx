@@ -17,3 +17,5 @@ export const metadata = {
 	title: 'Mix Playlists',
 	description: 'Compare and mix locally cached playlists here',
 };
+
+export const dynamic = 'force-static';

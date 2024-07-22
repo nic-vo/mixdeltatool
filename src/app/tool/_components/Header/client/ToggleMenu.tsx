@@ -7,7 +7,7 @@ import {
 } from '@/components/global/serverComponentUI';
 import { useState, useRef, useEffect, FocusEventHandler } from 'react';
 import { IoClose, IoMenu } from 'react-icons/io5';
-import { FlatButton, FlatLink } from '../server';
+import { FlatButton, FlatLink } from './server';
 
 const ToggleMenu = () => {
 	const [toggled, setToggled] = useState(false);
