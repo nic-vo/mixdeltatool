@@ -33,4 +33,4 @@ export const metadata = {
 	description: 'Add specific playlists / albums locally to the tool from here',
 };
 
-export const dynamic = 'force-static';
+// export const dynamic = 'force-static';
