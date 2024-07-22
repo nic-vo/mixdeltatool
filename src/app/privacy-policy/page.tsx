@@ -9,7 +9,7 @@ import { GlobalMain, InlineLink } from '@/components/global/serverComponentUI';
 const PrivacyPolicy = () => {
 	return (
 		<GlobalMain className='max-w-prose mt-16 mb-8 !overflow-auto px-2 outline-white focus-visible:outline flex flex-col gap-8'>
-			<header className='flex flex-col gap-4'>
+			<header className='flex flex-col gap-4 w-full'>
 				<h1 className='text-center text-5xl font-black'>
 					MixDelta Privacy Policy
 				</h1>
