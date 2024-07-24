@@ -1,4 +1,4 @@
-import { badResponse, defaultErrorMessages } from './responses';
+import { badResponse } from './responses';
 import { auth } from '@/auth';
 import checkAndUpdateEntry from '../database/redis/ratelimiting';
 
@@ -40,8 +40,7 @@ export function handlerWithTimeout(config: myConfigType, handler: BaseHandler) {
 					RATE_LIMIT_ROLLING_LIMIT,
 				},
 			} = config;
-			const { ip } = req;
-			console.log(ip);
+			const ip = req.ip ?? req.headers.get('X-Forwarded-For');
 			if (!ip) return badResponse(500);
 			try {
 				const rateLimitValue = await checkAndUpdateEntry({
@@ -89,8 +88,7 @@ export function handlerWithTimeoutAndAuth(
 					RATE_LIMIT_ROLLING_LIMIT,
 				},
 			} = config;
-			const { ip } = req;
-			console.log(ip);
+			const ip = req.ip ?? req.headers.get('X-Forwarded-For');
 			if (!ip) return badResponse(500);
 			try {
 				const rateLimitValue = await checkAndUpdateEntry({
