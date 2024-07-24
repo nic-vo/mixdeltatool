@@ -35,6 +35,7 @@ export const GlobalBlockLink = ({
 	) : (
 		<a
 			{...attrs}
+			href={href}
 			className={globalClasser(className)}>
 			{children}
 		</a>
@@ -104,6 +105,7 @@ export const InlineLink = ({
 	return (
 		<a
 			{...attrs}
+			href={href}
 			className={inlineClasser(className)}>
 			{children}
 		</a>
