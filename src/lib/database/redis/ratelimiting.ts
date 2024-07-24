@@ -65,5 +65,6 @@ export default async function checkAndUpdateEntry(params: {
 				2 * rollingDecaySeconds * rollingLimit,
 		}
 	);
-	return (newTokens - rollingLimit) * rollingDecaySeconds;
+	// Return number of tokens
+	return newTokens;
 }
