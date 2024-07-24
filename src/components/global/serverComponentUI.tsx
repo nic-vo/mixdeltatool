@@ -104,6 +104,7 @@ export const InlineLink = ({
 	return (
 		<a
 			{...attrs}
+			href={href}
 			className={inlineClasser(className)}>
 			{children}
 		</a>
