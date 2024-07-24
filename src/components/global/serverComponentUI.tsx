@@ -35,6 +35,7 @@ export const GlobalBlockLink = ({
 	) : (
 		<a
 			{...attrs}
+			href={href}
 			className={globalClasser(className)}>
 			{children}
 		</a>
