@@ -49,9 +49,14 @@ export function handlerWithTimeout(config: myConfigType, handler: BaseHandler) {
 					rollingDecaySeconds: RATE_LIMIT_DECAY_SECONDS,
 					ip,
 				});
-				if (rateLimitValue)
+				if (rateLimitValue && rateLimitValue > RATE_LIMIT_ROLLING_LIMIT)
 					return badResponse(429, {
-						headers: { 'Retry-After': rateLimitValue.toString() },
+						headers: {
+							'Retry-After': (
+								(rateLimitValue - RATE_LIMIT_ROLLING_LIMIT) *
+								RATE_LIMIT_DECAY_SECONDS
+							).toString(),
+						},
 					});
 			} catch {
 				return badResponse(502, {
@@ -97,9 +102,14 @@ export function handlerWithTimeoutAndAuth(
 					rollingDecaySeconds: RATE_LIMIT_DECAY_SECONDS,
 					ip,
 				});
-				if (rateLimitValue)
+				if (rateLimitValue && rateLimitValue > RATE_LIMIT_ROLLING_LIMIT)
 					return badResponse(429, {
-						headers: { 'Retry-After': rateLimitValue.toString() },
+						headers: {
+							'Retry-After': (
+								(rateLimitValue - RATE_LIMIT_ROLLING_LIMIT) *
+								RATE_LIMIT_DECAY_SECONDS
+							).toString(),
+						},
 					});
 			} catch {
 				return badResponse(502, {
