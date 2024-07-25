@@ -11,13 +11,21 @@ import {
 	hitsSpotify,
 	localNavigation,
 } from '@/consts/buttonStates';
+import { redirect } from 'next/navigation';
 import { saSignOut } from '@/auth';
 
 const ToolRoot = async () => {
+	const session = await auth();
+	if (!session) redirect(`/api/auth/signin`);
+
 	return (
 		<GlobalMain className='justify-center'>
 			<ToolHeading className='text-center'>
-				&uarr; Start up here! &uarr;
+				Welcome,{' '}
+				{(session.user &&
+					(session.user?.name ?? session.user?.email?.split('@')[0])) ??
+					'Stranger'}
+				!
 			</ToolHeading>
 			<form action={saSignOut}>
 				<GlobalButton
