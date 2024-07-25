@@ -18,4 +18,4 @@ export const metadata = {
 	description: 'Compare and mix locally cached playlists here',
 };
 
-export const dynamic = 'force-static';
+// export const dynamic = 'force-static';
