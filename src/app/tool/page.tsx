@@ -1,4 +1,4 @@
-import { auth } from '@/auth';
+import { auth, saSignIn, saSignOut } from '@/auth';
 import {
 	GlobalButton,
 	GlobalMain,
@@ -11,12 +11,33 @@ import {
 	hitsSpotify,
 	localNavigation,
 } from '@/consts/buttonStates';
-import { redirect } from 'next/navigation';
-import { saSignOut } from '@/auth';
 
 const ToolRoot = async () => {
 	const session = await auth();
-	if (!session) redirect(`/api/auth/signin`);
+	if (!session)
+		return (
+			<GlobalMain className='justify-center'>
+				<ToolHeading className='text-center'>
+					Ideally, sign in first.
+				</ToolHeading>
+				<p>
+					You&apos;ll be redirected to sign in if you try to use anything
+					anyway.
+				</p>
+				<form action={saSignIn}>
+					<GlobalButton
+						type='submit'
+						className={hitsSpotify}>
+						<GlobalTextWrapper>Sign in</GlobalTextWrapper>
+					</GlobalButton>
+				</form>
+				<GlobalBlockLink
+					href='/'
+					className={localNavigation + ' ' + flippedSlider}>
+					<GlobalTextWrapper>&larr; Return Home</GlobalTextWrapper>
+				</GlobalBlockLink>
+			</GlobalMain>
+		);
 
 	return (
 		<GlobalMain className='justify-center'>
