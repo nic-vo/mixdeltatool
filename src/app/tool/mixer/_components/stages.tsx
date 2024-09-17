@@ -218,12 +218,17 @@ export const ActionSelector = (props: StageProps) => {
 					id='actionType'
 					value={action}
 					onChange={actionHandler}>
-					<option value={''}>Choose one...</option>
+					<option
+						value={''}
+						className='text-black'>
+						Choose one...
+					</option>
 					{Object.entries(CLIENT_DIFF_TYPES).map((pair) => {
 						return (
 							<option
 								value={pair[0]}
-								key={pair[0]}>
+								key={pair[0]}
+								className='text-black'>
 								{pair[1]}
 							</option>
 						);

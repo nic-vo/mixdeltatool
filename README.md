@@ -10,7 +10,11 @@ You can either use [the live version](https://mixdeltatool.vercel.app) or clone 
 
 ## Changelog
 
-### 1.0.0 -
+### 1.0.1
+
+- Mixer text color bugfix
+
+### 1.0.0
 
 - Simplify tailwind parsing with tailwind-merge
 - Metadata
