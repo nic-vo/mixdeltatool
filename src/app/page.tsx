@@ -5,7 +5,7 @@ import {
 } from '@/components/global/serverComponentUI';
 import { hitsSpotify, localNavigation } from '@/consts/buttonStates';
 
-export default async function Home() {
+export default function Home() {
 	return (
 		<GlobalMain className='lg:m-auto lg:grid gap-8 grid-cols-2'>
 			<hgroup className='mt-32 lg:mt-0 w-full lg:text-right lg:self-end'>
