@@ -1,6 +1,5 @@
 import { auth, saSignIn, saSignOut } from '@/auth';
 import {
-	GlobalButton,
 	GlobalMain,
 	GlobalBlockLink,
 	GlobalTextWrapper,
@@ -11,50 +10,78 @@ import {
 	hitsSpotify,
 	localNavigation,
 } from '@/consts/buttonStates';
+import { Suspense } from 'react';
+import InProgressLogo from '@/components/global/InProgressLogo';
+import LandingSubmitTimeout from './_components/LandingSubmitTimeout';
 
-const ToolRoot = async () => {
+const signInButtonID = 'landing-signin-button';
+const signOutButtonID = 'landing-signout-button';
+
+const ToolLanding = async () => {
 	const session = await auth();
 	if (!session)
 		return (
-			<GlobalMain className='justify-center'>
-				<ToolHeading className='text-center'>
-					Ideally, sign in first.
-				</ToolHeading>
-				<p>
-					You&apos;ll be redirected to sign in if you try to use anything
-					anyway.
+			<>
+				<p className='text-center'>
+					Ideally, sign in first. You&apos;ll be redirected to sign in if you
+					try to use anything, anyway.
 				</p>
-				<form action={saSignIn}>
-					<GlobalButton
+				<form
+					action={saSignIn}
+					className='flex flex-col items-center w-full'>
+					<label htmlFor={signInButtonID}>
+						<span className='sr-only'>Click to sign in to the tool</span>
+					</label>
+					<LandingSubmitTimeout
+						id={signInButtonID}
 						type='submit'
 						className={hitsSpotify}>
 						<GlobalTextWrapper>Sign in</GlobalTextWrapper>
-					</GlobalButton>
+					</LandingSubmitTimeout>
 				</form>
-				<GlobalBlockLink
-					href='/'
-					className={localNavigation + ' ' + flippedSlider}>
-					<GlobalTextWrapper>&larr; Return Home</GlobalTextWrapper>
-				</GlobalBlockLink>
-			</GlobalMain>
+			</>
 		);
-
 	return (
-		<GlobalMain className='justify-center'>
-			<ToolHeading className='text-center'>
+		<>
+			<p className='text-center'>
 				Welcome,{' '}
-				{(session.user &&
-					(session.user?.name ?? session.user?.email?.split('@')[0])) ??
-					'Stranger'}
+				{session.user?.name ?? session.user?.email?.split('@')[0] ?? 'Stranger'}
 				!
-			</ToolHeading>
+			</p>
 			<form action={saSignOut}>
-				<GlobalButton
+				<label htmlFor={signOutButtonID}>
+					<span className='sr-only'>Click to sign out of the tool</span>
+				</label>
+				<LandingSubmitTimeout
+					id={signOutButtonID}
 					type='submit'
 					className={hitsSpotify + ' ' + flippedSlider}>
 					<GlobalTextWrapper>Sign out</GlobalTextWrapper>
-				</GlobalButton>
+				</LandingSubmitTimeout>
 			</form>
+		</>
+	);
+};
+
+const ToolRoot = () => {
+	return (
+		<GlobalMain className='justify-between my-16'>
+			<ToolHeading className='text-center'>Start here.</ToolHeading>
+			<div
+				aria-live='polite'
+				className='flex flex-col items-center gap-8'>
+				<Suspense
+					fallback={
+						<div className='flex items-center'>
+							<InProgressLogo twSize='size-32' />
+							<span className='animate-pulse font-bold text-3xl'>
+								Loading...
+							</span>
+						</div>
+					}>
+					<ToolLanding />
+				</Suspense>
+			</div>
 			<GlobalBlockLink
 				href='/'
 				className={localNavigation + ' ' + flippedSlider}>
