@@ -31,7 +31,7 @@ const DeleteForm = () => {
 			setSuccess(true);
 			setTimeout(() => signOut({ callbackUrl: '/', redirect: true }), 3000);
 		} catch (e: any) {
-			setError(e.message ? e.message : 'Unknown error');
+			setError((e.message as string | undefined) ?? 'Unknown error');
 		}
 		setLoading(false);
 		return;
