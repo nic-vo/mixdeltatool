@@ -12,7 +12,7 @@ import {
 } from '@/consts/buttonStates';
 import { Suspense } from 'react';
 import InProgressLogo from '@/components/global/InProgressLogo';
-import LandingSubmitTimeout from './_components/LandingSubmitTimeout';
+import LandingSubmitTimeout from '@/components/global/LandingSubmitTimeout';
 
 const signInButtonID = 'landing-signin-button';
 const signOutButtonID = 'landing-signout-button';
