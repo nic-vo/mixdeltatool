@@ -1,11 +1,13 @@
 import { saSignIn } from '@/auth';
 import {
 	GlobalBlockLink,
-	GlobalButton,
 	GlobalMain,
 	GlobalTextWrapper,
 } from '@/components/global/serverComponentUI';
+import LandingSubmitTimeout from '@/components/global/LandingSubmitTimeout';
 import { hitsSpotify, localNavigation } from '@/consts/buttonStates';
+
+const signInButtonID = 'login-signin-button';
 
 const LoginPage = () => (
 	<GlobalMain className='justify-center'>
@@ -13,11 +15,15 @@ const LoginPage = () => (
 			Sign in to start mixing.
 		</h1>
 		<form action={saSignIn}>
-			<GlobalButton
-				className={hitsSpotify}
-				type='submit'>
+			<label htmlFor={signInButtonID}>
+				<span className='sr-only'>Click to sign in to the tool</span>
+			</label>
+			<LandingSubmitTimeout
+				id={signInButtonID}
+				type='submit'
+				className={hitsSpotify}>
 				<GlobalTextWrapper>Sign in</GlobalTextWrapper>
-			</GlobalButton>
+			</LandingSubmitTimeout>
 		</form>
 		<GlobalBlockLink
 			href='/'
