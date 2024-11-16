@@ -10,6 +10,11 @@ You can either use [the live version](https://mixdeltatool.vercel.app) or clone 
 
 ## Changelog
 
+### 1.1.0
+
+- Unfortunately, reduce blocking nature of auth, especially on cold starts for page routes
+- Bump to Next 15 to realize the caching improvements
+
 ### 1.0.1
 
 - Mixer text color bugfix
