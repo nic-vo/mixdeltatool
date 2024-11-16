@@ -5,6 +5,7 @@ import checkAndUpdateEntry from '../database/redis/ratelimiting';
 import { AppRouteHandlerFnContext } from 'next-auth/lib/types';
 import { NextRequest } from 'next/server';
 import { NextAuthRequest } from 'next-auth/lib';
+import { ipAddress } from '@vercel/functions';
 
 type BaseHandler = (
 	req: NextRequest,
@@ -40,7 +41,7 @@ export function handlerWithTimeout(config: myConfigType, handler: BaseHandler) {
 					RATE_LIMIT_ROLLING_LIMIT,
 				},
 			} = config;
-			const ip = req.ip ?? req.headers.get('X-Forwarded-For');
+			const ip = ipAddress(req);
 			if (!ip) return badResponse(500);
 			try {
 				const rateLimitValue = await checkAndUpdateEntry({
@@ -93,7 +94,7 @@ export function handlerWithTimeoutAndAuth(
 					RATE_LIMIT_ROLLING_LIMIT,
 				},
 			} = config;
-			const ip = req.ip ?? req.headers.get('X-Forwarded-For');
+			const ip = ipAddress(req);
 			if (!ip) return badResponse(500);
 			try {
 				const rateLimitValue = await checkAndUpdateEntry({
