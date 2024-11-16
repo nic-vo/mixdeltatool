@@ -10,6 +10,10 @@ You can either use [the live version](https://mixdeltatool.vercel.app) or clone 
 
 ## Changelog
 
+### 1.1.1
+
+- IP parsing fix
+
 ### 1.1.0
 
 - Unfortunately, reduce blocking nature of auth, especially on cold starts for page routes
