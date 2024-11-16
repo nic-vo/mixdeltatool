@@ -1,13 +1,55 @@
 'use client';
 
-import { signOut } from 'next-auth/react';
+import { signIn, signOut, useSession } from 'next-auth/react';
 import {
 	GlobalButton,
 	GlobalTextWrapper,
 } from '@/components/global/serverComponentUI';
-import { useState, useRef, useEffect, FocusEventHandler } from 'react';
+import {
+	useState,
+	useRef,
+	useEffect,
+	FocusEventHandler,
+	MouseEventHandler,
+} from 'react';
 import { IoClose, IoMenu } from 'react-icons/io5';
 import { FlatButton, FlatLink } from './server';
+import useButtonTimeout from '@/components/global/ButtonTimeoutHook';
+import InProgressLogo from '@/components/global/InProgressLogo';
+
+const HeaderSignoutButton = ({ toggled }: { toggled: boolean }) => {
+	const { status } = useSession();
+	const { disabled, clickHandler } = useButtonTimeout(
+		'Pending...',
+		'Try again.'
+	);
+
+	const handler: MouseEventHandler<HTMLButtonElement> = (e) => {
+		if (status === 'loading') return;
+		if (status === 'authenticated') {
+			signOut({ redirectTo: '/tool' });
+		} else {
+			signIn();
+		}
+		clickHandler(e);
+	};
+
+	return (
+		<FlatButton
+			onClick={handler}
+			tabIndex={toggled ? 0 : -1}
+			disabled={!toggled || disabled}
+			className='h-16'>
+			{disabled || status === 'loading' ? (
+				<InProgressLogo twSize='size-4' />
+			) : (
+				<GlobalTextWrapper>
+					{status === 'authenticated' ? 'Sign out' : 'Sign in'}
+				</GlobalTextWrapper>
+			)}
+		</FlatButton>
+	);
+};
 
 const ToggleMenu = () => {
 	const [toggled, setToggled] = useState(false);
@@ -94,11 +136,7 @@ const ToggleMenu = () => {
 						</li>
 					</ul>
 				</nav>
-				<FlatButton
-					onClick={() => signOut()}
-					tabIndex={toggled ? 0 : -1}>
-					<GlobalTextWrapper>Sign out</GlobalTextWrapper>
-				</FlatButton>
+				<HeaderSignoutButton toggled={toggled} />
 			</div>
 		</>
 	);
