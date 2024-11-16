@@ -163,7 +163,7 @@ export async function createEmptyPlaylist({
 			headers,
 			method: 'POST',
 			body: JSON.stringify({
-				name: `MixDelta - ${newName ?? genUId(4)}`,
+				name: `MixDelta\\${newName ?? genUId(4)}`,
 				public: false,
 			}),
 		});
