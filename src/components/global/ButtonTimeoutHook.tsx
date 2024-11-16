@@ -11,7 +11,7 @@ const useButtonTimeout = (firstDelayMsg: string, totalFailMsg: string) => {
 	const [message, setMessage] = useState('');
 	const [disabled, setDisabled] = useState(false);
 
-	const clickHandler: MouseEventHandler<HTMLButtonElement> = async (e) => {
+	const clickHandler: MouseEventHandler<HTMLButtonElement> = async () => {
 		if (messageCountdown) clearTimeout(messageCountdown);
 		if (totalCountdown) clearTimeout(totalCountdown);
 		setMessage('');
