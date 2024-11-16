@@ -5,26 +5,25 @@ const CORSGet = (req: NextRequest) => {
 	if (process.env.NODE_ENV === 'development' && origin) {
 		return origin;
 	}
-	if (origin !== process.env.SAFE_ORIGIN)
-		return 'https://mixdeltatool.vercel.app';
+	if (origin !== process.env.SAFE_ORIGIN) return 'https://mixdelta.xyz';
 	return origin;
 };
 
-const CORSHeaders = (req: NextRequest) => {
-	return {
-		'Access-Control-Allow-Credentials': 'true',
-		'Access-Control-Allow-Origin': CORSGet(req),
-		'Access-Control-Allow-Methods': 'OPTIONS,POST',
-		'Access-Control-Allow-Headers':
-			'Accept, Accept-Version, Content-Length, Content-Type, Date, Accept-Encoding',
-	};
-};
+type MyMethods = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+type nonEmptyArray<T> = [T, ...T[]];
 
-export const OPTIONS = (req: NextRequest) => {
-	return new NextResponse('', {
-		headers: CORSHeaders(req),
-		status: 200,
-	});
+export const createOptions = (methods: nonEmptyArray<MyMethods>) => {
+	return (req: NextRequest) =>
+		new NextResponse('', {
+			headers: {
+				'Access-Control-Allow-Credentials': 'true',
+				'Access-Control-Allow-Origin': CORSGet(req),
+				'Access-Control-Allow-Methods': `OPTIONS,${methods.join(',')}`,
+				'Access-Control-Allow-Headers':
+					'Accept, Accept-Version, Content-Length, Content-Type, Date, Accept-Encoding',
+			},
+			status: 200,
+		});
 };
 
 export const defaultErrorMessages = {

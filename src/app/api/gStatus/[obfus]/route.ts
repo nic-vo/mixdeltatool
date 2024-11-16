@@ -1,5 +1,5 @@
 import setNewGlobalStatus from './_lib';
-import { OPTIONS, badResponse } from '@/lib/route_helpers/responses';
+import { createOptions, badResponse } from '@/lib/route_helpers/responses';
 import { handlerWithTimeout } from '@/lib/route_helpers/wrappers';
 import { z } from 'zod';
 import { revalidateTag } from 'next/cache';
@@ -21,7 +21,7 @@ const validator = z.object({
 
 export const maxDuration = 20;
 
-export { OPTIONS };
+export const OPTIONS = createOptions(['PUT']);
 
 export const PUT = handlerWithTimeout(
 	{
