@@ -3,7 +3,7 @@ import {
 	GlobalMain,
 	GlobalTextWrapper,
 } from '@/components/global/serverComponentUI';
-import { hitsSpotify, localNavigation } from '@/consts/buttonStates';
+import { hitsSpotify } from '@/consts/buttonStates';
 
 export default function Home() {
 	return (
@@ -19,13 +19,6 @@ export default function Home() {
 			</hgroup>
 			<nav className='lg:justify-self-end self-start lg:col-start-1'>
 				<ul className='flex flex-col gap-4'>
-					<li>
-						<GlobalBlockLink
-							href='/login'
-							className={localNavigation}>
-							<GlobalTextWrapper>Sign In &rarr;</GlobalTextWrapper>
-						</GlobalBlockLink>
-					</li>
 					<li>
 						<GlobalBlockLink
 							href='/tool'
