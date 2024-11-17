@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { AppDispatch, selectPage, selectUserFetch } from '@/state';
 import { retrieveUserListsAsync } from '@/state/thunks';
 import { AdderForm, SmallStatus } from '../../_components/server';
-import { IoDownload } from 'react-icons/io5';
+import { IoClose, IoDownload } from 'react-icons/io5';
 import {
 	GlobalButton,
 	GlobalTextWrapper,
@@ -61,7 +61,7 @@ export default function UserAdder() {
 				<GlobalButton
 					type='reset'
 					className='flex items-center gap-2 after:bg-red-500 hover:border-red-500 focus-visible:border-red-500 hover:text-white focus-visible:text-white h-max'>
-					<IoDownload
+					<IoClose
 						aria-hidden
 						className='relative z-10 block text-2xl shrink-0'
 					/>{' '}

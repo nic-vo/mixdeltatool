@@ -1,6 +1,5 @@
-import { auth, saSignIn, saSignOut } from '@/auth';
+import { saSignIn, saSignOut } from '@/auth';
 import {
-	GlobalButton,
 	GlobalMain,
 	GlobalBlockLink,
 	GlobalTextWrapper,
@@ -11,58 +10,65 @@ import {
 	hitsSpotify,
 	localNavigation,
 } from '@/consts/buttonStates';
+import LandingSubmitTimeout from '@/components/global/LandingSubmitTimeout';
+import LandingClientCheck from './_components/LandingClientCheck';
+import { SessionProvider } from 'next-auth/react';
 
-const ToolRoot = async () => {
-	const session = await auth();
-	if (!session)
-		return (
-			<GlobalMain className='justify-center'>
-				<ToolHeading className='text-center'>
-					Ideally, sign in first.
-				</ToolHeading>
-				<p>
-					You&apos;ll be redirected to sign in if you try to use anything
-					anyway.
-				</p>
-				<form action={saSignIn}>
-					<GlobalButton
-						type='submit'
-						className={hitsSpotify}>
-						<GlobalTextWrapper>Sign in</GlobalTextWrapper>
-					</GlobalButton>
-				</form>
-				<GlobalBlockLink
-					href='/'
-					className={localNavigation + ' ' + flippedSlider}>
-					<GlobalTextWrapper>&larr; Return Home</GlobalTextWrapper>
-				</GlobalBlockLink>
-			</GlobalMain>
-		);
+const signInButtonID = 'landing-signin-button';
+const signOutButtonID = 'landing-signout-button';
 
-	return (
-		<GlobalMain className='justify-center'>
-			<ToolHeading className='text-center'>
-				Welcome,{' '}
-				{(session.user &&
-					(session.user?.name ?? session.user?.email?.split('@')[0])) ??
-					'Stranger'}
-				!
-			</ToolHeading>
-			<form action={saSignOut}>
-				<GlobalButton
+const ToolRoot = () => (
+	<GlobalMain className='gap-8 my-16'>
+		<ToolHeading className='text-center'>Start here.</ToolHeading>
+		<div className='w-full min-h-32 flex flex-col gap-2 items-center justify-center'>
+			<p>Are you signed in?...</p>
+			<LandingClientCheck />
+		</div>
+		<div className='flex flex-col gap-4'>
+			<p className='text-center max-w-prose'>
+				Ideally, sign in first. You&apos;ll be redirected to sign in if you try
+				to use anything, anyway. You&apos;ll also be redirected to sign in if
+				your Spotify session has expired.
+			</p>
+			<form
+				action={saSignIn}
+				className='flex flex-col items-center w-full'>
+				<label htmlFor={signInButtonID}>
+					<span className='sr-only'>Click to sign in to the tool</span>
+				</label>
+				<LandingSubmitTimeout
+					id={signInButtonID}
 					type='submit'
-					className={hitsSpotify + ' ' + flippedSlider}>
-					<GlobalTextWrapper>Sign out</GlobalTextWrapper>
-				</GlobalButton>
+					className={hitsSpotify + ' border-green-400'}>
+					<GlobalTextWrapper>Sign in</GlobalTextWrapper>
+				</LandingSubmitTimeout>
 			</form>
-			<GlobalBlockLink
-				href='/'
-				className={localNavigation + ' ' + flippedSlider}>
-				<GlobalTextWrapper>&larr; Return Home</GlobalTextWrapper>
-			</GlobalBlockLink>
-		</GlobalMain>
-	);
-};
+		</div>
+		<div className='flex flex-col gap-4'>
+			<p className='text-center'>
+				If you&apos;ve already signed in, you can sign out.
+			</p>
+			<form
+				action={saSignOut}
+				className='flex flex-col items-center w-full'>
+				<label htmlFor={signOutButtonID}>
+					<span className='sr-only'>Click to sign out of the tool</span>
+				</label>
+				<LandingSubmitTimeout
+					id={signOutButtonID}
+					type='submit'
+					className={localNavigation + ' ' + flippedSlider}>
+					<GlobalTextWrapper>Sign out</GlobalTextWrapper>
+				</LandingSubmitTimeout>
+			</form>
+		</div>
+		<GlobalBlockLink
+			href='/'
+			className={localNavigation + ' ' + flippedSlider + ' mt-auto'}>
+			<GlobalTextWrapper>&larr; Return Home</GlobalTextWrapper>
+		</GlobalBlockLink>
+	</GlobalMain>
+);
 
 export default ToolRoot;
 

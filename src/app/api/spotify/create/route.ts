@@ -30,7 +30,7 @@ const handler = async (req: NextAuthRequest) => {
 	let part = [] as string[];
 
 	// Validate body and body values
-	let target, differ, actionType, newName, newDesc, keepImg;
+	let target, differ, actionType, newName: string | null, newDesc, keepImg;
 	try {
 		const parsed = diffBodyParser.parse(await req.json());
 		target = parsed.target;
@@ -57,7 +57,7 @@ const handler = async (req: NextAuthRequest) => {
 	// Check if session is being accessed when access token might not be live
 	const { accessToken } = token;
 
-	newName = newName ? sanitize(newName) : null;
+	newName = (newName && sanitize(newName)) ?? null;
 
 	let targetResponse, differResponse, emptyPlaylistResponse;
 	try {
@@ -197,7 +197,8 @@ const handler = async (req: NextAuthRequest) => {
 					owner: target.owner.reduce((str, current, index) => {
 						let newstr =
 							str +
-							`${current.name}${index < target.owner.length - 1 ? ', ' : ''}`;
+							current.name +
+							`${index < target.owner.length - 1 ? ', ' : ''}`;
 						return newstr;
 					}, ''),
 				},
@@ -206,7 +207,8 @@ const handler = async (req: NextAuthRequest) => {
 					owner: differ.owner.reduce((str, current, index) => {
 						let newstr =
 							str +
-							`${current.name}${index < differ.owner.length - 1 ? ', ' : ''}`;
+							current.name +
+							`${index < differ.owner.length - 1 ? ', ' : ''}`;
 						return newstr;
 					}, ''),
 				},

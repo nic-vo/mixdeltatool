@@ -12,10 +12,10 @@ export type GlobalButtonProps = PropsWithChildren &
 export type GlobalLinkProps = PropsWithChildren &
 	AnchorHTMLAttributes<HTMLAnchorElement> & { href: string };
 
-const globalClasser = (className?: string) =>
+export const globalClasser = (className?: string) =>
 	merge(
 		'flex items-center justify-center relative py-2 px-8 border-2 rounded-full border-slate-500 bg-transparent hover:text-black focus-visible:text-black hover:border-white focus-visible:border-white outline-none transition-all after:absolute after:h-full after:w-[102%] after:top-0 after:left-0 overflow-hidden after:-translate-x-full after:transition-all hover:after:translate-x-0 focus-visible:after:translate-x-0 text-center font-karla font-medium disabled:opacity-25 disabled:cursor-not-allowed after:disabled:opacity-0 disabled:text-slate-500 hover:disabled:border-slate-500 after:bg-white disabled:border-slate-500',
-		className ? className : ''
+		className ?? ''
 	);
 
 export const GlobalBlockLink = ({

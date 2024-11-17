@@ -16,13 +16,17 @@ export const FlatLink = (props: GlobalLinkProps) => (
 	</GlobalBlockLink>
 );
 
-export const FlatButton = (props: GlobalButtonProps) => (
+export const FlatButton = ({
+	children,
+	className,
+	...attrs
+}: GlobalButtonProps) => (
 	<GlobalButton
-		{...props}
+		{...attrs}
 		className={
 			'rounded-none border-x-0 w-full text-black hover:text-white focus-visible:text-white after:bg-black border-black hover:border-black focus-visible:border-black' +
-			(props.className ? ` ${props.className}` : '')
+			(className ? ` ${className}` : '')
 		}>
-		{props.children}
+		{children}
 	</GlobalButton>
 );

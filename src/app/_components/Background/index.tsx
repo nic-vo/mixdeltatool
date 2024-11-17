@@ -74,8 +74,7 @@ const Background = (props: { fps?: number }) => {
 					predrawY,
 					posX: Math.round(rawX),
 					period:
-						Math.round(Math.random() * 100 + 20) *
-						(props.fps ? props.fps : DEFAULT_FPS),
+						Math.round(Math.random() * 100 + 20) * (props.fps ?? DEFAULT_FPS),
 					totalY,
 					hue: Math.round(hue),
 				});

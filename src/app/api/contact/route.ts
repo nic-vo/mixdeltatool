@@ -8,6 +8,7 @@ import { handlerWithTimeout } from '@/lib/route_helpers/wrappers';
 import { badResponse } from '@/lib/route_helpers/responses';
 
 import { NextRequest } from 'next/server';
+import { ipAddress } from '@vercel/functions';
 
 const rateLimit = {
 	RATE_LIMIT_PREFIX: 'SCF',
@@ -31,7 +32,7 @@ export const POST = handlerWithTimeout(
 			return badResponse(400);
 		}
 
-		const { ip } = req;
+		const ip = ipAddress(req);
 		if (!ip) return badResponse(500);
 
 		let canAddNew, _;

@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { signOut } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 
 import type {
 	MyUserAPIRouteResponse,
@@ -44,7 +44,7 @@ export const retrieveSpecificAsync = createAsyncThunk(
 			throw { message: 'There was an error reaching our servers' };
 		}
 		if (response.ok) return json as MyPlaylistObject;
-		if (response.status === 401) signOut();
+		if (response.status === 401) signIn();
 		throw json as { message: string };
 	}
 );
@@ -65,7 +65,7 @@ export const retrieveUserListsAsync = createAsyncThunk(
 			throw { message: 'There was an error reaching our servers' };
 		}
 		if (response.ok) return json as MyUserAPIRouteResponse;
-		if (response.status === 401) signOut();
+		if (response.status === 401) signIn();
 		throw json as { message: string };
 	}
 );
@@ -96,7 +96,7 @@ export const differOperationAsync = createAsyncThunk(
 		});
 		const jsoned = await response.json();
 		if (response.ok) return jsoned as differRouteResponse;
-		if (response.status === 401) signOut();
+		if (response.status === 401) signIn();
 		throw jsoned as { message: string };
 	}
 );

@@ -62,11 +62,10 @@ const { handlers, signIn, signOut, auth } = NextAuth({
 			session.user.email = user.email;
 			session.user.name = user.name;
 			// Return early if now is still within 1 hour of signing in
-			if (
-				Date.parse(session.expires) - 1000 * (maxAgeSeconds - 60 * 60) >
-				Date.now()
-			)
-				return session;
+			// 1 hour === Spotify access token expiry
+			const msRepresentingHourAfterLogin =
+				Date.parse(session.expires) - 1000 * (maxAgeSeconds - 60 * 60);
+			if (msRepresentingHourAfterLogin > Date.now()) return session;
 
 			/*
 			**Refresh account access token, expiry, and refresh token
@@ -122,7 +121,7 @@ const { handlers, signIn, signOut, auth } = NextAuth({
 		},
 	},
 	pages: {
-		signIn: '/login',
+		signIn: '/tool',
 	},
 	debug: process.env.NODE_ENV !== 'production',
 });

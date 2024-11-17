@@ -1,8 +1,7 @@
 import mongoosePromise from '@/lib/database/mongoose/connection';
 import { Session } from '@/lib/database/mongoose/models';
 import { handlerWithTimeoutAndAuth } from '@/lib/route_helpers/wrappers';
-import { badResponse } from '@/lib/route_helpers/responses';
-import { OPTIONS } from '@/lib/route_helpers/responses';
+import { badResponse, createOptions } from '@/lib/route_helpers/responses';
 
 import { NextAuthRequest } from 'next-auth/lib';
 import { AppRouteHandlerFnContext } from 'next-auth/lib/types';
@@ -14,7 +13,7 @@ const rateLimit = {
 };
 export const maxDuration = 30;
 
-export { OPTIONS };
+export const OPTIONS = createOptions(['DELETE']);
 
 export const DELETE = handlerWithTimeoutAndAuth(
 	{
